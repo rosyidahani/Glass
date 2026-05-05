@@ -1,0 +1,101 @@
+import hashlib
+
+from odoo import models, fields, api
+
+
+class Mahasiswa(models.Model):
+    _name = 'mahasiswa.mahasiswa'
+    _description = 'Data Mahasiswa'
+    _rec_name = 'name'
+
+    nim = fields.Char(
+        string='NIM',
+        required=True,
+        index=True,
+        help='Nomor Induk Mahasiswa, digunakan untuk login.',
+    )
+    password = fields.Char(
+        string='Password',
+        required=True,
+        help='Password untuk login (disimpan dalam bentuk hash SHA-256).',
+    )
+    name = fields.Char(
+        string='Nama',
+        required=True,
+    )
+    foto_profil = fields.Image(
+        string='Foto Profil',
+        max_width=354,
+        max_height=472,
+        help='Foto profil mahasiswa ukuran 3x4 cm (354x472 px).',
+    )
+    total_xp = fields.Integer(
+        string='Total XP',
+        default=0,
+    )
+    koin = fields.Integer(
+        string='Koin',
+        default=0,
+    )
+    semester = fields.Integer(
+        string='Semester',
+        default=1,
+    )
+    active = fields.Boolean(
+        string='Active',
+        default=True,
+    )
+
+    _sql_constraints = [
+        ('nim_unique', 'UNIQUE(nim)', 'NIM sudah terdaftar!'),
+    ]
+
+    # ------------------------------------------------------------------
+    # Helper: hashing
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _hash_password(raw_password):
+        """Hash password menggunakan SHA-256.
+        Bisa diganti dengan algoritma lain di kemudian hari."""
+        return hashlib.sha256(raw_password.encode('utf-8')).hexdigest()
+
+    # ------------------------------------------------------------------
+    # ORM overrides
+    # ------------------------------------------------------------------
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Hash password saat membuat record baru."""
+        for vals in vals_list:
+            if vals.get('password'):
+                vals['password'] = self._hash_password(vals['password'])
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """Hash password saat mengupdate record jika password berubah."""
+        if vals.get('password'):
+            vals['password'] = self._hash_password(vals['password'])
+        return super().write(vals)
+
+    # ------------------------------------------------------------------
+    # Authentication
+    # ------------------------------------------------------------------
+    @api.model
+    def authenticate_nim(self, nim, password):
+        """Autentikasi mahasiswa berdasarkan NIM dan password.
+        Returns: recordset mahasiswa jika valid, False jika tidak."""
+        mahasiswa = self.sudo().search(
+            [('nim', '=', nim), ('active', '=', True)], limit=1
+        )
+        if mahasiswa and mahasiswa.password == self._hash_password(password):
+            return mahasiswa
+        return False
+
+    # ------------------------------------------------------------------
+    # Display name
+    # ------------------------------------------------------------------
+    def name_get(self):
+        result = []
+        for rec in self:
+            display = f"[{rec.nim}] {rec.name}" if rec.nim else rec.name
+            result.append((rec.id, display))
+        return result

@@ -1,0 +1,216 @@
+<odoo>
+    <template id="dashboard" name="Dashboard Page">
+        <t t-call="custom_web.layout">
+            <style>
+                .dashboard-container {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    position: relative;
+                }
+                .top-hud {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 20px;
+                    z-index: 10;
+                }
+                .hud-left {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .profile-pill {
+                    background: #ffffff;
+                    padding: 8px 16px;
+                    border-radius: 30px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 12px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                }
+                .profile-pill .avatar-small {
+                    width: 32px;
+                    height: 32px;
+                    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                    border-radius: 50%;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 700;
+                    font-size: 14px;
+                }
+                .profile-info {
+                    display: flex;
+                    flex-direction: column;
+                }
+                .profile-name {
+                    font-weight: 700;
+                    font-size: 14px;
+                    color: #1e293b;
+                }
+                .profile-level {
+                    font-size: 11px;
+                    color: #64748b;
+                    font-weight: 600;
+                }
+                .xp-bar-container {
+                    background: #ffffff;
+                    padding: 8px 16px;
+                    border-radius: 30px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                    width: 140px;
+                }
+                .xp-label {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #3b82f6;
+                    margin-bottom: 4px;
+                }
+                .xp-track {
+                    height: 6px;
+                    background: #e2e8f0;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                .xp-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+                    border-radius: 10px;
+                }
+                
+                .hud-right {
+                    display: flex;
+                    gap: 10px;
+                }
+                .coin-pill {
+                    background: #ffffff;
+                    padding: 8px 16px;
+                    border-radius: 30px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                    font-weight: 700;
+                    font-size: 14px;
+                    color: #f59e0b;
+                }
+                .icon-btn {
+                    width: 40px;
+                    height: 40px;
+                    background: #ffffff;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                    color: #64748b;
+                    font-size: 18px;
+                    text-decoration: none;
+                }
+                
+                .avatar-container {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    min-height: 400px;
+                }
+                
+                .avatar-glow {
+                    position: absolute;
+                    width: 250px;
+                    height: 250px;
+                    background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%);
+                    border-radius: 50%;
+                    z-index: 1;
+                    bottom: 20px;
+                }
+                
+                .avatar-placeholder {
+                    position: relative;
+                    z-index: 2;
+                    width: 200px;
+                    height: 350px;
+                    background: rgba(255,255,255,0.4);
+                    border: 2px dashed #94a3b8;
+                    border-radius: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    backdrop-filter: blur(5px);
+                    color: #64748b;
+                    font-weight: 600;
+                    text-align: center;
+                    padding: 20px;
+                }
+                
+                .avatar-placeholder span.icon {
+                    font-size: 40px;
+                    margin-bottom: 10px;
+                    color: #cbd5e1;
+                }
+                
+                .user-image {
+                    position: relative;
+                    z-index: 2;
+                    max-width: 100%;
+                    max-height: 450px;
+                    object-fit: contain;
+                    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));
+                }
+
+            </style>
+
+            <div class="dashboard-container">
+                <div class="top-hud">
+                    <div class="hud-left">
+                        <div class="profile-pill">
+                            <div class="avatar-small">
+                                <t t-esc="mahasiswa.name[0].upper()"/>
+                            </div>
+                            <div class="profile-info">
+                                <span class="profile-name"><t t-esc="mahasiswa.name"/></span>
+                                <span class="profile-level">Semester <t t-esc="mahasiswa.semester"/> | <t t-esc="mahasiswa.nim"/></span>
+                            </div>
+                        </div>
+                        <div class="xp-bar-container">
+                            <div class="xp-label">
+                                <span>XP</span>
+                                <span><t t-esc="mahasiswa.total_xp"/> / <t t-esc="(mahasiswa.semester * 1000)"/></span>
+                            </div>
+                            <div class="xp-track">
+                                <t t-set="xp_percent" t-value="min(100, int((mahasiswa.total_xp / max(1, (mahasiswa.semester * 1000))) * 100))"/>
+                                <div class="xp-fill" t-att-style="'width: ' + str(xp_percent) + '%;'"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hud-right">
+                        <div class="coin-pill">
+                            <span>🪙</span> <t t-esc="mahasiswa.koin"/>
+                        </div>
+                        <a href="#" class="icon-btn">⚙️</a>
+                    </div>
+                </div>
+
+                <div class="avatar-container">
+                    <div class="avatar-glow"></div>
+                    <t t-if="mahasiswa.foto_profil">
+                        <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" class="user-image" alt="Avatar"/>
+                    </t>
+                    <t t-else="">
+                        <div class="avatar-placeholder">
+                            <span class="icon">🧍</span>
+                            <span>3D Character<br/>Placeholder</span>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

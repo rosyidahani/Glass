@@ -1,0 +1,31 @@
+<odoo>
+
+    <!-- Web Page Template (rendered by controller) -->
+    <template id="menu" name="Menu Page">
+        <t t-call="custom_web.layout">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/menu/submenu">Submenu</a></li>
+            </ul>
+        </t>
+    </template>
+
+    <!-- Backend Action -->
+    <record id="action_custom_web" model="ir.actions.act_window">
+        <field name="name">Custom Web</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Backend Menu Items -->
+    <menuitem id="menu_custom_root"
+              name="Custom Web"
+              sequence="10"/>
+
+    <menuitem id="menu_custom_child"
+              name="Dashboard"
+              parent="menu_custom_root"
+              action="action_custom_web"/>
+
+</odoo>

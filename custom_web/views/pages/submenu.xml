@@ -1,0 +1,7 @@
+<odoo>
+    <template id="submenu" name="Submenu Page">
+        <t t-call="custom_web.layout">
+            <h3>Submenu Page</h3>
+        </t>
+    </template>
+</odoo>

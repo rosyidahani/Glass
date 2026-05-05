@@ -1,0 +1,113 @@
+<odoo>
+    <template id="login" name="Login Mahasiswa">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Login - Portal Mahasiswa</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        min-height: 100vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .login-card {
+                        background: #fff;
+                        border-radius: 16px;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                        padding: 48px 40px;
+                        width: 100%;
+                        max-width: 420px;
+                    }
+                    .login-card h2 {
+                        text-align: center;
+                        color: #333;
+                        margin-bottom: 8px;
+                        font-size: 28px;
+                    }
+                    .login-card p.subtitle {
+                        text-align: center;
+                        color: #888;
+                        margin-bottom: 32px;
+                        font-size: 14px;
+                    }
+                    .form-group {
+                        margin-bottom: 20px;
+                    }
+                    .form-group label {
+                        display: block;
+                        margin-bottom: 6px;
+                        color: #555;
+                        font-weight: 600;
+                        font-size: 14px;
+                    }
+                    .form-group input {
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 2px solid #e0e0e0;
+                        border-radius: 8px;
+                        font-size: 15px;
+                        transition: border-color 0.3s;
+                        outline: none;
+                    }
+                    .form-group input:focus {
+                        border-color: #667eea;
+                    }
+                    .btn-login {
+                        width: 100%;
+                        padding: 14px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: #fff;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: opacity 0.3s;
+                        margin-top: 8px;
+                    }
+                    .btn-login:hover { opacity: 0.9; }
+                    .error-msg {
+                        background: #ffe0e0;
+                        color: #c0392b;
+                        padding: 12px 16px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                        font-size: 14px;
+                        text-align: center;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="login-card">
+                    <h2>Portal Mahasiswa</h2>
+                    <p class="subtitle">Silakan login dengan NIM Anda</p>
+
+                    <t t-if="error">
+                        <div class="error-msg"><t t-esc="error"/></div>
+                    </t>
+
+                    <form action="/login" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                        <div class="form-group">
+                            <label for="nim">NIM</label>
+                            <input type="text" id="nim" name="nim" placeholder="Masukkan NIM" required="required"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Masukkan Password" required="required"/>
+                        </div>
+
+                        <button type="submit" class="btn-login">Login</button>
+                    </form>
+                </div>
+            </body>
+        </html>
+    </template>
+</odoo>
