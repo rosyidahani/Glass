@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_feature_dosen_form" model="ir.ui.view">
+        <field name="name">feature.dosen.form</field>
+        <field name="model">feature.dosen</field>
+        <field name="arch" type="xml">
+            <form string="Form Dosen">
+                <sheet>
+                    <!-- Judul Utama (Modern Style) -->
+                    <div class="oe_title">
+                        <label for="name" string="Nama Dosen"/>
+                        <h1>
+                            <field name="name" placeholder="Contoh: Dr. Budi Santoso, M.T."/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group name="identitas_utama" string="Informasi Kepegawaian">
+                            <field name="nip" placeholder="Masukkan NIP..."/>
+                            <field name="gender" widget="radio" options="{'horizontal': true}"/>
+                            <field name="spesialisasi" placeholder="Misal: Backend Engineer"/>
+                        </group>
+                        
+                        <group name="kontak" string="Kontak &amp; Komunikasi">
+                            <field name="email" widget="email"/>
+                            <field name="telepon" widget="phone"/>
+                        </group>
+                    </group>
+
+                    <!-- Tab bawah untuk merapikan informasi tambahan -->
+                    <notebook>
+                        <page string="Detail Alamat" name="address">
+                            <group>
+                                <field name="alamat" placeholder="Jl. Kaliurang KM 5, Yogyakarta..."/>
+                            </group>
+                        </page>
+                        <page string="Catatan Internal" name="internal_notes">
+                            <field name="description" placeholder="Tambahkan catatan khusus dosen di sini..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree/List View -->
+    <record id="view_feature_dosen_tree" model="ir.ui.view">
+        <field name="name">feature.dosen.tree</field>
+        <field name="model">feature.dosen</field>
+        <field name="arch" type="xml">
+            <tree string="Daftar Dosen">
+                <field name="name"/>
+                <field name="nip"/>
+                <field name="gender"/>
+                <field name="spesialisasi"/>
+                <field name="email"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_feature_dosen_search" model="ir.ui.view">
+        <field name="name">feature.dosen.search</field>
+        <field name="model">feature.dosen</field>
+        <field name="arch" type="xml">
+            <search string="Cari Dosen">
+                <field name="name" string="Nama atau NIP"/>
+                <field name="nip" string="NIP"/>
+                <field name="spesialisasi"/>
+                <separator/>
+                <filter name="pria" string="Pria" domain="[('gender', '=', 'pria')]"/>
+                <filter name="wanita" string="Wanita" domain="[('gender', '=', 'wanita')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_feature_dosen" model="ir.actions.act_window">
+        <field name="name">Dosen</field>
+        <field name="res_model">feature.dosen</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada data dosen. Buat yang pertama!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Root -->
+    <menuitem id="menu_dosen_root"
+              name="Dosen"
+              sequence="50"/>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_dosen_data"
+              name="Data Dosen"
+              parent="menu_dosen_root"
+              action="action_feature_dosen"
+              sequence="10"/>
+</odoo>
