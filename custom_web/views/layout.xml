@@ -170,6 +170,7 @@
                         <div class="sidebar-header">
                             <h3>📚 Portal</h3>
                             <div class="user-name">
+<<<<<<< HEAD
                                 <t t-if="request.session.get('dosen_id')">
                                     <t t-esc="request.session.get('dosen_name', 'Dosen')"/>
                                 </t>
@@ -194,6 +195,17 @@
                                 <li><a href="/leaderboard" t-att-class="'active' if request.httprequest.path == '/leaderboard' else ''"><span class="icon">🏆</span> Leaderboard</a></li>
                             </ul>
                         </t>
+=======
+                                <t t-esc="request.session.get('mahasiswa_name', 'Student')"/>
+                            </div>
+                        </div>
+                        <ul class="sidebar-nav">
+                            <li><a href="/menu" t-att-class="'active' if request.httprequest.path == '/menu' else ''"><span class="icon">📋</span> Tugas</a></li>
+                            <li><a href="/presensi" t-att-class="'active' if request.httprequest.path == '/presensi' else ''"><span class="icon">📍</span> Presensi</a></li>
+                            <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path == '/dashboard' else ''"><span class="icon">🏠</span> Home</a></li>
+                            <li><a href="/leaderboard" t-att-class="'active' if request.httprequest.path == '/leaderboard' else ''"><span class="icon">🏆</span> Leaderboard</a></li>
+                        </ul>
+>>>>>>> a7fb560f2b89bac0588d027908ef36e3540408bd
                         <div class="sidebar-footer">
                             <a href="/logout"><span class="icon">🚪</span> Logout</a>
                         </div>

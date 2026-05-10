@@ -17,7 +17,10 @@
                     <group>
                         <group name="identitas_utama" string="Informasi Kepegawaian">
                             <field name="nip" placeholder="Masukkan NIP..."/>
+<<<<<<< HEAD
                             <field name="password" password="True" placeholder="Masukkan Password..."/>
+=======
+>>>>>>> a7fb560f2b89bac0588d027908ef36e3540408bd
                             <field name="gender" widget="radio" options="{'horizontal': true}"/>
                             <field name="spesialisasi" placeholder="Misal: Backend Engineer"/>
                         </group>

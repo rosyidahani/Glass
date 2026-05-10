@@ -17,7 +17,11 @@
         <field name="res_model">res.users</field>
         <field name="view_mode">tree,form</field>
     </record>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> a7fb560f2b89bac0588d027908ef36e3540408bd
     <!-- Backend Menu Items -->
     <menuitem id="menu_custom_root"
               name="Custom Web"
