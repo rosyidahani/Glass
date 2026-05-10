@@ -1,0 +1,4 @@
+<odoo>
+    <!-- File dummy ini sengaja dibuat agar Odoo tidak error saat di-upgrade.
+         Dashboard asli sudah dipindahkan ke folder mahasiswa/dashboard.xml -->
+</odoo>
