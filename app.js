@@ -10,12 +10,32 @@ DATA SEMENTARA
 ====================================
 */
 
-let mahasiswa = {
-  id: 1,
-  nama: "Bintang",
-  xp_rank: 1500,
-  koin: 500
-};
+let mahasiswa = [
+  {
+    id: 1,
+    nama: "Oci",
+    xp_rank: 1500,
+    koin: 500
+  },
+  {
+    id: 2,
+    nama: "Yuyu",
+    xp_rank: 1200,
+    koin: 400
+  },
+  {
+    id: 3,
+    nama: "Pandi",
+    xp_rank: 1000,
+    koin: 300
+  },
+  {
+    id: 4,
+    nama: "Gagas Tamvan",
+    xp_rank: 1800,
+    koin: 700
+  }
+];
 
 /*
 ====================================
@@ -38,17 +58,33 @@ app.get("/api/mahasiswa/status", (req, res) => {
 POST ACTION
 POST /api/mahasiswa/action
 ====================================
+BODY:
+{
+  "id": 1,
+  "action": "tambah_xp"
+}
+====================================
 */
 
 app.post("/api/mahasiswa/action", (req, res) => {
 
-  const { action } = req.body;
+  const { id, action } = req.body;
 
   // VALIDASI
-  if (!action) {
+  if (!id || !action) {
     return res.status(400).json({
       success: false,
-      message: "Action wajib diisi"
+      message: "ID dan action wajib diisi"
+    });
+  }
+
+  // CARI MAHASISWA
+  const mhs = mahasiswa.find((item) => item.id === id);
+
+  if (!mhs) {
+    return res.status(404).json({
+      success: false,
+      message: "Mahasiswa tidak ditemukan"
     });
   }
 
@@ -56,24 +92,24 @@ app.post("/api/mahasiswa/action", (req, res) => {
   switch(action) {
 
     case "tambah_xp":
-      mahasiswa.xp_rank += 100;
+      mhs.xp_rank += 100;
       break;
 
     case "tambah_koin":
-      mahasiswa.koin += 50;
+      mhs.koin += 50;
       break;
 
     case "beli_item":
-      mahasiswa.koin -= 100;
+      mhs.koin -= 100;
       break;
 
     case "naik_level":
-      mahasiswa.xp_rank += 500;
+      mhs.xp_rank += 500;
       break;
 
     case "reset":
-      mahasiswa.xp_rank = 0;
-      mahasiswa.koin = 0;
+      mhs.xp_rank = 0;
+      mhs.koin = 0;
       break;
 
     default:
@@ -88,7 +124,7 @@ app.post("/api/mahasiswa/action", (req, res) => {
   res.status(200).json({
     success: true,
     message: `${action} berhasil`,
-    data: mahasiswa
+    data: mhs
   });
 
 });
@@ -102,20 +138,12 @@ GET /api/leaderboard
 
 app.get("/api/leaderboard", (req, res) => {
 
-  const leaderboard = [
-    {
-      nama: "Bintang",
-      xp_rank: mahasiswa.xp_rank
-    },
-    {
-      nama: "Adit",
-      xp_rank: 1200
-    },
-    {
-      nama: "Rama",
-      xp_rank: 900
-    }
-  ];
+  const leaderboard = mahasiswa
+    .sort((a, b) => b.xp_rank - a.xp_rank)
+    .map((mhs) => ({
+      nama: mhs.nama,
+      xp_rank: mhs.xp_rank
+    }));
 
   res.status(200).json({
     success: true,
