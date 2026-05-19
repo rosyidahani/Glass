@@ -1,0 +1,33 @@
+<odoo>
+    <template id="dashboard_dosen" name="Dashboard Dosen">
+        <t t-call="custom_web.layout">
+            <style>
+                .dashboard-dosen-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    background: #ffffff;
+                    border-radius: 20px;
+                    padding: 40px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+                }
+                .dashboard-dosen-container h1 {
+                    font-size: 32px;
+                    color: #1e293b;
+                    margin-bottom: 10px;
+                }
+                .dashboard-dosen-container p {
+                    font-size: 16px;
+                    color: #64748b;
+                }
+            </style>
+            
+            <div class="dashboard-dosen-container">
+                <h1>Selamat Datang, <t t-esc="dosen.name"/></h1>
+                <p>NIP: <t t-esc="dosen.nip"/></p>
+            </div>
+        </t>
+    </template>
+</odoo>
