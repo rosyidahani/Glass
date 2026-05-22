@@ -2,23 +2,6 @@
 <odoo>
 
     <!-- ============================================================ -->
-    <!-- Tree View                                                     -->
-    <!-- ============================================================ -->
-    <record id="view_mahasiswa_tree" model="ir.ui.view">
-        <field name="name">mahasiswa.mahasiswa.tree</field>
-        <field name="model">mahasiswa.mahasiswa</field>
-        <field name="arch" type="xml">
-            <tree string="Data Mahasiswa">
-                <field name="nim"/>
-                <field name="name"/>
-                <field name="semester"/>
-                <field name="total_xp"/>
-                <field name="koin"/>
-            </tree>
-        </field>
-    </record>
-
-    <!-- ============================================================ -->
     <!-- Form View                                                     -->
     <!-- ============================================================ -->
     <record id="view_mahasiswa_form" model="ir.ui.view">
