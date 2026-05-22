@@ -85,7 +85,7 @@ class MahasiswaAPI(http.Controller):
 
         return self._success({
             'xp_rank': mhs.total_xp,   # field asli: total_xp
-            'koin': mhs.koin,           # field asli: koin
+            'koin': mhs.koin,          # field asli: koin
         })
 
     # ================================================
@@ -128,3 +128,38 @@ class MahasiswaAPI(http.Controller):
             'xp_rank': mhs.total_xp,
             'koin': mhs.koin,
         })
+
+    # ================================================
+    # ENDPOINT 3: GET /api/leaderboard
+    # Menarik data top 10 mahasiswa berdasarkan total_xp
+    # ================================================
+    @http.route('/api/leaderboard', type='http',
+                auth='public', methods=['GET'], cors='*')
+    def get_leaderboard(self, **kw):
+        # 1. Cek Autentikasi
+        mhs = self._get_mahasiswa_from_session()
+        if not mhs:
+            return self._error('Belum login atau sesi habis.', 401)
+
+        try:
+            # 2. Tarik Data dari Database Odoo
+            top_students = request.env['mahasiswa.mahasiswa'].sudo().search(
+                [('active', '=', True)], 
+                order='total_xp desc', 
+                limit=10
+            )
+
+            # 3. Format Data untuk Frontend
+            data_leaderboard = []
+            for rank, student in enumerate(top_students, start=1):
+                data_leaderboard.append({
+                    'rank': rank,
+                    'nama': student.name, 
+                    'total_xp': student.total_xp,
+                    'koin': student.koin
+                })
+
+            return self._success(data_leaderboard)
+            
+        except Exception as e:
+            return self._error(f'Terjadi kesalahan internal: {str(e)}', 500)
