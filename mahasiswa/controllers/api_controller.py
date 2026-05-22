@@ -21,27 +21,83 @@ class MahasiswaAPI(http.Controller):
             status=status
         )
 
+    def _get_mahasiswa_from_session(self):
+        """Ambil mahasiswa berdasarkan NIM yang disimpan di session."""
+        nim = request.session.get('mahasiswa_nim')
+        if not nim:
+            return None
+        return request.env['mahasiswa.mahasiswa'].sudo().search(
+            [('nim', '=', nim), ('active', '=', True)], limit=1
+        )
+
+    # ================================================
+    # ENDPOINT LOGIN: POST /api/auth/login
+    # Mahasiswa login pakai NIM + password
+    # ================================================
+    @http.route('/api/auth/login', type='http',
+                auth='public', methods=['POST'], cors='*', csrf=False)
+    def login(self, **kw):
+        try:
+            body = json.loads(request.httprequest.data)
+        except Exception:
+            return self._error('Format request tidak valid, harus JSON.')
+
+        nim = body.get('nim')
+        password = body.get('password')
+
+        if not nim or not password:
+            return self._error('NIM dan password wajib diisi.')
+
+        mahasiswa = request.env['mahasiswa.mahasiswa'].sudo().authenticate_nim(
+            nim, password
+        )
+        if not mahasiswa:
+            return self._error('NIM atau password salah.', 401)
+
+        # Simpan NIM di session agar endpoint lain bisa kenal siapa yang login
+        request.session['mahasiswa_nim'] = mahasiswa.nim
+
+        return self._success({
+            'nama': mahasiswa.name,
+            'nim': mahasiswa.nim,
+            'total_xp': mahasiswa.total_xp,
+            'koin': mahasiswa.koin,
+        })
+
+    # ================================================
+    # ENDPOINT LOGOUT: POST /api/auth/logout
+    # ================================================
+    @http.route('/api/auth/logout', type='http',
+                auth='public', methods=['POST'], cors='*', csrf=False)
+    def logout(self, **kw):
+        request.session.pop('mahasiswa_nim', None)
+        return self._success({'message': 'Logout berhasil.'})
+
     # ================================================
     # ENDPOINT 1: GET /api/mahasiswa/status
-    # DATA PALSU dulu — nunggu Backend 1 konfirmasi nama model & field
     # ================================================
     @http.route('/api/mahasiswa/status', type='http',
-                auth='user', methods=['GET'], cors='*')
+                auth='public', methods=['GET'], cors='*')
     def get_status(self, **kw):
-        # TODO: ganti mock_data ini setelah Backend 1 selesai
-        mock_data = {
-            'xp_rank': 1500,
-            'koin': 500,
-        }
-        return self._success(mock_data)
+        mhs = self._get_mahasiswa_from_session()
+        if not mhs:
+            return self._error('Belum login atau sesi habis.', 401)
+
+        return self._success({
+            'xp_rank': mhs.total_xp,   # field asli: total_xp
+            'koin': mhs.koin,           # field asli: koin
+        })
 
     # ================================================
     # ENDPOINT 2: POST /api/mahasiswa/action
-    # SKELETON dulu — logic pemanggilan fungsi Backend 1 menyusul
     # ================================================
     @http.route('/api/mahasiswa/action', type='http',
-                auth='user', methods=['POST'], cors='*', csrf=False)
+                auth='public', methods=['POST'], cors='*', csrf=False)
     def post_action(self, **kw):
+        mhs = self._get_mahasiswa_from_session()
+        if not mhs:
+            return self._error('Belum login atau sesi habis.', 401)
+
         try:
             body = json.loads(request.httprequest.data)
         except Exception:
@@ -55,10 +111,20 @@ class MahasiswaAPI(http.Controller):
         if not isinstance(jumlah, (int, float)) or jumlah <= 0:
             return self._error('Parameter "jumlah" harus angka lebih dari 0.')
 
-        # TODO: ganti bagian ini setelah Backend 1 selesai
-        # Sekarang langsung return sukses palsu dulu
+        try:
+            if action == 'add_xp':
+                mhs.add_xp(jumlah)
+            elif action == 'add_koin':
+                mhs.add_koin(jumlah)
+            elif action == 'spend_koin':
+                mhs.spend_koin(jumlah)
+            else:
+                return self._error(f'Action "{action}" tidak dikenali.')
+        except UserError as e:
+            return self._error(str(e), 400)
+
         return self._success({
-            'message': f'[MOCK] Action "{action}" diterima, jumlah: {jumlah}',
-            'xp_rank': 1500,
-            'koin': 500,
+            'message': f'Action "{action}" berhasil.',
+            'xp_rank': mhs.total_xp,
+            'koin': mhs.koin,
         })
