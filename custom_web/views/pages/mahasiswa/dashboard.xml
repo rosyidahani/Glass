@@ -1,386 +1,14 @@
 <odoo>
     <template id="dashboard" name="Dashboard Page">
         <t t-call="custom_web.layout">
-            <style>
-                /* Animations */
-                @keyframes float {
-                    0% { transform: translateY(0px); }
-                    50% { transform: translateY(-15px); }
-                    100% { transform: translateY(0px); }
-                }
-
-                @keyframes pulse-glow {
-                    0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
-                    70% { box-shadow: 0 0 0 20px rgba(79, 70, 229, 0); }
-                    100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
-                }
-
-                @keyframes gradient-shift {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-
-                .dashboard-container {
-                    display: flex;
-                    flex-direction: column;
-                    height: 100%;
-                    position: relative;
-                    padding: 10px;
-                    gap: 24px;
-                }
-
-                /* Glassmorphism Utilities */
-                .glass-panel {
-                    background: rgba(255, 255, 255, 0.65);
-                    backdrop-filter: blur(16px);
-                    -webkit-backdrop-filter: blur(16px);
-                    border: 1px solid rgba(255, 255, 255, 0.8);
-                    box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.05);
-                    border-radius: 24px;
-                }
-
-                /* --- TOP HUD --- */
-                .top-hud {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    z-index: 10;
-                    flex-wrap: wrap;
-                    gap: 16px;
-                }
-
-                .hud-left {
-                    display: flex;
-                    gap: 16px;
-                    align-items: center;
-                    flex-wrap: wrap;
-                }
-
-                .profile-pill {
-                    padding: 6px 20px 6px 6px;
-                    border-radius: 40px;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 12px;
-                    text-decoration: none;
-                    color: inherit;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .profile-pill:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 15px 25px rgba(0,0,0,0.08);
-                    background: rgba(255, 255, 255, 0.9);
-                }
-
-                .profile-pill .avatar-small {
-                    width: 48px;
-                    height: 48px;
-                    background: linear-gradient(135deg, #4f46e5, #ec4899);
-                    border-radius: 50%;
-                    color: white;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: 800;
-                    font-size: 18px;
-                    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
-                    overflow: hidden;
-                }
-
-                .profile-pill .avatar-small img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-
-                .profile-info {
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                .profile-name {
-                    font-weight: 800;
-                    font-size: 16px;
-                    color: #0f172a;
-                    letter-spacing: -0.3px;
-                }
-
-                .profile-level {
-                    font-size: 12px;
-                    color: #64748b;
-                    font-weight: 600;
-                }
-
-                .xp-bar-container {
-                    padding: 12px 20px;
-                    width: 200px;
-                }
-
-                .xp-label {
-                    display: flex;
-                    justify-content: space-between;
-                    font-size: 12px;
-                    font-weight: 800;
-                    color: #4f46e5;
-                    margin-bottom: 8px;
-                }
-
-                .xp-track {
-                    height: 8px;
-                    background: rgba(226, 232, 240, 0.8);
-                    border-radius: 10px;
-                    overflow: hidden;
-                    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-                }
-
-                .xp-fill {
-                    height: 100%;
-                    background: linear-gradient(90deg, #4f46e5, #8b5cf6, #ec4899);
-                    background-size: 200% 200%;
-                    border-radius: 10px;
-                    animation: gradient-shift 3s ease infinite;
-                }
-
-                .hud-right {
-                    display: flex;
-                    gap: 12px;
-                    align-items: center;
-                }
-
-                .coin-pill {
-                    padding: 10px 20px;
-                    border-radius: 30px;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-weight: 800;
-                    font-size: 16px;
-                    color: #f59e0b;
-                    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-
-                .coin-pill:hover {
-                    transform: scale(1.05) translateY(-2px);
-                }
-
-                .icon-btn {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #64748b;
-                    font-size: 20px;
-                    text-decoration: none;
-                    transition: all 0.3s ease;
-                }
-
-                .icon-btn:hover {
-                    color: #4f46e5;
-                    transform: rotate(45deg);
-                    background: rgba(255, 255, 255, 0.9);
-                }
-
-                /* --- MAIN CONTENT AREA --- */
-                .main-dashboard-area {
-                    display: flex;
-                    gap: 24px;
-                    flex: 1;
-                    min-height: 0;
-                }
-
-                /* Avatar Display Section */
-                .avatar-section {
-                    flex: 1.2;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                    border-radius: 32px;
-                    background: radial-gradient(circle at center, rgba(79, 70, 229, 0.05) 0%, transparent 70%);
-                    min-height: 400px;
-                }
-
-                .avatar-glow {
-                    position: absolute;
-                    width: 250px;
-                    height: 250px;
-                    background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(236, 72, 153, 0.05) 70%);
-                    border-radius: 50%;
-                    z-index: 1;
-                    animation: pulse-glow 3s infinite;
-                }
-
-                .user-image {
-                    position: relative;
-                    z-index: 2;
-                    max-height: 450px;
-                    object-fit: contain;
-                    filter: drop-shadow(0 25px 35px rgba(0,0,0,0.2));
-                    animation: float 6s ease-in-out infinite;
-                }
-
-                .avatar-placeholder {
-                    position: relative;
-                    z-index: 2;
-                    width: 220px;
-                    height: 380px;
-                    border: 2px dashed #cbd5e1;
-                    border-radius: 30px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    color: #94a3b8;
-                    font-weight: 600;
-                    text-align: center;
-                    padding: 20px;
-                    animation: float 6s ease-in-out infinite;
-                }
-
-                .avatar-placeholder .icon {
-                    font-size: 50px;
-                    margin-bottom: 12px;
-                    color: #cbd5e1;
-                }
-
-                
-                .stats-section {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 20px;
-                }
-
-                .stats-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
-                }
-
-                .stat-card {
-                    padding: 20px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                    transition: transform 0.3s ease;
-                }
-
-                .stat-card:hover {
-                    transform: translateY(-5px);
-                }
-
-                .stat-icon {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 14px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 24px;
-                }
-
-                .icon-blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-                .icon-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
-
-                .stat-info h4 {
-                    margin: 0;
-                    font-size: 13px;
-                    color: #64748b;
-                    font-weight: 600;
-                }
-
-                .stat-info p {
-                    margin: 4px 0 0 0;
-                    font-size: 22px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
-
-                .recent-activity {
-                    flex: 1;
-                    padding: 24px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                }
-
-                .recent-activity h3 {
-                    margin: 0;
-                    font-size: 18px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
-
-                .activity-list {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                }
-
-                .activity-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 14px;
-                    padding: 12px;
-                    border-radius: 16px;
-                    background: rgba(255, 255, 255, 0.5);
-                    transition: background 0.2s, transform 0.2s;
-                }
-
-                .activity-item:hover {
-                    background: rgba(255, 255, 255, 0.9);
-                    transform: translateX(4px);
-                }
-
-                .activity-icon {
-                    width: 40px;
-                    height: 40px;
-                    background: #ffffff;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 18px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-                }
-
-                .activity-text h5 {
-                    margin: 0;
-                    font-size: 14px;
-                    color: #0f172a;
-                    font-weight: 700;
-                }
-
-                .activity-text p {
-                    margin: 2px 0 0 0;
-                    font-size: 12px;
-                    color: #64748b;
-                }
-
-                /* Responsive */
-                @media (max-width: 992px) {
-                    .main-dashboard-area {
-                        flex-direction: column;
-                    }
-                    .stats-section {
-                        width: 100%;
-                    }
-                    .avatar-section {
-                        min-height: 300px;
-                    }
-                }
-            </style>
+            <link rel="stylesheet" href="/custom_web/static/src/css/dashboard.css"/>
 
             <div class="dashboard-container">
                 <!-- TOP HUD -->
                 <div class="top-hud">
                     <div class="hud-left">
-                        <a href="/dashboard/mahasiswa/profile" class="profile-pill glass-panel">
-                            <div class="avatar-small">
+                        <a href="/dashboard/mahasiswa/profile" class="profile-xp-pill glass-panel">
+                            <div class="avatar-large">
                                 <t t-if="mahasiswa.foto_profil">
                                     <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
                                 </t>
@@ -388,56 +16,65 @@
                                     <t t-esc="mahasiswa.name[0].upper()"/>
                                 </t>
                             </div>
-                            <div class="profile-info">
-                                <span class="profile-name"><t t-esc="mahasiswa.name"/></span>
-                                <span class="profile-level">Semester <t t-esc="mahasiswa.semester"/> | <t t-esc="mahasiswa.nim"/></span>
-                            </div>
+                            <div class="profile-xp-info">
+                                 <div class="profile-name"><t t-esc="mahasiswa.name"/></div>
+                                 <div class="profile-level"><t t-esc="mahasiswa.nim"/></div>
+                                 <div class="xp-bar-section">
+                                     <div class="xp-track">
+                                         <t t-set="xp_percent" t-value="min(100, int((mahasiswa.total_xp / max(1, (mahasiswa.semester * 1000))) * 100))"/>
+                                         <div class="xp-fill" t-att-style="'width: ' + str(xp_percent) + '%;'"/>
+                                     </div>
+                                     <span class="xp-text"><t t-esc="mahasiswa.total_xp"/>/<t t-esc="mahasiswa.semester * 1000"/> XP</span>
+                                 </div>
+                             </div>
                         </a>
-                        
-                        <div class="xp-bar-container glass-panel">
-                            <div class="xp-label">
-                                <span>XP RANK</span>
-                                <span><t t-esc="mahasiswa.total_xp"/> / <t t-esc="(mahasiswa.semester * 1000)"/></span>
-                            </div>
-                            <div class="xp-track">
-                                <t t-set="xp_percent" t-value="min(100, int((mahasiswa.total_xp / max(1, (mahasiswa.semester * 1000))) * 100))"/>
-                                <div class="xp-fill" t-att-style="'width: ' + str(xp_percent) + '%;'"/>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="hud-right">
-                        <div class="coin-pill glass-panel" title="Koin yang dapat ditukar">
-                            <span>🪙</span> <t t-esc="mahasiswa.koin"/>
+                        <!-- Peringkat Leaderboard -->
+                        <div class="rank-pill glass-panel" title="Peringkat Leaderboard">
+                            <i class="bi bi-trophy-fill"></i> Peringkat #4
                         </div>
-                        <a href="#" class="icon-btn glass-panel" title="Pengaturan Akun">⚙️</a>
+                        
+                        <!-- Coin/Gold -->
+                        <div class="coin-pill glass-panel" title="Koin yang dapat ditukar">
+                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> Gold
+                        </div>
+                        
+                        <!-- Shop Button -->
+                        <a href="#" class="icon-btn shop-btn glass-panel" title="Shop">
+                            <i class="bi bi-bag-fill"></i>
+                        </a>
+
+                        <!-- Setting Button -->
+                        <a href="/dashboard/mahasiswa/profile" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
+                            <i class="bi bi-gear-fill"></i>
+                        </a>
                     </div>
                 </div>
 
                 <!-- MAIN DASHBOARD CONTENT -->
                 <div class="main-dashboard-area">
                     
-                    <!-- LEFT: 3D Avatar Area -->
+                    <!-- LEFT: 2D Character Area -->
                     <div class="avatar-section glass-panel">
                         <div class="avatar-glow"/>
-                        <div class="avatar-placeholder glass-panel">
-                            <span class="icon">🧍</span>
-                            <span>Karakter 3D<br/>(Segera Hadir)</span>
-                        </div>
+                        <img src="/custom_web/static/src/img/char_default.png" class="user-image" alt="Character Glass"/>
                     </div>
+
 
                     <!-- RIGHT: Quick Stats & Activity -->
                     <div class="stats-section">
                         <div class="stats-grid">
                             <div class="stat-card glass-panel">
-                                <div class="stat-icon icon-blue">📚</div>
+                                <div class="stat-icon icon-blue"><i class="bi bi-book-half"></i></div>
                                 <div class="stat-info">
                                     <h4>Kelas Aktif</h4>
                                     <p>8 <span style="font-size:12px; color:#64748b;">Mata Kuliah</span></p>
                                 </div>
                             </div>
                             <div class="stat-card glass-panel">
-                                <div class="stat-icon icon-purple">🎯</div>
+                                <div class="stat-icon icon-purple"><i class="bi bi-bullseye"></i></div>
                                 <div class="stat-info">
                                     <h4>Tugas Selesai</h4>
                                     <p>24 <span style="font-size:12px; color:#10b981;">+3 Minggu Ini</span></p>
@@ -449,21 +86,21 @@
                             <h3>Aktivitas Terkini</h3>
                             <div class="activity-list">
                                 <div class="activity-item">
-                                    <div class="activity-icon">🏆</div>
+                                    <div class="activity-icon"><i class="bi bi-trophy-fill" style="color: #f59e0b;"></i></div>
                                     <div class="activity-text">
                                         <h5>Tugas Pemrograman Lanjut</h5>
                                         <p>Mendapatkan +150 XP dan 50 Koin</p>
                                     </div>
                                 </div>
                                 <div class="activity-item">
-                                    <div class="activity-icon">📍</div>
+                                    <div class="activity-icon"><i class="bi bi-geo-alt-fill" style="color: #ef4444;"></i></div>
                                     <div class="activity-text">
                                         <h5>Presensi Sistem Basis Data</h5>
                                         <p>Hadir Tepat Waktu - Hari ini, 08:00</p>
                                     </div>
                                 </div>
                                 <div class="activity-item">
-                                    <div class="activity-icon">📢</div>
+                                    <div class="activity-icon"><i class="bi bi-megaphone-fill" style="color: #3b82f6;"></i></div>
                                     <div class="activity-text">
                                         <h5>Pengumuman Dosen</h5>
                                         <p>Jadwal UTS dimajukan ke tanggal 15.</p>

@@ -5,170 +5,15 @@
                 <meta charset="utf-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
                 <title>Portal Mahasiswa</title>
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;display=swap');
-
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body {
-                        font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background: #f0f4f8;
-                        color: #333;
-                    }
-                    .app-container { 
-                        display: flex; 
-                        min-height: 100vh; 
-                    }
-
-                    /* Sidebar (Desktop) */
-                    .sidebar {
-                        width: 260px;
-                        background: #ffffff;
-                        box-shadow: 2px 0 15px rgba(0,0,0,0.03);
-                        display: flex;
-                        flex-direction: column;
-                        z-index: 100;
-                    }
-                    .sidebar-header {
-                        padding: 30px 24px;
-                        border-bottom: 1px solid #f8f9fa;
-                    }
-                    .sidebar-header h3 {
-                        font-size: 20px;
-                        font-weight: 700;
-                        color: #1e293b;
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                    }
-                    .sidebar-header .user-name {
-                        font-size: 14px;
-                        color: #64748b;
-                        margin-top: 6px;
-                        font-weight: 500;
-                    }
-                    .sidebar-nav {
-                        list-style: none;
-                        padding: 20px 0;
-                        flex: 1;
-                    }
-                    .sidebar-nav li a {
-                        display: flex;
-                        align-items: center;
-                        padding: 14px 24px;
-                        color: #64748b;
-                        text-decoration: none;
-                        font-size: 16px;
-                        font-weight: 600;
-                        transition: all 0.2s ease;
-                        border-left: 4px solid transparent;
-                    }
-                    .sidebar-nav li a:hover, .sidebar-nav li a.active {
-                        background: #f8fafc;
-                        color: #3b82f6;
-                        border-left-color: #3b82f6;
-                    }
-                    .sidebar-nav li a span.icon {
-                        margin-right: 14px;
-                        font-size: 20px;
-                    }
-                    .sidebar-footer {
-                        padding: 20px 24px;
-                        border-top: 1px solid #f8f9fa;
-                    }
-                    .sidebar-footer a {
-                        color: #ef4444;
-                        text-decoration: none;
-                        font-size: 15px;
-                        font-weight: 600;
-                        display: flex;
-                        align-items: center;
-                        transition: color 0.2s;
-                    }
-                    .sidebar-footer a span.icon {
-                        margin-right: 14px;
-                        font-size: 18px;
-                    }
-                    .sidebar-footer a:hover { color: #dc2626; }
-
-                    /* Main Content */
-                    .main-content {
-                        flex: 1;
-                        padding: 40px;
-                        max-width: 1200px;
-                        margin: 0 auto;
-                        width: 100%;
-                        overflow-y: auto;
-                    }
-
-                    /* Mobile Responsive */
-                    @media (max-width: 768px) {
-                        .app-container {
-                            flex-direction: column;
-                            padding-bottom: 80px; /* Space for bottom nav */
-                        }
-                        .main-content {
-                            padding: 20px 16px;
-                        }
-                        .sidebar {
-                            position: fixed;
-                            bottom: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 75px;
-                            flex-direction: row;
-                            background: rgba(255, 255, 255, 0.95);
-                            backdrop-filter: blur(10px);
-                            -webkit-backdrop-filter: blur(10px);
-                            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-                            border-top-left-radius: 24px;
-                            border-top-right-radius: 24px;
-                        }
-                        .sidebar-header, .sidebar-footer {
-                            display: none;
-                        }
-                        .sidebar-nav {
-                            padding: 0 10px;
-                            display: flex;
-                            flex-direction: row;
-                            justify-content: space-between;
-                            align-items: center;
-                            width: 100%;
-                        }
-                        .sidebar-nav li {
-                            flex: 1;
-                            display: flex;
-                            justify-content: center;
-                        }
-                        .sidebar-nav li a {
-                            flex-direction: column;
-                            padding: 10px 0;
-                            font-size: 11px;
-                            font-weight: 600;
-                            border-left: none;
-                            color: #94a3b8;
-                            border-radius: 12px;
-                        }
-                        .sidebar-nav li a span.icon {
-                            margin-right: 0;
-                            margin-bottom: 4px;
-                            font-size: 24px;
-                            transition: transform 0.2s;
-                        }
-                        .sidebar-nav li a.active {
-                            background: transparent;
-                            color: #3b82f6;
-                        }
-                        .sidebar-nav li a.active span.icon {
-                            transform: scale(1.15);
-                        }
-                    }
-                </style>
+                <link rel="stylesheet" href="/custom_web/static/src/css/variables.css"/>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+                <link rel="stylesheet" href="/custom_web/static/src/css/layout.css"/>
             </head>
             <body>
                 <div class="app-container">
                     <div class="sidebar">
                         <div class="sidebar-header">
-                            <h3>📚 Portal</h3>
+                            <h3><i class="bi bi-mortarboard-fill" style="color: #3b82f6;"></i> Portal</h3>
                             <div class="user-name">
                                 <t t-if="request.session.get('dosen_id')">
                                     <t t-esc="request.session.get('dosen_name', 'Dosen')"/>
@@ -181,21 +26,21 @@
                         
                         <t t-if="request.session.get('dosen_id')">
                             <ul class="sidebar-nav">
-                                <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path.startswith('/dashboard') else ''"><span class="icon">🏠</span> Home</a></li>
-                                <li><a href="#" t-att-class="'active'"><span class="icon">📊</span> Presensi Mahasiswa</a></li>
-                                <li><a href="#" t-att-class="'active'"><span class="icon">⚙️</span> Pengaturan</a></li>
+                                <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path.startswith('/dashboard') else ''"><span class="icon"><i class="bi bi-house-door-fill"></i></span> Home</a></li>
+                                <li><a href="#" t-att-class="'active'"><span class="icon"><i class="bi bi-calendar-check-fill"></i></span> Presensi Mahasiswa</a></li>
+                                <li><a href="#" t-att-class="'active'"><span class="icon"><i class="bi bi-gear-fill"></i></span> Pengaturan</a></li>
                             </ul>
                         </t>
                         <t t-else="">
                             <ul class="sidebar-nav">
-                                <li><a href="/menu" t-att-class="'active' if request.httprequest.path == '/menu' else ''"><span class="icon">📋</span> Tugas</a></li>
-                                <li><a href="/presensi" t-att-class="'active' if request.httprequest.path == '/presensi' else ''"><span class="icon">📍</span> Presensi</a></li>
-                                <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path.startswith('/dashboard') else ''"><span class="icon">🏠</span> Home</a></li>
-                                <li><a href="/leaderboard" t-att-class="'active' if request.httprequest.path == '/leaderboard' else ''"><span class="icon">🏆</span> Leaderboard</a></li>
+                                <li><a href="/menu" t-att-class="'active' if request.httprequest.path == '/menu' else ''"><span class="icon"><i class="bi bi-clipboard-data-fill"></i></span> Tugas</a></li>
+                                <li><a href="/presensi" t-att-class="'active' if request.httprequest.path == '/presensi' else ''"><span class="icon"><i class="bi bi-geo-alt-fill"></i></span> Presensi</a></li>
+                                <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path.startswith('/dashboard') else ''"><span class="icon"><i class="bi bi-house-door-fill"></i></span> Home</a></li>
+                                <li><a href="/leaderboard" t-att-class="'active' if request.httprequest.path == '/leaderboard' else ''"><span class="icon"><i class="bi bi-trophy-fill"></i></span> Leaderboard</a></li>
                             </ul>
                         </t>
                         <div class="sidebar-footer">
-                            <a href="/logout"><span class="icon">🚪</span> Logout</a>
+                            <a href="/logout"><span class="icon"><i class="bi bi-box-arrow-right"></i></span> Logout</a>
                         </div>
                     </div>
                     <div class="main-content">

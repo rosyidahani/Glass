@@ -2,245 +2,12 @@
 <odoo>
     <template id="profile" name="Mahasiswa Profile">
         <t t-call="custom_web.layout">
-            <style>
-                .profile-container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 32px;
-                    max-width: 600px;
-                    margin: 0 auto;
-                    padding: 16px;
-                }
-                
-                /* Topbar */
-                .profile-topbar {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                }
-                .back-btn {
-                    text-decoration: none;
-                    color: #1e293b;
-                    font-size: 20px;
-                    width: 44px;
-                    height: 44px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.65);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-                    transition: background 0.2s, transform 0.2s;
-                }
-                .back-btn:hover {
-                    background: rgba(255, 255, 255, 0.9);
-                    transform: translateX(-2px);
-                }
-                .topbar-title {
-                    font-size: 20px;
-                    font-weight: 800;
-                    color: #1e293b;
-                }
-                .topbar-action {
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.65);
-                    backdrop-filter: blur(12px);
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-                }
-                
-                /* Header Section */
-                .profile-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 24px;
-                }
-                .profile-picture-wrapper {
-                    position: relative;
-                }
-                .profile-picture {
-                    width: 110px;
-                    height: 110px;
-                    border-radius: 50%;
-                    background: linear-gradient(135deg, #4f46e5, #ec4899);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 40px;
-                    font-weight: 800;
-                    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
-                    overflow: hidden;
-                    border: 4px solid #ffffff;
-                }
-                .profile-picture img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-                .edit-icon {
-                    position: absolute;
-                    bottom: 0;
-                    right: 4px;
-                    width: 32px;
-                    height: 32px;
-                    background: #64748b;
-                    color: white;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 14px;
-                    border: 3px solid #f0f4f8; 
-                    cursor: pointer;
-                    transition: transform 0.2s, background 0.2s;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                }
-                .edit-icon:hover {
-                    transform: scale(1.1);
-                    background: #4f46e5;
-                }
-                .profile-details {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 4px;
-                }
-                .profile-details h2 {
-                    margin: 0;
-                    font-size: 24px;
-                    font-weight: 800;
-                    color: #0f172a;
-                    letter-spacing: -0.5px;
-                }
-                .profile-details p {
-                    margin: 0;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #64748b;
-                }
-                .edit-btn {
-                    margin-top: 8px;
-                    padding: 8px 18px;
-                    border-radius: 20px;
-                    border: 1.5px solid #4f46e5;
-                    background: transparent;
-                    color: #4f46e5;
-                    font-size: 13px;
-                    font-weight: 700;
-                    cursor: pointer;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: max-content;
-                    transition: all 0.2s;
-                    text-decoration: none;
-                }
-                .edit-btn:hover {
-                    background: rgba(79, 70, 229, 0.1);
-                    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.1);
-                }
-
-                /* Stats Tabs */
-                .stats-container {
-                    display: flex;
-                    background: rgba(255, 255, 255, 0.65);
-                    backdrop-filter: blur(16px);
-                    -webkit-backdrop-filter: blur(16px);
-                    border: 1px solid rgba(255, 255, 255, 0.8);
-                    border-radius: 20px;
-                    padding: 20px 16px;
-                    box-shadow: 0 8px 30px rgba(31, 38, 135, 0.05);
-                }
-                .stat-box {
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                }
-                .stat-box:not(:last-child)::after {
-                    content: '';
-                    position: absolute;
-                    right: 0;
-                    top: 15%;
-                    height: 70%;
-                    width: 1px;
-                    background: rgba(0,0,0,0.1);
-                }
-                .stat-box h4 {
-                    margin: 0;
-                    font-size: 22px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
-                .stat-box span {
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: #64748b;
-                    margin-top: 4px;
-                }
-                
-                /* Extra Layout */
-                .settings-list {
-                    background: rgba(255, 255, 255, 0.65);
-                    backdrop-filter: blur(16px);
-                    -webkit-backdrop-filter: blur(16px);
-                    border-radius: 20px;
-                    padding: 8px 20px;
-                    box-shadow: 0 8px 30px rgba(31, 38, 135, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.8);
-                    display: flex;
-                    flex-direction: column;
-                }
-                .settings-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 18px 0;
-                    text-decoration: none;
-                    color: #0f172a;
-                    font-weight: 700;
-                    font-size: 15px;
-                    border-bottom: 1px solid rgba(0,0,0,0.05);
-                    transition: transform 0.2s;
-                }
-                .settings-item:hover {
-                    transform: translateX(4px);
-                }
-                .settings-item:last-child {
-                    border-bottom: none;
-                }
-                .settings-item .item-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 14px;
-                }
-                .settings-item .item-icon {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 12px;
-                    background: rgba(79, 70, 229, 0.1);
-                    color: #4f46e5;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 18px;
-                }
-                .settings-item .item-arrow {
-                    color: #94a3b8;
-                    font-size: 20px;
-                    font-weight: 400;
-                }
-            </style>
+            <link rel="stylesheet" href="/custom_web/static/src/css/profile.css"/>
 
             <div class="profile-container">
                 <!-- Topbar -->
                 <div class="profile-topbar">
-                    <a href="/dashboard/mahasiswa" class="back-btn">←</a>
+                    <a href="/dashboard/mahasiswa" class="back-btn"><i class="bi bi-arrow-left"></i></a>
                     <div class="topbar-title">Profil</div>
                     <div class="topbar-action"></div>
                 </div>
@@ -256,7 +23,7 @@
                                 <t t-esc="mahasiswa.name[0].upper()"/>
                             </t>
                         </div>
-                        <div class="edit-icon" title="Ubah Foto" onclick="document.getElementById('fotoProfilInput').click();">✏️</div>
+                        <div class="edit-icon" title="Ubah Foto" onclick="document.getElementById('fotoProfilInput').click();"><i class="bi bi-pencil-fill"></i></div>
                     </div>
                     <div class="profile-details">
                         <h2><t t-esc="mahasiswa.name"/></h2>
@@ -290,24 +57,24 @@
                 <div class="settings-list">
                     <a href="#" class="settings-item">
                         <div class="item-left">
-                            <div class="item-icon">👤</div>
+                            <div class="item-icon"><i class="bi bi-person-fill"></i></div>
                             <span>Informasi Pribadi</span>
                         </div>
-                        <div class="item-arrow">›</div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
                     </a>
                     <a href="#" class="settings-item">
                         <div class="item-left">
-                            <div class="item-icon">🔒</div>
+                            <div class="item-icon"><i class="bi bi-shield-lock-fill"></i></div>
                             <span>Keamanan &amp; Password</span>
                         </div>
-                        <div class="item-arrow">›</div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
                     </a>
                     <a href="#" class="settings-item">
                         <div class="item-left">
-                            <div class="item-icon">🔔</div>
+                            <div class="item-icon"><i class="bi bi-bell-fill"></i></div>
                             <span>Pengaturan Notifikasi</span>
                         </div>
-                        <div class="item-arrow">›</div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
                     </a>
                 </div>
             </div>

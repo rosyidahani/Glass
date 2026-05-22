@@ -1,0 +1,476 @@
+/* Animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(79, 70, 229, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    padding: 10px;
+    gap: 24px;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.05);
+    border-radius: 24px;
+}
+
+/* --- TOP HUD --- */
+.top-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.hud-left {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-xp-pill {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px 14px 16px;
+    border-radius: 28px;
+    gap: 20px;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 84px;
+    margin-left: 0; /* Align perfectly on the left edge */
+    width: 480px; /* Solid width on desktop to prevent collapsing */
+    max-width: 100%; /* Fully responsive on mobile viewport */
+}
+
+.profile-xp-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(0,0,0,0.08);
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.profile-xp-pill .avatar-large {
+    width: 76px;
+    height: 76px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%; /* perfect circle as requested */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 26px;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.45), 0 4px 15px rgba(99, 102, 241, 0.2); /* gorgeous pink/purple outline glow from screenshot */
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid #ffffff;
+}
+
+.profile-xp-pill .avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-xp-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.profile-xp-info .profile-name {
+    font-weight: 800;
+    font-size: 18px; /* enlarged as per screenshot suggestion */
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+}
+
+.profile-xp-info .profile-level {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-top: -2px;
+}
+
+.xp-bar-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.xp-track {
+    height: 8px;
+    background: rgba(226, 232, 240, 0.8);
+    border-radius: 10px;
+    flex: 1;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6); /* elegant bright purple/indigo gradient from screenshot */
+    border-radius: 10px;
+}
+
+.xp-text {
+    font-size: 12px;
+    font-weight: 800;
+    color: #6366f1; /* bold purple XP label */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hud-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.rank-pill {
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #4f46e5;
+    background: rgba(79, 70, 229, 0.08);
+    border: 1px solid rgba(79, 70, 229, 0.15);
+}
+
+.rank-pill i {
+    color: #f59e0b;
+    font-size: 16px;
+}
+
+.coin-pill {
+    height: 48px;
+    box-sizing: border-box;
+    padding: 0 20px;
+    border-radius: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 14px;
+    color: #f59e0b;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.coin-pill:hover {
+    transform: scale(1.05) translateY(-2px);
+}
+
+.icon-btn {
+    width: 48px;
+    height: 48px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.icon-btn:hover {
+    color: #4f46e5;
+    transform: scale(1.08) translateY(-2px);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.setting-btn:hover {
+    transform: scale(1.08) rotate(45deg);
+}
+
+/* --- MAIN CONTENT AREA --- */
+.main-dashboard-area {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Avatar Display Section */
+.avatar-section {
+    flex: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-radius: 32px;
+    background: radial-gradient(circle at center, rgba(79, 70, 229, 0.05) 0%, transparent 70%);
+    min-height: 400px;
+}
+
+.avatar-glow {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(236, 72, 153, 0.05) 70%);
+    border-radius: 50%;
+    z-index: 1;
+    animation: pulse-glow 3s infinite;
+}
+
+.user-image {
+    position: relative;
+    z-index: 2;
+    max-height: 450px;
+    object-fit: contain;
+    filter: drop-shadow(0 25px 35px rgba(0,0,0,0.2));
+    animation: float 6s ease-in-out infinite;
+}
+
+.avatar-placeholder {
+    position: relative;
+    z-index: 2;
+    width: 220px;
+    height: 380px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
+    animation: float 6s ease-in-out infinite;
+}
+
+.avatar-placeholder .icon {
+    font-size: 50px;
+    margin-bottom: 12px;
+    color: #cbd5e1;
+}
+
+.stats-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stat-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.icon-blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.icon-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+.stat-info h4 {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.stat-info p {
+    margin: 4px 0 0 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.recent-activity {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.recent-activity h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateX(4px);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.activity-text h5 {
+    margin: 0;
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.activity-text p {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .main-dashboard-area {
+        flex-direction: column;
+    }
+    .stats-section {
+        width: 100%;
+    }
+    .avatar-section {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-hud {
+        flex-direction: row; /* Force side-by-side horizontal flow */
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .hud-left {
+        width: 60%;
+        max-width: 60%; /* Only half to 60% of page width to make it spacious and elegant */
+    }
+    .profile-xp-pill {
+        width: 100%;
+        margin-left: 0;
+        padding: 10px 12px; /* Super compact padding */
+        min-height: 72px;
+        gap: 12px;
+        border-radius: 20px;
+    }
+    .profile-xp-pill .avatar-large {
+        width: 56px; /* Scaled down avatar for mobile */
+        height: 56px;
+        font-size: 20px;
+        box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
+    }
+    .profile-xp-info .profile-name {
+        font-size: 15px; /* Compact name typography */
+    }
+    .profile-xp-info .profile-level {
+        font-size: 11px; /* Compact level typography */
+    }
+    .xp-bar-section {
+        gap: 8px;
+    }
+    .xp-track {
+        height: 6px;
+    }
+    .xp-text {
+        font-size: 9px;
+    }
+    .hud-right {
+        width: auto;
+        flex-direction: column; /* Stack Rank, Gold, Shop, Settings vertically */
+        align-items: flex-end;
+        gap: 8px;
+    }
+    .rank-pill {
+        width: auto;
+        height: 36px;
+        font-size: 11px;
+        padding: 0 12px;
+        border-radius: 12px;
+    }
+    .coin-pill {
+        width: auto;
+        height: 32px;
+        font-size: 11px;
+        padding: 0 12px;
+        border-radius: 10px;
+    }
+    .icon-btn {
+        width: 38px;
+        height: 38px;
+    }
+}
+
