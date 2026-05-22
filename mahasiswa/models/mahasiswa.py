@@ -1,6 +1,7 @@
 import hashlib
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class Mahasiswa(models.Model):
@@ -99,3 +100,21 @@ class Mahasiswa(models.Model):
             display = f"[{rec.nim}] {rec.name}" if rec.nim else rec.name
             result.append((rec.id, display))
         return result
+
+    # ------------------------------------------------------------------
+    # XP & Koin Management
+    # ------------------------------------------------------------------
+    def add_xp(self, jumlah):
+        """Menambah angka XP."""
+        self.total_xp += jumlah
+
+    def add_koin(self, jumlah):
+        """Menambah angka koin."""
+        self.koin += jumlah
+
+    def spend_koin(self, jumlah):
+        """Fungsi untuk belajar/mengurangi koin lengkap dengan validasi.
+        Jika koin kurang, sistem akan melempar UserError agar transaksi gagal."""
+        if self.koin < jumlah:
+            raise UserError('Koin tidak cukup untuk melakukan transaksi ini.')
+        self.koin -= jumlah
