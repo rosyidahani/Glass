@@ -7,7 +7,8 @@
                 <!-- TOP HUD -->
                 <div class="top-hud">
                     <div class="hud-left">
-                        <a href="/dashboard/mahasiswa/profile" class="profile-xp-pill glass-panel">
+                        <!-- Profile Card without EXP -->
+                        <a href="/dashboard/mahasiswa/profile" class="profile-pill glass-panel">
                             <div class="avatar-large">
                                 <t t-if="mahasiswa.foto_profil">
                                     <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
@@ -16,40 +17,40 @@
                                     <t t-esc="mahasiswa.name[0].upper()"/>
                                 </t>
                             </div>
-                            <div class="profile-xp-info">
+                            <div class="profile-info">
                                  <div class="profile-name"><t t-esc="mahasiswa.name"/></div>
                                  <div class="profile-level"><t t-esc="mahasiswa.nim"/></div>
-                                 <div class="xp-bar-section">
-                                     <div class="xp-track">
-                                         <t t-set="xp_percent" t-value="min(100, int((mahasiswa.total_xp / max(1, (mahasiswa.semester * 1000))) * 100))"/>
-                                         <div class="xp-fill" t-att-style="'width: ' + str(xp_percent) + '%;'"/>
-                                     </div>
-                                     <span class="xp-text"><t t-esc="mahasiswa.total_xp"/>/<t t-esc="mahasiswa.semester * 1000"/> XP</span>
-                                 </div>
+                             </div>
+                             <!-- Rank Badge on the right inside profile-pill -->
+                             <div class="profile-rank-badge" title="Rank Leaderboard">
+                                 <span>#4</span>
                              </div>
                         </a>
+                        
+                        <!-- Action Buttons stacked below profile pill -->
+                        <div class="hud-actions-vertical">
+                            <!-- Shop Button -->
+                            <a href="#" class="icon-btn shop-btn glass-panel" title="Shop">
+                                <i class="bi bi-bag-fill"></i>
+                            </a>
+                            <!-- Setting Button -->
+                            <a href="/dashboard/mahasiswa/profile" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
+                                <i class="bi bi-gear-fill"></i>
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="hud-right">
-                        <!-- Peringkat Leaderboard -->
-                        <div class="rank-pill glass-panel" title="Peringkat Leaderboard">
-                            <i class="bi bi-trophy-fill"></i> Peringkat #4
+                    <!-- Right vertical stack of 2 stats pills -->
+                    <div class="hud-right-vertical">
+                        <!-- Coin/Poin (Top) -->
+                        <div class="coin-pill" title="Koin yang dapat ditukar">
+                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> Poin
                         </div>
-                        
-                        <!-- Coin/Gold -->
-                        <div class="coin-pill glass-panel" title="Koin yang dapat ditukar">
-                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> Gold
-                        </div>
-                        
-                        <!-- Shop Button -->
-                        <a href="#" class="icon-btn shop-btn glass-panel" title="Shop">
-                            <i class="bi bi-bag-fill"></i>
-                        </a>
 
-                        <!-- Setting Button -->
-                        <a href="/dashboard/mahasiswa/profile" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
-                            <i class="bi bi-gear-fill"></i>
-                        </a>
+                        <!-- EXP Pill (Bottom) -->
+                        <div class="xp-pill" title="Total XP">
+                            <i class="bi bi-star-fill"></i> <t t-esc="mahasiswa.total_xp"/> XP
+                        </div>
                     </div>
                 </div>
 
@@ -62,53 +63,6 @@
                         <img src="/custom_web/static/src/img/char_default.png" class="user-image" alt="Character Glass"/>
                     </div>
 
-
-                    <!-- RIGHT: Quick Stats & Activity -->
-                    <div class="stats-section">
-                        <div class="stats-grid">
-                            <div class="stat-card glass-panel">
-                                <div class="stat-icon icon-blue"><i class="bi bi-book-half"></i></div>
-                                <div class="stat-info">
-                                    <h4>Kelas Aktif</h4>
-                                    <p>8 <span style="font-size:12px; color:#64748b;">Mata Kuliah</span></p>
-                                </div>
-                            </div>
-                            <div class="stat-card glass-panel">
-                                <div class="stat-icon icon-purple"><i class="bi bi-bullseye"></i></div>
-                                <div class="stat-info">
-                                    <h4>Tugas Selesai</h4>
-                                    <p>24 <span style="font-size:12px; color:#10b981;">+3 Minggu Ini</span></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="recent-activity glass-panel">
-                            <h3>Aktivitas Terkini</h3>
-                            <div class="activity-list">
-                                <div class="activity-item">
-                                    <div class="activity-icon"><i class="bi bi-trophy-fill" style="color: #f59e0b;"></i></div>
-                                    <div class="activity-text">
-                                        <h5>Tugas Pemrograman Lanjut</h5>
-                                        <p>Mendapatkan +150 XP dan 50 Koin</p>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon"><i class="bi bi-geo-alt-fill" style="color: #ef4444;"></i></div>
-                                    <div class="activity-text">
-                                        <h5>Presensi Sistem Basis Data</h5>
-                                        <p>Hadir Tepat Waktu - Hari ini, 08:00</p>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon"><i class="bi bi-megaphone-fill" style="color: #3b82f6;"></i></div>
-                                    <div class="activity-text">
-                                        <h5>Pengumuman Dosen</h5>
-                                        <p>Jadwal UTS dimajukan ke tanggal 15.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </div>

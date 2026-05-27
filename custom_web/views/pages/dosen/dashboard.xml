@@ -3,9 +3,68 @@
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_dashboard.css"/>
             
-            <div class="dashboard-dosen-container">
-                <h1>Selamat Datang, <t t-esc="dosen.name"/></h1>
-                <p>NIP: <t t-esc="dosen.nip"/></p>
+            <div class="dosen-dashboard-container">
+                <!-- Lecturer Profile HUD Header -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name"><t t-esc="dosen.name"/></h2>
+                            <p class="dosen-nip"><t t-esc="dosen.nip"/></p>
+                        </div>
+                    </div>
+                    <!-- Settings Button -->
+                    <a href="#" class="dosen-settings-btn" title="Pengaturan Akun">
+                        <i class="bi bi-gear-fill"></i>
+                    </a>
+                </div>
+
+                <!-- Main Action Cards Layout -->
+                <div class="dosen-grid">
+                    <!-- CARD 1: Input Tugas -->
+                    <div class="dosen-card glass-panel">
+                        <div class="dosen-card-icon icon-blue">
+                            <i class="bi bi-file-earmark-plus-fill"></i>
+                        </div>
+                        <div class="dosen-card-body">
+                            <h3>Input Tugas</h3>
+                            <p>Kelola dan buat penugasan baru untuk mahasiswa secara terorganisir.</p>
+                        </div>
+                        <div class="dosen-card-footer">
+                            <a href="#" class="dosen-action-btn btn-blue">Tambahkan Tugas</a>
+                        </div>
+                    </div>
+
+                    <!-- CARD 2: Presensi -->
+                    <div class="dosen-card glass-panel">
+                        <div class="dosen-card-icon icon-purple">
+                            <i class="bi bi-calendar-check-fill"></i>
+                        </div>
+                        <div class="dosen-card-body">
+                            <h3>Presensi</h3>
+                            <p>Buka sesi kehadiran kelas baru dan awasi partisipasi mahasiswa secara instan.</p>
+                        </div>
+                        <div class="dosen-card-footer">
+                            <a href="#" class="dosen-action-btn btn-purple">Mulai Presensi</a>
+                        </div>
+                    </div>
+
+                    <!-- CARD 3: Leaderboard -->
+                    <div class="dosen-card glass-panel">
+                        <div class="dosen-card-icon icon-amber">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                        <div class="dosen-card-body">
+                            <h3>Leaderboard</h3>
+                            <p>Pantau peringkat keaktifan, skor XP, serta total perolehan koin mahasiswa teraktif.</p>
+                        </div>
+                        <div class="dosen-card-footer">
+                            <a href="#" class="dosen-action-btn btn-amber">Lihat Leaderboard</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </t>
     </template>

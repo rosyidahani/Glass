@@ -1,20 +1,284 @@
-.dashboard-dosen-container {
+.dosen-dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 10px;
+    height: 100%;
+}
+
+/* --- LECTURER HEADER HUD --- */
+.dosen-header-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    transition: all 0.3s ease;
+}
+
+.dosen-header-hud:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(31, 38, 135, 0.08);
+}
+
+.dosen-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dosen-avatar-wrapper {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 22px;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(79, 70, 229, 0.15);
+    overflow: hidden;
+    border: 3px solid #ffffff;
+    flex-shrink: 0;
+}
+
+.dosen-avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dosen-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dosen-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin: 0;
+}
+
+.dosen-nip {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Status dot active */
+.dosen-settings-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dosen-settings-btn:hover {
+    color: #4f46e5;
+    background: #ffffff;
+    transform: scale(1.1) rotate(45deg);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+}
+
+/* --- MAIN ACTIONS GRID --- */
+.dosen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.dosen-card {
+    padding: 30px 24px;
+    border-radius: 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100%;
-    background: #ffffff;
+    text-align: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.dosen-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(31, 38, 135, 0.08);
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.dosen-card-icon {
+    width: 64px;
+    height: 64px;
     border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: transform 0.3s ease;
 }
-.dashboard-dosen-container h1 {
-    font-size: 32px;
-    color: #1e293b;
-    margin-bottom: 10px;
+
+.dosen-card:hover .dosen-card-icon {
+    transform: scale(1.1) rotate(5deg);
 }
-.dashboard-dosen-container p {
-    font-size: 16px;
+
+.icon-blue { background: rgba(59, 130, 246, 0.08); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.15); }
+.icon-purple { background: rgba(139, 92, 246, 0.08); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.15); }
+.icon-amber { background: rgba(245, 158, 11, 0.08); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.15); }
+
+.dosen-card-body h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.dosen-card-body p {
+    font-size: 14px;
     color: #64748b;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.dosen-card-footer {
+    width: 100%;
+    margin-top: auto;
+}
+
+.dosen-action-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.btn-blue {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+.btn-blue:hover {
+    background: #2563eb;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-purple {
+    background: #8b5cf6;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
+.btn-purple:hover {
+    background: #7c3aed;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-amber {
+    background: #f59e0b;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+.btn-amber:hover {
+    background: #d97706;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    transform: translateY(-1px);
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 992px) {
+    .dosen-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .dosen-card {
+        padding: 24px;
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+        gap: 16px;
+    }
+    .dosen-card-icon {
+        flex-shrink: 0;
+    }
+    .dosen-card-footer {
+        width: auto;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+    .dosen-action-btn {
+        width: max-content;
+        padding: 10px 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dosen-dashboard-container {
+        gap: 16px;
+    }
+    .dosen-header-hud {
+        padding: 14px 18px;
+        border-radius: 20px;
+    }
+    .dosen-avatar-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+    }
+    .dosen-name {
+        font-size: 15px;
+    }
+    .dosen-nip {
+        font-size: 11px;
+    }
+    .dosen-status-indicator {
+        padding: 6px 12px;
+        border-radius: 12px;
+    }
+    .status-label {
+        font-size: 10px;
+    }
+    .dosen-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+        border-radius: 20px;
+        gap: 16px;
+    }
+    .dosen-card-footer {
+        width: 100%;
+        margin-left: 0;
+    }
+    .dosen-action-btn {
+        width: 100%;
+    }
 }

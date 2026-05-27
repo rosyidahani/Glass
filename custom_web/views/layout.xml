@@ -27,14 +27,14 @@
                         <t t-if="request.session.get('dosen_id')">
                             <ul class="sidebar-nav">
                                 <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path.startswith('/dashboard') else ''"><span class="icon"><i class="bi bi-house-door-fill"></i></span> Home</a></li>
-                                <li><a href="#" t-att-class="'active'"><span class="icon"><i class="bi bi-calendar-check-fill"></i></span> Presensi Mahasiswa</a></li>
-                                <li><a href="#" t-att-class="'active'"><span class="icon"><i class="bi bi-gear-fill"></i></span> Pengaturan</a></li>
+                                <li><a href="#" t-att-class="'active' if request.httprequest.path == '/presensi_mahasiswa' else ''"><span class="icon"><i class="bi bi-calendar-check-fill"></i></span> Presensi Mahasiswa</a></li>
+                                <li><a href="#" t-att-class="'active' if request.httprequest.path == '/pengaturan' else ''"><span class="icon"><i class="bi bi-gear-fill"></i></span> Pengaturan</a></li>
                             </ul>
                         </t>
                         <t t-else="">
                             <ul class="sidebar-nav">
                                 <li><a href="/menu" t-att-class="'active' if request.httprequest.path == '/menu' else ''"><span class="icon"><i class="bi bi-clipboard-data-fill"></i></span> Tugas</a></li>
-                                <li><a href="/presensi" t-att-class="'active' if request.httprequest.path == '/presensi' else ''"><span class="icon"><i class="bi bi-geo-alt-fill"></i></span> Presensi</a></li>
+                                <li><a href="/presensi" t-att-class="'active' if request.httprequest.path == '/presensi' else ''"><span class="icon"><i class="bi bi-calendar-check-fill"></i></span> Presensi</a></li>
                                 <li><a href="/dashboard" t-att-class="'active' if request.httprequest.path.startswith('/dashboard') else ''"><span class="icon"><i class="bi bi-house-door-fill"></i></span> Home</a></li>
                                 <li><a href="/leaderboard" t-att-class="'active' if request.httprequest.path == '/leaderboard' else ''"><span class="icon"><i class="bi bi-trophy-fill"></i></span> Leaderboard</a></li>
                             </ul>
