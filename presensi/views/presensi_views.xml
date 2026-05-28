@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_presensi_sesi_tree" model="ir.ui.view">
+    <field name="name">presensi.sesi.tree</field>
+    <field name="model">presensi.sesi</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="mata_kuliah"/>
+        <field name="status"/>
+        <field name="waktu_buka"/>
+        <field name="total_hadir"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="action_presensi_sesi" model="ir.actions.act_window">
+    <field name="name">Sesi Presensi</field>
+    <field name="res_model">presensi.sesi</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>
