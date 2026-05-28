@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_presensi_sesi,presensi.sesi,model_presensi_sesi,,1,1,1,1
+access_presensi_record,presensi.record,model_presensi_record,,1,1,1,1
