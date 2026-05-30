@@ -70,7 +70,7 @@
                             <!-- Footer Card Button -->
                             <div class="card-footer-action">
                                 <t t-if="course['status'] == 'selesai'">
-                                    <button class="btn-action btn-disabled" disabled="disabled">Selesai</button>
+                                    <button class="btn-action btn-disabled" disabled="disabled"><t t-esc="course.get('action_label', 'Selesai')"/></button>
                                 </t>
                                 <t t-else="">
                                     <a t-att-href="'/presensi/scan/' + str(course['id'])" class="btn-action btn-active">

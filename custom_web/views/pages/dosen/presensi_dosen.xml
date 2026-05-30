@@ -35,10 +35,29 @@
                                 <input type="text" id="nama_sesi" name="nama_sesi" placeholder="Contoh: Pertemuan 5" required="required" class="form-control"/>
                             </div>
 
-                            <!-- Mata Kuliah -->
+                            <!-- Mata Kuliah (Custom Select with Search) -->
                             <div class="form-group">
-                                <label for="mata_kuliah">Mata Kuliah <span class="required">*</span></label>
-                                <input type="text" id="mata_kuliah" name="mata_kuliah" placeholder="Contoh: Desain Web Lanjut" required="required" class="form-control"/>
+                                <label for="mata_kuliah_btn">Mata Kuliah <span class="required">*</span></label>
+                                <div class="custom-select-container">
+                                    <button type="button" id="mata_kuliah_btn" class="form-control select-trigger-btn">
+                                        <span id="selected_course_text">-- Pilih Mata Kuliah --</span>
+                                        <i class="bi bi-chevron-down dropdown-arrow-icon"></i>
+                                    </button>
+                                    <input type="hidden" id="mata_kuliah_id" name="mata_kuliah_id" required="required"/>
+                                    <div id="mata_kuliah_dropdown" class="custom-select-pane hidden">
+                                        <div class="search-box-wrapper">
+                                            <i class="bi bi-search search-icon"></i>
+                                            <input type="text" id="mata_kuliah_search" placeholder="Cari mata kuliah..." autocomplete="off" class="dropdown-search-input"/>
+                                        </div>
+                                        <div class="dropdown-options-list">
+                                            <t t-foreach="courses_list" t-as="c">
+                                                <div class="dropdown-option-item" t-att-data-id="c.id" t-att-data-name="c.nama" t-att-data-code="c.kode">
+                                                    <span class="course-code"><t t-esc="c.kode"/></span> - <span class="course-name"><t t-esc="c.nama"/></span> <span class="course-sem">(Sem <t t-esc="c.semester"/>)</span>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Tipe Kelas (Segmented Toggle) -->
@@ -118,7 +137,7 @@
                                         <div class="session-item-header">
                                             <div class="session-title-block">
                                                 <h4><t t-esc="sesi.name"/></h4>
-                                                <p class="matkul"><t t-esc="sesi.mata_kuliah"/></p>
+                                                <p class="matkul"><t t-esc="sesi.mata_kuliah_id.nama"/></p>
                                             </div>
                                             <!-- Badge Tipe Kelas -->
                                             <t t-if="sesi.tipe_kelas == 'online'">
@@ -137,7 +156,7 @@
                                                 </div>
                                                 <div class="stat-box info">
                                                     <span class="label-info"><strong>Waktu Buka:</strong></span>
-                                                    <span class="value-info time-format"><t t-esc="str(sesi.waktu_buka).split('.')[0] if sesi.waktu_buka else '-'"/></span>
+                                                    <span class="value-info time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -184,7 +203,7 @@
                                     <t t-foreach="closed_sessions" t-as="sesi">
                                         <tr>
                                             <td class="bold"><t t-esc="sesi.name"/></td>
-                                            <td><t t-esc="sesi.mata_kuliah"/></td>
+                                            <td><t t-esc="sesi.mata_kuliah_id.nama"/></td>
                                             <td>
                                                 <t t-if="sesi.tipe_kelas == 'online'">
                                                     <span class="badge online">Online</span>
@@ -193,8 +212,8 @@
                                                     <span class="badge offline">Offline</span>
                                                 </t>
                                             </td>
-                                            <td class="time-format"><t t-esc="str(sesi.waktu_buka).split('.')[0] if sesi.waktu_buka else '-'"/></td>
-                                            <td class="time-format"><t t-esc="str(sesi.waktu_tutup).split('.')[0] if sesi.waktu_tutup else '-'"/></td>
+                                            <td class="time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></td>
+                                            <td class="time-format"><span t-field="sesi.waktu_tutup" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></td>
                                             <td class="center bold text-primary"><t t-esc="sesi.total_hadir"/> Mhs</td>
                                             <td><span class="status-badge closed">Selesai</span></td>
                                         </tr>

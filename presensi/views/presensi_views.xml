@@ -19,4 +19,9 @@
     <field name="res_model">presensi.sesi</field>
     <field name="view_mode">tree,form</field>
   </record>
+
+  <menuitem id="menu_presensi_sesi"
+            name="Sesi Presensi"
+            action="action_presensi_sesi"
+            sequence="35"/>
 </odoo>

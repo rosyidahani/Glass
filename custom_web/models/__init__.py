@@ -1,1 +1,1 @@
-# Models are now managed by the 'mahasiswa' module.
+from . import relationships

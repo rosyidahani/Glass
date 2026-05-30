@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initFormDefaults();
     initTypeToggle();
     initLocationFetch();
+    initAutocompleteSelect();
     initFormSubmit();
     initTutupSesi();
 });
@@ -121,7 +122,7 @@ function initFormSubmit() {
 
         // Ambil data form
         var namaSesi = document.getElementById('nama_sesi').value;
-        var mataKuliah = document.getElementById('mata_kuliah').value;
+        var mataKuliahId = document.getElementById('mata_kuliah_id').value;
         var tipeKelas = document.querySelector('input[name="tipe_kelas"]:checked').value;
         var datetimeVal = document.getElementById('batas_waktu_telat').value; // format: YYYY-MM-DDTHH:MM
         
@@ -130,7 +131,7 @@ function initFormSubmit() {
 
         var payload = {
             nama_sesi: namaSesi,
-            mata_kuliah: mataKuliah,
+            mata_kuliah_id: parseInt(mataKuliahId),
             tipe_kelas: tipeKelas,
             batas_waktu_telat: formatBatasTelat
         };
@@ -218,5 +219,91 @@ function initTutupSesi() {
             btn.disabled = false;
             btn.innerHTML = originalHTML;
         });
+    });
+}
+
+// 6. Logika Autocomplete Dropdown untuk Mata Kuliah
+function initAutocompleteSelect() {
+    var triggerBtn = document.getElementById('mata_kuliah_btn');
+    var selectedText = document.getElementById('selected_course_text');
+    var idInput = document.getElementById('mata_kuliah_id');
+    var dropdownPane = document.getElementById('mata_kuliah_dropdown');
+    var searchInput = document.getElementById('mata_kuliah_search');
+    
+    if (!triggerBtn || !selectedText || !idInput || !dropdownPane || !searchInput) return;
+    
+    var items = dropdownPane.getElementsByClassName('dropdown-option-item');
+    
+    // Toggle dropdown pane
+    triggerBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var isHidden = dropdownPane.classList.contains('hidden');
+        if (isHidden) {
+            dropdownPane.classList.remove('hidden');
+            triggerBtn.classList.add('active');
+            searchInput.focus();
+        } else {
+            dropdownPane.classList.add('hidden');
+            triggerBtn.classList.remove('active');
+        }
+    });
+    
+    // Search filter logic (triggers on typing >= 2 characters)
+    searchInput.addEventListener('input', function() {
+        var query = searchInput.value.trim().toLowerCase();
+        
+        // Jika input kurang dari 2 karakter, tampilkan semua mata kuliah
+        if (query.length < 2) {
+            for (var i = 0; i < items.length; i++) {
+                items[i].style.display = 'block';
+            }
+            return;
+        }
+        
+        // Filter mata kuliah
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var name = item.getAttribute('data-name').toLowerCase();
+            var code = item.getAttribute('data-code').toLowerCase();
+            
+            if (name.includes(query) || code.includes(query)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+    
+    // Tangani pemilihan item dropdown
+    dropdownPane.addEventListener('click', function(e) {
+        var item = e.target.closest('.dropdown-option-item');
+        if (!item) return;
+        
+        var id = item.getAttribute('data-id');
+        var name = item.getAttribute('data-name');
+        var code = item.getAttribute('data-code');
+        
+        // Update tampilan pilihan
+        selectedText.textContent = `${code} - ${name}`;
+        selectedText.style.color = '#0f172a'; // Beri warna gelap agar kontras
+        idInput.value = id;
+        
+        // Tutup dropdown
+        dropdownPane.classList.add('hidden');
+        triggerBtn.classList.remove('active');
+        
+        // Bersihkan kotak pencarian
+        searchInput.value = '';
+        for (var i = 0; i < items.length; i++) {
+            items[i].style.display = 'block';
+        }
+    });
+    
+    // Sembunyikan dropdown jika mengklik di luar area input/dropdown
+    document.addEventListener('click', function(e) {
+        if (!triggerBtn.contains(e.target) && !dropdownPane.contains(e.target)) {
+            dropdownPane.classList.add('hidden');
+            triggerBtn.classList.remove('active');
+        }
     });
 }

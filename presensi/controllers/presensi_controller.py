@@ -73,11 +73,26 @@ class PresensiController(http.Controller):
             if 'latitude' not in body or 'longitude' not in body or 'radius_meter' not in body:
                 return self._error('Untuk kelas offline, latitude, longitude, dan radius wajib diisi.')
 
+        # Convert local time (Asia/Jakarta) input to UTC
+        import pytz
+        from datetime import datetime
+        try:
+            dt_str = body['batas_waktu_telat'].replace('T', ' ')
+            if len(dt_str) == 16:
+                dt_str += ':00'
+            local_dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+            local_tz = pytz.timezone('Asia/Jakarta')
+            localized_dt = local_tz.localize(local_dt)
+            utc_dt = localized_dt.astimezone(pytz.utc)
+            batas_waktu_utc = utc_dt.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception:
+            batas_waktu_utc = body['batas_waktu_telat']
+
         sesi_vals = {
             'name': body['nama_sesi'],
-            'mata_kuliah_id'    : int(body['mata_kuliah_id']),
+            'mata_kuliah_id': int(body['mata_kuliah_id']),
             'tipe_kelas': tipe_kelas,
-            'batas_waktu_telat': body['batas_waktu_telat'],
+            'batas_waktu_telat': batas_waktu_utc,
         }
         if tipe_kelas == 'offline':
             sesi_vals.update({
@@ -91,6 +106,10 @@ class PresensiController(http.Controller):
                 'longitude': 0.0,
                 'radius_meter': 0,
             })
+
+        dosen_id = request.session.get('dosen_id')
+        if dosen_id:
+            sesi_vals['feature_dosen_id'] = dosen_id
 
         sesi = request.env['presensi.sesi'].sudo().create(sesi_vals)
         sesi.buka_sesi()

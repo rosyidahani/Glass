@@ -48,4 +48,9 @@
     <field name="res_model">mata.kuliah</field>
     <field name="view_mode">tree,form</field>
   </record>
+
+  <menuitem id="menu_mata_kuliah"
+            name="Mata Kuliah"
+            action="action_mata_kuliah"
+            sequence="25"/>
 </odoo>

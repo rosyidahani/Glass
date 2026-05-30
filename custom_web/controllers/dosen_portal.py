@@ -31,13 +31,20 @@ class DosenPortalController(http.Controller):
             return request.redirect('/login')
 
         sesi_obj = request.env['presensi.sesi'].sudo()
-        open_sessions = sesi_obj.search([('status', '=', 'open')], order='id desc')
-        closed_sessions = sesi_obj.search([('status', '=', 'closed')], order='id desc')
+        open_sessions = sesi_obj.search([('status', '=', 'open'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
+        closed_sessions = sesi_obj.search([('status', '=', 'closed'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
+
+        # Load courses specifically taught by this Dosen
+        courses_list = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        if not courses_list:
+            # Fallback to all active courses if no relationship is defined yet
+            courses_list = request.env['mata.kuliah'].sudo().search([], order='nama asc')
 
         return request.render('custom_web.presensi_dosen', {
             'dosen': dosen,
             'open_sessions': open_sessions,
             'closed_sessions': closed_sessions,
+            'courses_list': courses_list,
         })
 
     @http.route('/dosen/tugas', auth='public', website=True, type='http')
@@ -55,13 +62,12 @@ class DosenPortalController(http.Controller):
         if not dosen:
             return request.redirect('/login')
 
-        # Mock mata kuliah options for Dosen
-        mata_kuliah = [
-            {'id': 1, 'name': 'Kecerdasan Buatan (AI)'},
-            {'id': 2, 'name': 'Pemrograman Web II'},
-            {'id': 3, 'name': 'Rekayasa Perangkat Lunak'},
-            {'id': 4, 'name': 'Interaksi Manusia dan Komputer'}
-        ]
+        # Get actual courses taught by this Dosen from database (removes mockup dummy data)
+        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        if not real_mk:
+            real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
+        
+        mata_kuliah = [{'id': mk.id, 'name': mk.nama} for mk in real_mk]
 
         return request.render('custom_web.tugas_dosen_buat', {
             'dosen': dosen,
@@ -74,12 +80,12 @@ class DosenPortalController(http.Controller):
         if not dosen:
             return request.redirect('/login')
 
-        mata_kuliah = [
-            {'id': 1, 'name': 'Kecerdasan Buatan (AI)'},
-            {'id': 2, 'name': 'Pemrograman Web II'},
-            {'id': 3, 'name': 'Rekayasa Perangkat Lunak'},
-            {'id': 4, 'name': 'Interaksi Manusia dan Komputer'}
-        ]
+        # Get actual courses taught by this Dosen from database (removes mockup dummy data)
+        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        if not real_mk:
+            real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
+        
+        mata_kuliah = [{'id': mk.id, 'name': mk.nama} for mk in real_mk]
 
         return request.render('custom_web.tugas_dosen_pengumpulan', {
             'dosen': dosen,
