@@ -1,0 +1,110 @@
+<odoo>
+    <template id="presensi_scan" name="Presensi Face ID">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/presensi.css"/>
+
+            <!-- Presence Metadata for JS -->
+            <div id="presenceMetadata" 
+                 t-att-data-course-id="course['id']" 
+                 t-att-data-course-name="course['name']" 
+                 t-att-data-course-type="course['status']" 
+                 t-att-data-student-name="mahasiswa.name"
+                 t-att-data-student-nim="mahasiswa.nim"
+                 style="display: none;"></div>
+
+            <div class="presensi-scan-container">
+                <!-- Top Mock Header Bar -->
+                <div class="presensi-top-bar glass-panel">
+                    <a href="/presensi" class="btn-back"><i class="bi bi-arrow-left"></i></a>
+                    <span class="bar-title">Presensi mahasiswa</span>
+                    <div class="bar-avatar">
+                        <t t-if="mahasiswa.foto_profil">
+                            <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
+                        </t>
+                        <t t-else="">
+                            <t t-esc="mahasiswa.name[0].upper()"/>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Main Camera/Scanner Card -->
+                <div class="scanner-card glass-panel" id="scannerCard">
+                    <div class="camera-wrapper">
+                        <!-- Real Camera Video Element -->
+                        <video id="webcam" autoplay="true" playsinline="true" class="webcam-feed hidden"></video>
+
+                        <!-- Fallback Wireframe Scanner Illustration (SVG) -->
+                        <div id="cameraFallback" class="camera-fallback">
+                            <div class="wireframe-glow"></div>
+                            <svg viewBox="0 0 200 200" class="wireframe-face">
+                                <!-- Outer boundary oval -->
+                                <ellipse cx="100" cy="95" rx="55" ry="70" fill="none" stroke="rgba(59, 130, 246, 0.4)" stroke-width="2" stroke-dasharray="5,5" />
+                                <!-- Simplified face silhouette -->
+                                <path d="M70,140 C80,165 120,165 130,140" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2.5" />
+                                <path d="M80,90 C90,100 110,100 120,90" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2" />
+                                <circle cx="85" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
+                                <circle cx="115" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
+                                <path d="M100,75 L100,100 L95,102" fill="none" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" />
+                            </svg>
+                            <span class="fallback-text"><i class="bi bi-camera-video-off-fill"></i> Kamera tidak aktif / diblokir</span>
+                        </div>
+
+                        <!-- Scan Overlay Frame -->
+                        <div class="scan-overlay">
+                            <!-- Glowing Scanner Line (moves down/up) -->
+                            <div class="laser-scanner" id="laserScanner"></div>
+                            
+                            <!-- The Oval Outline mapping the face area -->
+                            <div class="face-oval-frame">
+                            </div>
+                        </div>
+
+                        <!-- Vector Success Checklist SVG (Hidden initially) -->
+                        <div class="success-checkmark-overlay hidden" id="successCheckmark">
+                            <div class="checkmark-circle-glow">
+                                <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                </svg>
+                            </div>
+                            <h3>Presensi Sukses!</h3>
+                            <p id="successMessage">Selamat belajar, presensi Anda telah terekam.</p>
+                        </div>
+
+                        <!-- Micro Info Box on Scanner Top -->
+                        <div class="scanner-status-box" id="scannerStatusBox">
+                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> Menunggu Pemindaian...</span>
+                        </div>
+                    </div>
+
+                    <!-- Scan Oval Button at center-bottom of scanner block -->
+                    <div class="scanner-action">
+                        <button type="button" class="btn-scan-oval" id="btnMulaiPresensi" onclick="startPresenceSimulation()">
+                            <span class="btn-text">Mulai Presensi</span>
+                            <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> memproses...</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bottom Stats Card -->
+                <div class="student-info-card glass-panel">
+                    <div class="info-row">
+                        <div class="info-label">Nama</div>
+                        <div class="info-separator">:</div>
+                        <div class="info-value text-highlight"><t t-esc="mahasiswa.name"/></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Nim</div>
+                        <div class="info-separator">:</div>
+                        <div class="info-value"><t t-esc="mahasiswa.nim"/></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Matkul</div>
+                        <div class="info-separator">:</div>
+                        <div class="info-value text-accent"><t t-esc="course['name']"/></div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

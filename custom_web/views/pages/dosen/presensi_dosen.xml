@@ -1,0 +1,210 @@
+<odoo>
+    <template id="presensi_dosen" name="Presensi Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
+            <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
+
+            <div class="dosen-presensi-container">
+                <!-- Top Header HUD -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name"><t t-esc="dosen.name"/></h2>
+                            <p class="dosen-role"><i class="bi bi-person-workspace"></i> Dosen Pengajar</p>
+                        </div>
+                    </div>
+                    <a href="/dashboard/dosen" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+                    </a>
+                </div>
+
+                <div class="dosen-presensi-grid">
+                    <!-- SECTION KIRI: Form Buka Sesi Baru -->
+                    <div class="dosen-form-card glass-panel">
+                        <div class="card-header">
+                            <span class="header-icon"><i class="bi bi-plus-circle-fill"></i></span>
+                            <h3>Buka Sesi Presensi Baru</h3>
+                        </div>
+                        <form id="formBukaSesi" class="modern-form">
+                            <!-- Nama Sesi -->
+                            <div class="form-group">
+                                <label for="nama_sesi">Nama Sesi <span class="required">*</span></label>
+                                <input type="text" id="nama_sesi" name="nama_sesi" placeholder="Contoh: Pertemuan 5" required="required" class="form-control"/>
+                            </div>
+
+                            <!-- Mata Kuliah -->
+                            <div class="form-group">
+                                <label for="mata_kuliah">Mata Kuliah <span class="required">*</span></label>
+                                <input type="text" id="mata_kuliah" name="mata_kuliah" placeholder="Contoh: Desain Web Lanjut" required="required" class="form-control"/>
+                            </div>
+
+                            <!-- Tipe Kelas (Segmented Toggle) -->
+                            <div class="form-group">
+                                <label>Tipe Kelas <span class="required">*</span></label>
+                                <div class="segmented-control">
+                                    <input type="radio" id="type_offline" name="tipe_kelas" value="offline" checked="checked"/>
+                                    <label for="type_offline" class="segmented-label offline-label">
+                                        <i class="bi bi-geo-alt-fill"></i> Luring (Offline)
+                                    </label>
+
+                                    <input type="radio" id="type_online" name="tipe_kelas" value="online"/>
+                                    <label for="type_online" class="segmented-label online-label">
+                                        <i class="bi bi-laptop"></i> Daring (Online)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Koordinat GPS & Radius (Akan disembunyikan jika Online) -->
+                            <div id="gps-fields-container" class="gps-fields-wrapper">
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="latitude">Latitude <span class="required">*</span></label>
+                                        <input type="number" step="any" id="latitude" name="latitude" placeholder="0.0" class="form-control"/>
+                                    </div>
+                                    <div class="form-group half">
+                                        <label for="longitude">Longitude <span class="required">*</span></label>
+                                        <input type="number" step="any" id="longitude" name="longitude" placeholder="0.0" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="gps-detection-box">
+                                    <button type="button" id="btnDapatkanLokasi" class="btn-location-fetch">
+                                        <i class="bi bi-cursor-fill pulsing-icon"></i> Dapatkan Lokasi GPS Saya
+                                    </button>
+                                    <div id="gps-status" class="gps-status-text">Lokasi belum terdeteksi.</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="radius_meter">Radius Batas Hadir (meter) <span class="required">*</span></label>
+                                    <input type="number" id="radius_meter" name="radius_meter" value="100" class="form-control"/>
+                                    <span class="input-helper">Jarak toleransi maksimal mahasiswa dari kelas.</span>
+                                </div>
+                            </div>
+
+                            <!-- Batas Waktu Telat -->
+                            <div class="form-group">
+                                <label for="batas_waktu_telat">Batas Waktu Tepat Waktu <span class="required">*</span></label>
+                                <input type="datetime-local" id="batas_waktu_telat" name="batas_waktu_telat" required="required" class="form-control"/>
+                                <span class="input-helper">Mahasiswa yang hadir lewat waktu ini akan dicatat "Terlambat" (Reward +0).</span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" id="btnSubmitSesi" class="btn-submit-sesi">
+                                <i class="bi bi-check2-circle"></i> Mulai Sesi Presensi
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- SECTION KANAN: Pemantauan Sesi Aktif -->
+                    <div class="dosen-list-card glass-panel">
+                        <div class="card-header">
+                            <span class="header-icon"><i class="bi bi-broadcast"></i></span>
+                            <h3>Sesi Presensi Aktif</h3>
+                        </div>
+
+                        <div id="sesi-aktif-list" class="sessions-container">
+                            <t t-if="not open_sessions">
+                                <div class="empty-state">
+                                    <i class="bi bi-slash-circle"></i>
+                                    <p>Belum ada sesi presensi yang sedang aktif dibuka.</p>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <t t-foreach="open_sessions" t-as="sesi">
+                                    <div class="session-active-item" t-att-id="'sesi-item-' + str(sesi.id)">
+                                        <div class="session-item-header">
+                                            <div class="session-title-block">
+                                                <h4><t t-esc="sesi.name"/></h4>
+                                                <p class="matkul"><t t-esc="sesi.mata_kuliah"/></p>
+                                            </div>
+                                            <!-- Badge Tipe Kelas -->
+                                            <t t-if="sesi.tipe_kelas == 'online'">
+                                                <span class="type-badge online"><i class="bi bi-laptop"></i> Online</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="type-badge offline"><i class="bi bi-geo-alt-fill"></i> Offline</span>
+                                            </t>
+                                        </div>
+
+                                        <div class="session-item-body">
+                                            <div class="stats-row">
+                                                <div class="stat-box">
+                                                    <span class="number"><t t-esc="sesi.total_hadir"/></span>
+                                                    <span class="label">Mahasiswa Hadir</span>
+                                                </div>
+                                                <div class="stat-box info">
+                                                    <span class="label-info"><strong>Waktu Buka:</strong></span>
+                                                    <span class="value-info time-format"><t t-esc="str(sesi.waktu_buka).split('.')[0] if sesi.waktu_buka else '-'"/></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="session-item-footer">
+                                            <button type="button" class="btn-tutup-sesi" t-att-data-id="sesi.id">
+                                                <i class="bi bi-stop-circle-fill"></i> Tutup Sesi Presensi
+                                            </button>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION BAWAH: Riwayat Sesi Presensi -->
+                <div class="riwayat-section glass-panel">
+                    <div class="card-header">
+                        <span class="header-icon"><i class="bi bi-clock-history"></i></span>
+                        <h3>Riwayat Sesi Presensi Dosen</h3>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Sesi</th>
+                                    <th>Mata Kuliah</th>
+                                    <th>Tipe</th>
+                                    <th>Waktu Buka</th>
+                                    <th>Waktu Tutup</th>
+                                    <th>Total Hadir</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="riwayat-table-body">
+                                <t t-if="not closed_sessions">
+                                    <tr class="row-empty">
+                                        <td colspan="7">Belum ada riwayat sesi presensi yang ditutup.</td>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                    <t t-foreach="closed_sessions" t-as="sesi">
+                                        <tr>
+                                            <td class="bold"><t t-esc="sesi.name"/></td>
+                                            <td><t t-esc="sesi.mata_kuliah"/></td>
+                                            <td>
+                                                <t t-if="sesi.tipe_kelas == 'online'">
+                                                    <span class="badge online">Online</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge offline">Offline</span>
+                                                </t>
+                                            </td>
+                                            <td class="time-format"><t t-esc="str(sesi.waktu_buka).split('.')[0] if sesi.waktu_buka else '-'"/></td>
+                                            <td class="time-format"><t t-esc="str(sesi.waktu_tutup).split('.')[0] if sesi.waktu_tutup else '-'"/></td>
+                                            <td class="center bold text-primary"><t t-esc="sesi.total_hadir"/> Mhs</td>
+                                            <td><span class="status-badge closed">Selesai</span></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

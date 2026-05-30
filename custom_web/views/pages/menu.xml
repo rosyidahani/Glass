@@ -1,31 +1,190 @@
 <odoo>
-
-    <!-- Web Page Template (rendered by controller) -->
-    <template id="menu" name="Menu Page">
+    <!-- Rebuild menu template into the Student Tugas Portal -->
+    <template id="menu" name="Student Tugas Dashboard">
         <t t-call="custom_web.layout">
-            <h2>Menu</h2>
-            <ul>
-                <li><a href="/dashboard">Dashboard</a></li>
-                <li><a href="/menu/submenu">Submenu</a></li>
-            </ul>
+            <div class="mhs-tugas-container">
+                
+                <!-- HUD Stats Header -->
+                <div class="mhs-header-hud">
+                    <div class="hud-profile-meta">
+                        <span class="avatar-shortcut"><i class="bi bi-mortarboard-fill"></i></span>
+                        <div class="meta-txt">
+                            <h2>Dashboard Tugas</h2>
+                            <p><i class="bi bi-person-badge"></i> Selamat datang kembali, <t t-esc="mahasiswa_name"/></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Badges -->
+                    <div class="mhs-stats-hud">
+                        <div class="stat-badge">
+                            <span class="num text-purple" id="count-semua">2</span>
+                            <span class="lbl">Total Tugas</span>
+                        </div>
+                        <div class="stat-badge">
+                            <span class="num text-orange" id="count-belum">2</span>
+                            <span class="lbl">Belum Selesai</span>
+                        </div>
+                        <div class="stat-badge">
+                            <span class="num text-green" id="count-selesai">0</span>
+                            <span class="lbl">Selesai</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters & Tab Control -->
+                <div class="tugas-tab-filters">
+                    <button class="tab-btn active" id="tab-all" onclick="filterMhsTugas('all')">
+                        <i class="bi bi-grid-fill"></i> Semua Tugas
+                    </button>
+                    <button class="tab-btn" id="tab-pending" onclick="filterMhsTugas('pending')">
+                        <i class="bi bi-hourglass-split"></i> Belum Selesai
+                    </button>
+                    <button class="tab-btn" id="tab-completed" onclick="filterMhsTugas('completed')">
+                        <i class="bi bi-check-circle-fill"></i> Selesai
+                    </button>
+                </div>
+
+                <!-- Assignment Feed Grid -->
+                <div class="mhs-assignments-feed" id="student-tugas-list">
+                    
+                    <!-- Mock Assignment 1 -->
+                    <div class="tugas-card" data-id="task-1" data-status="pending" data-jenis="Individu">
+                        <div class="tugas-card-header">
+                            <div class="subject-info">
+                                <div class="sub-meta">
+                                    <h4>Implementasi Jaringan Saraf Tiruan (Backpropagation)</h4>
+                                    <p>Kecerdasan Buatan (AI)</p>
+                                </div>
+                            </div>
+                            <span class="type-badge individu">
+                                <i class="bi bi-person-fill"></i> Individu
+                            </span>
+                        </div>
+                        <div class="tugas-card-body">
+                            <p class="desc">Buatlah rancangan dan kode implementasi Jaringan Saraf Tiruan dengan algoritma Backpropagation dari awal tanpa menggunakan framework ML eksternal (gunakan NumPy jika menggunakan Python). Tugas dikumpulkan berupa file PDF laporan analisis dan file source code.</p>
+                            <div class="card-deadline">
+                                <span class="lbl-deadline">Batas Pengumpulan:</span>
+                                <span class="val-deadline soon"><i class="bi bi-clock-fill"></i> 3 Juni 2026, 23:59 WIB</span>
+                            </div>
+                        </div>
+                        <div class="tugas-card-footer">
+                            <span class="status-indicator pending">
+                                <i class="bi bi-exclamation-circle-fill"></i> Belum Dikumpulkan
+                            </span>
+                            <button class="btn-action-kumpulkan" onclick="openSubmissionDrawer('task-1', 'Implementasi Jaringan Saraf Tiruan (Backpropagation)', 'Kecerdasan Buatan (AI)')">
+                                <i class="bi bi-cloud-arrow-up-fill"></i> Kumpulkan Tugas
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mock Assignment 2 -->
+                    <div class="tugas-card" data-id="task-2" data-status="pending" data-jenis="Kelompok">
+                        <div class="tugas-card-header">
+                            <div class="subject-info">
+                                <div class="sub-meta">
+                                    <h4>Pembangunan Portal Web dengan Odoo Controller</h4>
+                                    <p>Pemrograman Web II</p>
+                                </div>
+                            </div>
+                            <span class="type-badge kelompok">
+                                <i class="bi bi-people-fill"></i> Kelompok
+                            </span>
+                        </div>
+                        <div class="tugas-card-body">
+                            <p class="desc">Bangunlah sebuah modul Odoo custom yang berisi template website frontend terintegrasi dengan session Odoo backend. Dosen dan mahasiswa wajib memiliki autentikasi portal terpisah. Tugas dikerjakan berkelompok maksimal 3 orang.</p>
+                            <div class="card-deadline">
+                                <span class="lbl-deadline">Batas Pengumpulan:</span>
+                                <span class="val-deadline soon"><i class="bi bi-clock-fill"></i> 7 Juni 2026, 23:59 WIB</span>
+                            </div>
+                        </div>
+                        <div class="tugas-card-footer">
+                            <span class="status-indicator pending">
+                                <i class="bi bi-exclamation-circle-fill"></i> Belum Dikumpulkan
+                            </span>
+                            <button class="btn-action-kumpulkan" onclick="openSubmissionDrawer('task-2', 'Pembangunan Portal Web dengan Odoo Controller', 'Pemrograman Web II')">
+                                <i class="bi bi-cloud-arrow-up-fill"></i> Kumpulkan Tugas
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Slide-up Submission Drawer / Modal -->
+            <div class="submission-modal-overlay" id="submission-overlay" onclick="closeSubmissionDrawer()">
+                <div class="submission-drawer" onclick="event.stopPropagation()">
+                    <div class="drawer-header">
+                        <div class="header-txt">
+                            <span class="drawer-icon"><i class="bi bi-cloud-arrow-up-fill"></i></span>
+                            <div>
+                                <h3 id="submit-task-title">Judul Tugas</h3>
+                                <p id="submit-task-subject">Nama Mata Kuliah</p>
+                            </div>
+                        </div>
+                        <button class="btn-close-drawer" onclick="closeSubmissionDrawer()"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <form id="form-kumpul-tugas" class="drawer-form" onsubmit="return false;">
+                        <input type="hidden" id="submit-task-id" name="task_id"/>
+                        
+                        <!-- Upload File Mock Area -->
+                        <div class="form-group">
+                            <label>Unggah Berkas Tugas (Mock File)</label>
+                            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-upload').click()">
+                                <i class="bi bi-file-earmark-zip-fill text-purple"></i>
+                                <p class="drop-main">Tarik &amp; lepas berkas di sini atau klik untuk mencari</p>
+                                <p class="drop-sub">Mendukung format ZIP, RAR, PDF, atau DOCX (Maksimal 10MB)</p>
+                                <span id="file-name-display" class="file-chosen-name hidden"></span>
+                                <input type="file" id="file-upload" class="hidden" onchange="handleFileSelect(this)"/>
+                            </div>
+                        </div>
+
+                        <!-- Link Submission -->
+                        <div class="form-group">
+                            <label for="link-submission"><i class="bi bi-link-45deg"></i> Link Tautan Pengumpulan (Opsional)</label>
+                            <input type="url" id="link-submission" class="form-control" placeholder="Contoh: https://github.com/username/repository-tugas"/>
+                            <p class="input-helper">Sertakan tautan repository GitHub atau Google Drive jika pengerjaan menggunakan kontrol versi.</p>
+                        </div>
+
+                        <!-- Catatan Mahasiswa -->
+                        <div class="form-group">
+                            <label for="catatan">Catatan untuk Dosen</label>
+                            <textarea id="catatan" class="form-control" rows="3" placeholder="Tuliskan catatan pengerjaan tambahan di sini..."></textarea>
+                        </div>
+
+                        <button type="button" class="btn-submit-drawer" onclick="submitMockSubmission()">
+                            <i class="bi bi-check-circle-fill"></i> Kirim &amp; Kumpulkan Jawaban
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Celebration POP-UP (Confetti / XP Reward Panel) -->
+            <div class="celebration-overlay hidden" id="celebration-panel">
+                <div class="celebration-card">
+                    <div class="check-circle"><i class="bi bi-check-lg"></i></div>
+                    <h3>Tugas Berhasil Dikumpulkan!</h3>
+                    <p class="congrats">Luar biasa! Tugas Anda telah tersimpan secara aman di sistem.</p>
+                    
+                    <!-- Reward HUD -->
+                    <div class="gamified-reward">
+                        <div class="reward-box xp">
+                            <span class="value">+15</span>
+                            <span class="label">XP Didapat</span>
+                        </div>
+                        <div class="reward-box coin">
+                            <span class="value">+3</span>
+                            <span class="label">Koin Didapat</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-close-celebration" onclick="closeCelebration()">
+                        Kembali ke Dashboard Tugas
+                    </button>
+                </div>
+            </div>
+
+            <div class="glowing-toast-container" id="mhs-toast-container"></div>
         </t>
     </template>
-
-    <!-- Backend Action -->
-    <record id="action_custom_web" model="ir.actions.act_window">
-        <field name="name">Custom Web</field>
-        <field name="res_model">res.users</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-    
-    <!-- Backend Menu Items -->
-    <menuitem id="menu_custom_root"
-              name="Custom Web"
-              sequence="10"/>
-
-    <menuitem id="menu_custom_child"
-              name="Dashboard"
-              parent="menu_custom_root"
-              action="action_custom_web"/>
-
 </odoo>

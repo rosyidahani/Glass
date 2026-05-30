@@ -47,7 +47,7 @@
                             <p>Buka sesi kehadiran kelas baru dan awasi partisipasi mahasiswa secara instan.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="#" class="dosen-action-btn btn-purple">Mulai Presensi</a>
+                            <a href="/dosen/presensi" class="dosen-action-btn btn-purple">Mulai Presensi</a>
                         </div>
                     </div>
 

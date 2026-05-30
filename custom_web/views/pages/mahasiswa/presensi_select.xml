@@ -1,0 +1,87 @@
+<odoo>
+    <template id="presensi_select" name="Pilih Kelas Presensi">
+        <t t-call="custom_web.layout">
+            <!-- link to presence stylesheet -->
+            <link rel="stylesheet" href="/custom_web/static/src/css/presensi.css"/>
+
+            <div class="presensi-select-container">
+                <div class="header-section-main">
+                    <h2>Pilih Kelas &amp; Mata Kuliah</h2>
+                    <p>Silakan pilih kelas mata kuliah aktif untuk melakukan presensi kehadiran hari ini.</p>
+                </div>
+
+                <!-- Search and Filter Bar -->
+                <div class="filter-bar glass-panel">
+                    <div class="search-box">
+                        <i class="bi bi-search font-icon-search"></i>
+                        <input type="text" id="searchInput" placeholder="Cari mata kuliah atau dosen..." onkeyup="filterCourses()"/>
+                    </div>
+                    <div class="filter-options">
+                        <button class="filter-btn active" id="btn-all" onclick="filterStatus('all')">Semua</button>
+                        <button class="filter-btn" id="btn-online" onclick="filterStatus('online')"><span class="dot dot-green"></span> Online</button>
+                        <button class="filter-btn" id="btn-offline" onclick="filterStatus('offline')"><span class="dot dot-blue"></span> Offline</button>
+                        <button class="filter-btn" id="btn-selesai" onclick="filterStatus('selesai')"><span class="dot dot-gray"></span> Selesai</button>
+                    </div>
+                </div>
+
+                <!-- Course Cards Grid -->
+                <div class="courses-grid" id="coursesGrid">
+                    <t t-foreach="courses" t-as="course">
+                        <!-- If finished, show disabled styling -->
+                        <div t-att-class="'course-card glass-panel ' + course['status'] + (' disabled-card' if course['status'] == 'selesai' else ' active-card')"
+                             t-att-data-name="course['name'].lower() + ' ' + course['dosen'].lower()"
+                             t-att-data-status="course['status']">
+                            
+                            <!-- Status Badge -->
+                            <div class="card-status-badge">
+                                <span t-att-class="'status-dot ' + course['status']"></span>
+                                <span class="status-text"><t t-esc="course['status_label']"/></span>
+                            </div>
+
+                            <div class="course-icon">
+                                <t t-if="course['status'] == 'online'">
+                                    <i class="bi bi-laptop-fill text-green"></i>
+                                </t>
+                                <t t-elif="course['status'] == 'offline'">
+                                    <i class="bi bi-building-fill text-blue"></i>
+                                </t>
+                                <t t-else="">
+                                    <i class="bi bi-calendar-x-fill text-gray"></i>
+                                </t>
+                            </div>
+
+                            <div class="course-details">
+                                <h3 class="course-title"><t t-esc="course['name']"/></h3>
+                                <p class="course-dosen"><i class="bi bi-person-fill"></i> <t t-esc="course['dosen']"/></p>
+                                
+                                <div class="course-meta">
+                                    <span><i class="bi bi-clock-fill"></i> <t t-esc="course['jam']"/></span>
+                                    <span><i class="bi bi-geo-alt-fill"></i> <t t-esc="course['ruang']"/></span>
+                                </div>
+
+                                <!-- Offline extra alert for GPS -->
+                                <t t-if="course['status'] == 'offline'">
+                                    <div class="gps-badge">
+                                        <i class="bi bi-pin-map-fill"></i> Validasi GPS Aktif (Radius Kampus)
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- Footer Card Button -->
+                            <div class="card-footer-action">
+                                <t t-if="course['status'] == 'selesai'">
+                                    <button class="btn-action btn-disabled" disabled="disabled">Selesai</button>
+                                </t>
+                                <t t-else="">
+                                    <a t-att-href="'/presensi/scan/' + str(course['id'])" class="btn-action btn-active">
+                                        Mulai Presensi <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -12,9 +12,15 @@ class PresensiSesi(models.Model):
     mata_kuliah = fields.Char(string='Mata Kuliah', required=True)
 
     # Koordinat lokasi kelas
-    latitude = fields.Float(string='Latitude', digits=(10, 7), required=True)
-    longitude = fields.Float(string='Longitude', digits=(10, 7), required=True)
+    latitude = fields.Float(string='Latitude', digits=(10, 7))
+    longitude = fields.Float(string='Longitude', digits=(10, 7))
     radius_meter = fields.Integer(string='Radius (meter)', default=100)
+
+    # Tipe kelas
+    tipe_kelas = fields.Selection([
+        ('online', 'Online'),
+        ('offline', 'Offline'),
+    ], default='offline', string='Tipe Kelas')
 
     # Waktu sesi
     waktu_buka = fields.Datetime(string='Waktu Buka')

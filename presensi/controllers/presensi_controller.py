@@ -63,20 +63,36 @@ class PresensiController(http.Controller):
         except Exception:
             return self._error('Format JSON tidak valid.')
 
-        required = ['nama_sesi', 'mata_kuliah', 'latitude',
-                    'longitude', 'radius_meter', 'batas_waktu_telat']
+        required = ['nama_sesi', 'mata_kuliah', 'tipe_kelas', 'batas_waktu_telat']
         for field in required:
             if field not in body:
                 return self._error(f'Field "{field}" wajib diisi.')
 
-        sesi = request.env['presensi.sesi'].sudo().create({
+        tipe_kelas = body.get('tipe_kelas', 'offline')
+        if tipe_kelas == 'offline':
+            if 'latitude' not in body or 'longitude' not in body or 'radius_meter' not in body:
+                return self._error('Untuk kelas offline, latitude, longitude, dan radius wajib diisi.')
+
+        sesi_vals = {
             'name': body['nama_sesi'],
             'mata_kuliah': body['mata_kuliah'],
-            'latitude': float(body['latitude']),
-            'longitude': float(body['longitude']),
-            'radius_meter': int(body['radius_meter']),
+            'tipe_kelas': tipe_kelas,
             'batas_waktu_telat': body['batas_waktu_telat'],
-        })
+        }
+        if tipe_kelas == 'offline':
+            sesi_vals.update({
+                'latitude': float(body['latitude']),
+                'longitude': float(body['longitude']),
+                'radius_meter': int(body['radius_meter']),
+            })
+        else:
+            sesi_vals.update({
+                'latitude': 0.0,
+                'longitude': 0.0,
+                'radius_meter': 0,
+            })
+
+        sesi = request.env['presensi.sesi'].sudo().create(sesi_vals)
         sesi.buka_sesi()
 
         return self._success({
@@ -129,20 +145,12 @@ class PresensiController(http.Controller):
             return self._error('Format JSON tidak valid.')
 
         sesi_id = body.get('sesi_id')
-        latitude = body.get('latitude')
-        longitude = body.get('longitude')
         is_mock = body.get('is_mock_location', False)
         accuracy = body.get('accuracy', 0)
         face_verified = body.get('face_verified', False)
 
-        if not all([sesi_id, latitude, longitude]):
-            return self._error('sesi_id, latitude, longitude wajib diisi.')
-
-        # Cek fake GPS
-        if self._deteksi_fake_gps(is_mock, accuracy):
-            return self._error(
-                'Terdeteksi lokasi palsu (Fake GPS). Presensi ditolak.', 403
-            )
+        if not sesi_id:
+            return self._error('sesi_id wajib diisi.')
 
         # Cek face ID
         if not face_verified:
@@ -163,17 +171,30 @@ class PresensiController(http.Controller):
         if sudah:
             return self._error('Kamu sudah melakukan presensi di sesi ini.')
 
-        # Validasi jarak GPS
-        jarak = self._hitung_jarak_meter(
-            float(latitude), float(longitude),
-            sesi.latitude, sesi.longitude
-        )
-        if jarak > sesi.radius_meter:
-            return self._error(
-                f'Lokasi kamu terlalu jauh dari kelas '
-                f'({round(jarak)} meter, batas {sesi.radius_meter} meter).',
-                403
+        # Validasi jarak GPS hanya jika kelas offline
+        jarak = 0
+        if sesi.tipe_kelas == 'offline':
+            latitude = body.get('latitude')
+            longitude = body.get('longitude')
+            if not latitude or not longitude:
+                return self._error('Untuk kelas luring (offline), koordinat lokasi Anda wajib dikirim.')
+
+            # Cek fake GPS
+            if self._deteksi_fake_gps(is_mock, accuracy):
+                return self._error(
+                    'Terdeteksi lokasi palsu (Fake GPS). Presensi ditolak.', 403
+                )
+
+            jarak = self._hitung_jarak_meter(
+                float(latitude), float(longitude),
+                sesi.latitude, sesi.longitude
             )
+            if jarak > sesi.radius_meter:
+                return self._error(
+                    f'Lokasi kamu terlalu jauh dari kelas '
+                    f'({round(jarak)} meter, batas {sesi.radius_meter} meter).',
+                    403
+                )
 
         # Tentukan tepat waktu / terlambat
         from odoo.fields import Datetime
