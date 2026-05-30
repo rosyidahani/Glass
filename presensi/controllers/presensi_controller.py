@@ -63,7 +63,7 @@ class PresensiController(http.Controller):
         except Exception:
             return self._error('Format JSON tidak valid.')
 
-        required = ['nama_sesi', 'mata_kuliah', 'tipe_kelas', 'batas_waktu_telat']
+        required = ['nama_sesi', 'mata_kuliah_id', 'tipe_kelas', 'batas_waktu_telat']
         for field in required:
             if field not in body:
                 return self._error(f'Field "{field}" wajib diisi.')
@@ -75,7 +75,7 @@ class PresensiController(http.Controller):
 
         sesi_vals = {
             'name': body['nama_sesi'],
-            'mata_kuliah': body['mata_kuliah'],
+            'mata_kuliah_id'    : int(body['mata_kuliah_id']),
             'tipe_kelas': tipe_kelas,
             'batas_waktu_telat': body['batas_waktu_telat'],
         }
@@ -234,6 +234,7 @@ class PresensiController(http.Controller):
             'xp_didapat': xp,
             'koin_didapat': koin,
             'jarak_meter': round(jarak),
+            'mata_kuliah': sesi.mata_kuliah_id.nama,  
         })
 
     # ================================================

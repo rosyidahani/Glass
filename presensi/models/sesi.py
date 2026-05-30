@@ -9,7 +9,12 @@ class PresensiSesi(models.Model):
     name = fields.Char(string='Nama Sesi', required=True)
     dosen_id = fields.Many2one('res.users', string='Dosen',
                                 default=lambda self: self.env.user)
-    mata_kuliah = fields.Char(string='Mata Kuliah', required=True)
+    mata_kuliah_id = fields.Many2one(
+    comodel_name='mata.kuliah',
+    string='Mata Kuliah',
+    required=True,
+    ondelete='restrict',  # cegah matkul dihapus kalau masih ada sesi
+)
 
     # Koordinat lokasi kelas
     latitude = fields.Float(string='Latitude', digits=(10, 7))

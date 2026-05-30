@@ -1,10 +1,10 @@
 {
-    'name': 'Presensi',
+    'name': 'Mata Kuliah',
     'version': '1.0',
-    'depends': ['base', 'mahasiswa', 'mata_kuliah'],
+    'depends': ['base', 'mahasiswa'],
     'data': [
         'security/ir.model.access.csv',
-        'views/presensi_views.xml',
+        'views/mata_kuliah_views.xml',
     ],
     'installable': True,
     'application': True,
