@@ -16,8 +16,8 @@
                             <p class="dosen-role"><i class="bi bi-person-workspace"></i> Dosen Pengajar</p>
                         </div>
                     </div>
-                    <a href="/dashboard/dosen" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+                    <a href="/dashboard" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
                     </a>
                 </div>
 

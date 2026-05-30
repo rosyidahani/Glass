@@ -4,109 +4,286 @@
         <t t-call="custom_web.layout">
             <div class="mhs-tugas-container">
                 
-                <!-- HUD Stats Header -->
+                <!-- Simple Header Card -->
                 <div class="mhs-header-hud">
                     <div class="hud-profile-meta">
-                        <span class="avatar-shortcut"><i class="bi bi-mortarboard-fill"></i></span>
-                        <div class="meta-txt">
-                            <h2>Dashboard Tugas</h2>
-                            <p><i class="bi bi-person-badge"></i> Selamat datang kembali, <t t-esc="mahasiswa_name"/></p>
+                        <h2>Tugas</h2>
+                    </div>
+                    <div class="avatar-circle-header">
+                        <t t-if="mahasiswa and mahasiswa.foto_profil">
+                            <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile" class="avatar-img-round"/>
+                        </t>
+                        <t t-else="">
+                            <span class="avatar-shortcut"><i class="bi bi-person-fill"></i></span>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Glassmorphic Stats Panel Capsules -->
+                <div class="tugas-stats-capsules">
+                    <div class="stat-capsule">
+                        <span class="icon-side purple"><i class="bi bi-journal-bookmark-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="num" id="stats-active-count">2</span>
+                            <span class="lbl">Tugas Aktif</span>
                         </div>
                     </div>
-                    
-                    <!-- Stats Badges -->
-                    <div class="mhs-stats-hud">
-                        <div class="stat-badge">
-                            <span class="num text-purple" id="count-semua">2</span>
-                            <span class="lbl">Total Tugas</span>
-                        </div>
-                        <div class="stat-badge">
-                            <span class="num text-orange" id="count-belum">2</span>
-                            <span class="lbl">Belum Selesai</span>
-                        </div>
-                        <div class="stat-badge">
-                            <span class="num text-green" id="count-selesai">0</span>
+                    <div class="stat-capsule">
+                        <span class="icon-side green"><i class="bi bi-check-circle-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="num" id="stats-history-count">5</span>
                             <span class="lbl">Selesai</span>
                         </div>
                     </div>
+                    <div class="stat-capsule">
+                        <span class="icon-side gold"><i class="bi bi-trophy-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="num">+15 XP</span>
+                            <span class="lbl">Reward Min.</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Filters & Tab Control -->
-                <div class="tugas-tab-filters">
-                    <button class="tab-btn active" id="tab-all" onclick="filterMhsTugas('all')">
-                        <i class="bi bi-grid-fill"></i> Semua Tugas
-                    </button>
-                    <button class="tab-btn" id="tab-pending" onclick="filterMhsTugas('pending')">
-                        <i class="bi bi-hourglass-split"></i> Belum Selesai
-                    </button>
-                    <button class="tab-btn" id="tab-completed" onclick="filterMhsTugas('completed')">
-                        <i class="bi bi-check-circle-fill"></i> Selesai
-                    </button>
+                <!-- Tabs: Tugas & History -->
+                <div class="tugas-tab-filters-layout">
+                    <button class="tab-btn active" id="tab-tugas" onclick="switchTugasTab('tugas')">Tugas</button>
+                    <button class="tab-btn" id="tab-history" onclick="switchTugasTab('history')">History</button>
                 </div>
 
-                <!-- Assignment Feed Grid -->
-                <div class="mhs-assignments-feed" id="student-tugas-list">
+                <!-- Symmetrical Sided Dashboard Filter & Sort Controls Bar -->
+                <div class="dashboard-controls-bar">
                     
-                    <!-- Mock Assignment 1 -->
-                    <div class="tugas-card" data-id="task-1" data-status="pending" data-jenis="Individu">
-                        <div class="tugas-card-header">
-                            <div class="subject-info">
-                                <div class="sub-meta">
-                                    <h4>Implementasi Jaringan Saraf Tiruan (Backpropagation)</h4>
-                                    <p>Kecerdasan Buatan (AI)</p>
+                    <!-- Course Filter Dropdown -->
+                    <div class="control-box course-select">
+                        <label class="dropdown-label">Pilih mata kuliah</label>
+                        <div class="course-dropdown-trigger" id="student_course_btn">
+                            <span id="selected_student_course">Semua Mata Kuliah</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="course-dropdown-pane hidden" id="student_course_dropdown">
+                            <div class="dropdown-option-item active" data-id="all">Semua Mata Kuliah</div>
+                            <t t-foreach="courses" t-as="c">
+                                <div class="dropdown-option-item" t-att-data-id="c.id" t-att-data-name="c.nama">
+                                    <t t-esc="c.nama"/>
                                 </div>
-                            </div>
-                            <span class="type-badge individu">
-                                <i class="bi bi-person-fill"></i> Individu
-                            </span>
-                        </div>
-                        <div class="tugas-card-body">
-                            <p class="desc">Buatlah rancangan dan kode implementasi Jaringan Saraf Tiruan dengan algoritma Backpropagation dari awal tanpa menggunakan framework ML eksternal (gunakan NumPy jika menggunakan Python). Tugas dikumpulkan berupa file PDF laporan analisis dan file source code.</p>
-                            <div class="card-deadline">
-                                <span class="lbl-deadline">Batas Pengumpulan:</span>
-                                <span class="val-deadline soon"><i class="bi bi-clock-fill"></i> 3 Juni 2026, 23:59 WIB</span>
-                            </div>
-                        </div>
-                        <div class="tugas-card-footer">
-                            <span class="status-indicator pending">
-                                <i class="bi bi-exclamation-circle-fill"></i> Belum Dikumpulkan
-                            </span>
-                            <button class="btn-action-kumpulkan" onclick="openSubmissionDrawer('task-1', 'Implementasi Jaringan Saraf Tiruan (Backpropagation)', 'Kecerdasan Buatan (AI)')">
-                                <i class="bi bi-cloud-arrow-up-fill"></i> Kumpulkan Tugas
-                            </button>
+                            </t>
                         </div>
                     </div>
 
-                    <!-- Mock Assignment 2 -->
-                    <div class="tugas-card" data-id="task-2" data-status="pending" data-jenis="Kelompok">
-                        <div class="tugas-card-header">
-                            <div class="subject-info">
-                                <div class="sub-meta">
-                                    <h4>Pembangunan Portal Web dengan Odoo Controller</h4>
-                                    <p>Pemrograman Web II</p>
-                                </div>
-                            </div>
-                            <span class="type-badge kelompok">
-                                <i class="bi bi-people-fill"></i> Kelompok
-                            </span>
+                    <!-- Sort & Status Filter Dropdown -->
+                    <div class="control-box sort-select">
+                        <label class="dropdown-label">Urutkan &amp; Filter</label>
+                        <div class="sort-dropdown-trigger" id="student_sort_btn">
+                            <span id="selected_student_sort"><i class="bi bi-funnel-fill text-purple"></i> Urutkan &amp; Filter</span>
+                            <i class="bi bi-chevron-down"></i>
                         </div>
-                        <div class="tugas-card-body">
-                            <p class="desc">Bangunlah sebuah modul Odoo custom yang berisi template website frontend terintegrasi dengan session Odoo backend. Dosen dan mahasiswa wajib memiliki autentikasi portal terpisah. Tugas dikerjakan berkelompok maksimal 3 orang.</p>
-                            <div class="card-deadline">
-                                <span class="lbl-deadline">Batas Pengumpulan:</span>
-                                <span class="val-deadline soon"><i class="bi bi-clock-fill"></i> 7 Juni 2026, 23:59 WIB</span>
-                            </div>
-                        </div>
-                        <div class="tugas-card-footer">
-                            <span class="status-indicator pending">
-                                <i class="bi bi-exclamation-circle-fill"></i> Belum Dikumpulkan
-                            </span>
-                            <button class="btn-action-kumpulkan" onclick="openSubmissionDrawer('task-2', 'Pembangunan Portal Web dengan Odoo Controller', 'Pemrograman Web II')">
-                                <i class="bi bi-cloud-arrow-up-fill"></i> Kumpulkan Tugas
-                            </button>
+                        <div class="sort-dropdown-pane hidden" id="student_sort_dropdown">
+                            <div class="sort-option-item active" data-sort="default">Default</div>
+                            
+                            <div class="dropdown-section-divider">Urutkan Nama &amp; Waktu</div>
+                            <div class="sort-option-item" data-sort="name-asc"><i class="bi bi-sort-alpha-down"></i> Nama (A-Z)</div>
+                            <div class="sort-option-item" data-sort="name-desc"><i class="bi bi-sort-alpha-up"></i> Nama (Z-A)</div>
+                            <div class="sort-option-item" data-sort="date-open-asc"><i class="bi bi-calendar-plus"></i> Tanggal Buka (Terlama)</div>
+                            <div class="sort-option-item" data-sort="date-open-desc"><i class="bi bi-calendar-plus-fill"></i> Tanggal Buka (Terbaru)</div>
+                            <div class="sort-option-item" data-sort="date-close-asc"><i class="bi bi-calendar-minus"></i> Batas Waktu (Terdekat)</div>
+                            <div class="sort-option-item" data-sort="date-close-desc"><i class="bi bi-calendar-minus-fill"></i> Batas Waktu (Terlama)</div>
+                            
+                            <div class="dropdown-section-divider">Filter Status</div>
+                            <div class="sort-option-item" data-sort="filter-all"><i class="bi bi-circle"></i> Semua Status</div>
+                            <div class="sort-option-item" data-sort="filter-selesai"><i class="bi bi-check-circle-fill text-success"></i> Selesai</div>
+                            <div class="sort-option-item" data-sort="filter-terlambat"><i class="bi bi-exclamation-circle-fill text-danger"></i> Terlambat</div>
                         </div>
                     </div>
 
+                </div>
+
+                <!-- TAB CONTENT 1: Active Tasks (Tugas Tab) -->
+                <div id="active-tasks-container" class="tasks-tab-content-wrapper">
+                    <div class="mhs-assignments-feed-layout">
+                        
+                        <!-- Card 1 (Pending) -->
+                        <div class="tugas-card-layout" data-id="task-1" data-course-id="6" data-status="pending" data-name="Praktikum 4 DNS Server" data-date-open="2026-05-10" data-date-close="2026-05-15">
+                            <div class="card-badge-row">
+                                <span class="badge-tag type-individu"><i class="bi bi-person-fill"></i> Individu</span>
+                                <span class="badge-tag points-badge"><i class="bi bi-lightning-fill"></i> +15 XP</span>
+                            </div>
+                            <div class="card-main-content">
+                                <h3 class="task-title">Praktikum 4 DNS Server</h3>
+                                <p class="task-subject">Administrasi sistem</p>
+                                
+                                <!-- Start Date and Deadline Timeline -->
+                                <div class="task-timeline-dates">
+                                    <div class="date-milestone start">
+                                        <i class="bi bi-calendar-event"></i>
+                                        <div class="m-txt">
+                                            <span class="lbl">Tanggal Buka</span>
+                                            <span class="val">10 Mei 2026, 08:00 WIB</span>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-connector"></div>
+                                    <div class="date-milestone end soon">
+                                        <i class="bi bi-calendar-check-fill"></i>
+                                        <div class="m-txt">
+                                            <span class="lbl">Batas Deadline</span>
+                                            <span class="val">15 Mei 2026, 23:59 WIB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-action-buttons">
+                                <button type="button" class="btn-detail-task" onclick="showTaskDetails('task-1', 'Praktikum 4 DNS Server', 'Administrasi sistem', 'Buatlah rancangan dan konfigurasi DNS Server master-slave pada linux Debian 12. Laporkan konfigurasi bind9, db.local, dan reverse zone beserta screenshot uji nslookup.')">Detail</button>
+                                <button type="button" class="btn-kerjakan-task" onclick="openSubmissionDrawer('task-1', 'Praktikum 4 DNS Server', 'Administrasi sistem')">Kerjakan</button>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 (Pending) -->
+                        <div class="tugas-card-layout" data-id="task-2" data-course-id="5" data-status="pending" data-name="Implementasi Jaringan Saraf Tiruan" data-date-open="2026-05-25" data-date-close="2026-06-03">
+                            <div class="card-badge-row">
+                                <span class="badge-tag type-kelompok"><i class="bi bi-people-fill"></i> Kelompok</span>
+                                <span class="badge-tag points-badge"><i class="bi bi-lightning-fill"></i> +25 XP</span>
+                            </div>
+                            <div class="card-main-content">
+                                <h3 class="task-title">Implementasi Jaringan Saraf Tiruan</h3>
+                                <p class="task-subject">Kecerdasan Buatan (AI)</p>
+                                
+                                <!-- Start Date and Deadline Timeline -->
+                                <div class="task-timeline-dates">
+                                    <div class="date-milestone start">
+                                        <i class="bi bi-calendar-event"></i>
+                                        <div class="m-txt">
+                                            <span class="lbl">Tanggal Buka</span>
+                                            <span class="val">25 Mei 2026, 08:00 WIB</span>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-connector"></div>
+                                    <div class="date-milestone end">
+                                        <i class="bi bi-calendar-check-fill"></i>
+                                        <div class="m-txt">
+                                            <span class="lbl">Batas Deadline</span>
+                                            <span class="val">3 Juni 2026, 23:59 WIB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-action-buttons">
+                                <button type="button" class="btn-detail-task" onclick="showTaskDetails('task-2', 'Implementasi Jaringan Saraf Tiruan', 'Kecerdasan Buatan (AI)', 'Bangun arsitektur multilayer perceptron dengan algoritma backpropagation dari awal menggunakan numpy untuk memprediksi data sensor cuaca.')">Detail</button>
+                                <button type="button" class="btn-kerjakan-task" onclick="openSubmissionDrawer('task-2', 'Implementasi Jaringan Saraf Tiruan', 'Kecerdasan Buatan (AI)')">Kerjakan</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TAB CONTENT 2: Premium History Activity Cards Feed -->
+                <div id="history-tasks-container" class="tasks-tab-content-wrapper hidden">
+                    <div class="history-cards-feed-wrapper">
+                        
+                        <!-- Row 1: Selesai -->
+                        <div class="history-card-strip" data-course-id="6" data-status="completed" data-name="Praktikum 4 DNS Server" data-date-open="2026-05-10" data-date-close="2026-05-15">
+                            <div class="strip-info">
+                                <h4 class="strip-title">Praktikum 4 DNS Server</h4>
+                                <p class="strip-subject">Administrasi sistem</p>
+                            </div>
+                            <div class="strip-dates">
+                                <div class="date-block">
+                                    <span class="lbl">Tanggal Buka</span>
+                                    <span class="val">10 Mei 2026</span>
+                                </div>
+                                <div class="date-block">
+                                    <span class="lbl">Batas Waktu</span>
+                                    <span class="val">15 Mei 2026</span>
+                                </div>
+                            </div>
+                            <div class="strip-badge-side">
+                                <span class="badge-status-pill success"><i class="bi bi-patch-check-fill"></i> Selesai</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Tidak Selesai (Late/Missed) -->
+                        <div class="history-card-strip" data-course-id="5" data-status="missed" data-name="Implementasi Neural Network" data-date-open="2026-05-25" data-date-close="2026-06-03">
+                            <div class="strip-info">
+                                <h4 class="strip-title">Implementasi Neural Network</h4>
+                                <p class="strip-subject">Kecerdasan Buatan (AI)</p>
+                            </div>
+                            <div class="strip-dates">
+                                <div class="date-block">
+                                    <span class="lbl">Tanggal Buka</span>
+                                    <span class="val">25 Mei 2026</span>
+                                </div>
+                                <div class="date-block">
+                                    <span class="lbl">Batas Waktu</span>
+                                    <span class="val">3 Juni 2026</span>
+                                </div>
+                            </div>
+                            <div class="strip-badge-side">
+                                <span class="badge-status-pill fail"><i class="bi bi-exclamation-triangle-fill"></i> Terlambat</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Selesai -->
+                        <div class="history-card-strip" data-course-id="6" data-status="completed" data-name="Konfigurasi DHCP Server" data-date-open="2026-05-01" data-date-close="2026-05-06">
+                            <div class="strip-info">
+                                <h4 class="strip-title">Konfigurasi DHCP Server</h4>
+                                <p class="strip-subject">Administrasi sistem</p>
+                            </div>
+                            <div class="strip-dates">
+                                <div class="date-block">
+                                    <span class="lbl">Tanggal Buka</span>
+                                    <span class="val">1 Mei 2026</span>
+                                </div>
+                                <div class="date-block">
+                                    <span class="lbl">Batas Waktu</span>
+                                    <span class="val">6 Mei 2026</span>
+                                </div>
+                            </div>
+                            <div class="strip-badge-side">
+                                <span class="badge-status-pill success"><i class="bi bi-patch-check-fill"></i> Selesai</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Tidak Selesai -->
+                        <div class="history-card-strip" data-course-id="7" data-status="missed" data-name="Pembuatan REST API Python" data-date-open="2026-05-12" data-date-close="2026-05-18">
+                            <div class="strip-info">
+                                <h4 class="strip-title">Pembuatan REST API Python</h4>
+                                <p class="strip-subject">Pemrograman Web II</p>
+                            </div>
+                            <div class="strip-dates">
+                                <div class="date-block">
+                                    <span class="lbl">Tanggal Buka</span>
+                                    <span class="val">12 Mei 2026</span>
+                                </div>
+                                <div class="date-block">
+                                    <span class="lbl">Batas Waktu</span>
+                                    <span class="val">18 Mei 2026</span>
+                                </div>
+                            </div>
+                            <div class="strip-badge-side">
+                                <span class="badge-status-pill fail"><i class="bi bi-exclamation-triangle-fill"></i> Terlambat</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 5: Selesai -->
+                        <div class="history-card-strip" data-course-id="8" data-status="completed" data-name="Perancangan Basis Data" data-date-open="2026-04-15" data-date-close="2026-04-22">
+                            <div class="strip-info">
+                                <h4 class="strip-title">Perancangan Basis Data</h4>
+                                <p class="strip-subject">Basis Data Lanjut</p>
+                            </div>
+                            <div class="strip-dates">
+                                <div class="date-block">
+                                    <span class="lbl">Tanggal Buka</span>
+                                    <span class="val">15 April 2026</span>
+                                </div>
+                                <div class="date-block">
+                                    <span class="lbl">Batas Waktu</span>
+                                    <span class="val">22 April 2026</span>
+                                </div>
+                            </div>
+                            <div class="strip-badge-side">
+                                <span class="badge-status-pill success"><i class="bi bi-patch-check-fill"></i> Selesai</span>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
             </div>
@@ -156,6 +333,26 @@
                             <i class="bi bi-check-circle-fill"></i> Kirim &amp; Kumpulkan Jawaban
                         </button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Task Detail Drawer (Slide up Modal) -->
+            <div class="submission-modal-overlay" id="detail-overlay" onclick="closeDetailDrawer()">
+                <div class="submission-drawer" onclick="event.stopPropagation()">
+                    <div class="drawer-header">
+                        <div class="header-txt">
+                            <span class="drawer-icon"><i class="bi bi-info-circle-fill"></i></span>
+                            <div>
+                                <h3 id="detail-task-title">Detail Tugas</h3>
+                                <p id="detail-task-subject">Nama Mata Kuliah</p>
+                            </div>
+                        </div>
+                        <button class="btn-close-drawer" onclick="closeDetailDrawer()"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <div class="detail-drawer-body">
+                        <label class="desc-label">Deskripsi Instruksi Pengerjaan:</label>
+                        <p id="detail-task-desc" class="desc-content"></p>
+                    </div>
                 </div>
             </div>
 

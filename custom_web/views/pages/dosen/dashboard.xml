@@ -33,7 +33,7 @@
                             <p>Kelola dan buat penugasan baru untuk mahasiswa secara terorganisir.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="#" class="dosen-action-btn btn-blue">Tambahkan Tugas</a>
+                            <a href="/dosen/tugas" class="dosen-action-btn btn-blue">Kelola Tugas</a>
                         </div>
                     </div>
 
@@ -51,17 +51,17 @@
                         </div>
                     </div>
 
-                    <!-- CARD 3: Leaderboard -->
+                    <!-- CARD 3: Pengumpulan Tugas -->
                     <div class="dosen-card glass-panel">
                         <div class="dosen-card-icon icon-amber">
-                            <i class="bi bi-trophy-fill"></i>
+                            <i class="bi bi-people-fill"></i>
                         </div>
                         <div class="dosen-card-body">
-                            <h3>Leaderboard</h3>
-                            <p>Pantau peringkat keaktifan, skor XP, serta total perolehan koin mahasiswa teraktif.</p>
+                            <h3>Pengumpulan</h3>
+                            <p>Periksa berkas jawaban tugas mahasiswa dan berikan feedback nilai secara instan.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="#" class="dosen-action-btn btn-amber">Lihat Leaderboard</a>
+                            <a href="/dosen/tugas/pengumpulan" class="dosen-action-btn btn-amber">Periksa Tugas</a>
                         </div>
                     </div>
                 </div>

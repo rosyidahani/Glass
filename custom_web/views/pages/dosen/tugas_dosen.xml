@@ -16,7 +16,7 @@
                         </div>
                     </div>
                     <a href="/dashboard" class="btn-back-dashboard">
-                        <i class="bi bi-house-fill"></i> Dashboard Utama
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
                     </a>
                 </div>
 
@@ -62,129 +62,60 @@
                         </div>
                     </div>
                     <a href="/dosen/tugas" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> Kembali ke Menu Tugas
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Tugas</span>
                     </a>
                 </div>
 
-                <!-- Grid System -->
-                <div class="dosen-tugas-grid">
-                    <!-- Left: Form Panel -->
-                    <div class="glass-panel">
-                        <div class="card-header">
-                            <span class="header-icon"><i class="bi bi-journal-plus"></i></span>
-                            <h3>Buat Tugas Baru</h3>
-                        </div>
-                        <form id="form-buat-tugas" class="modern-form" onsubmit="return false;">
-                            <div class="form-group">
-                                <label for="mk_id">Mata Kuliah <span class="required">*</span></label>
-                                <select id="mk_id" name="mk_id" class="form-control" required="required">
-                                    <option value="" disabled="disabled" selected="selected">-- Pilih Mata Kuliah --</option>
-                                    <t t-foreach="mata_kuliah" t-as="mk">
-                                        <option t-att-value="mk['id']"><t t-esc="mk['name']"/></option>
-                                    </t>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Jenis Tugas <span class="required">*</span></label>
-                                <div class="segmented-control">
-                                    <input type="radio" id="jenis_individu" name="jenis_tugas" value="Individu" checked="checked"/>
-                                    <label for="jenis_individu" class="segmented-label individu-label">
-                                        <i class="bi bi-person-fill"></i> Individu
-                                    </label>
-                                    <input type="radio" id="jenis_kelompok" name="jenis_tugas" value="Kelompok"/>
-                                    <label for="jenis_kelompok" class="segmented-label kelompok-label">
-                                        <i class="bi bi-people-fill"></i> Kelompok
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="judul">Judul Tugas <span class="required">*</span></label>
-                                <input type="text" id="judul" name="judul" class="form-control" placeholder="Contoh: Proyek Akhir Web Portal" required="required"/>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="deadline">Batas Pengumpulan (Deadline) <span class="required">*</span></label>
-                                <input type="datetime-local" id="deadline" name="deadline" class="form-control" required="required"/>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="deskripsi">Deskripsi Tugas <span class="required">*</span></label>
-                                <textarea id="deskripsi" name="deskripsi" class="form-control" rows="4" placeholder="Tuliskan petunjuk pengerjaan dan ketentuan tugas di sini..." required="required"></textarea>
-                            </div>
-
-                            <button type="submit" class="btn-submit-tugas">
-                                <i class="bi bi-send-fill"></i> Simpan &amp; Publikasikan Tugas
-                            </button>
-                        </form>
+                <!-- Centered Single Column Form Layout -->
+                <div class="dosen-single-form-layout">
+                    <div class="card-header">
+                        <span class="header-icon"><i class="bi bi-journal-plus"></i></span>
+                        <h3>Buat Tugas Baru</h3>
                     </div>
+                    <form id="form-buat-tugas" class="modern-form" onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="mk_id">Mata Kuliah <span class="required">*</span></label>
+                            <select id="mk_id" name="mk_id" class="form-control" required="required">
+                                <option value="" disabled="disabled" selected="selected">-- Pilih Mata Kuliah --</option>
+                                <t t-foreach="mata_kuliah" t-as="mk">
+                                    <option t-att-value="mk['id']"><t t-esc="mk['name']"/></option>
+                                </t>
+                            </select>
+                        </div>
 
-                    <!-- Right: List & Stats -->
-                    <div class="glass-panel">
-                        <div class="card-header">
-                            <span class="header-icon"><i class="bi bi-card-checklist"></i></span>
-                            <h3>Daftar Tugas Aktif</h3>
-                        </div>
-                        <div class="tugas-stats-hud">
-                            <div class="stat-card total">
-                                <span class="num" id="stat-total-tugas">2</span>
-                                <span class="lbl">Total Tugas</span>
-                            </div>
-                            <div class="stat-card individu">
-                                <span class="num text-purple" id="stat-individu">1</span>
-                                <span class="lbl">Individu</span>
-                            </div>
-                            <div class="stat-card kelompok">
-                                <span class="num text-blue" id="stat-kelompok">1</span>
-                                <span class="lbl">Kelompok</span>
+                        <div class="form-group">
+                            <label>Jenis Tugas <span class="required">*</span></label>
+                            <div class="segmented-control">
+                                <input type="radio" id="jenis_individu" name="jenis_tugas" value="Individu" checked="checked"/>
+                                <label for="jenis_individu" class="segmented-label individu-label">
+                                    <i class="bi bi-person-fill"></i> Individu
+                                </label>
+                                <input type="radio" id="jenis_kelompok" name="jenis_tugas" value="Kelompok"/>
+                                <label for="jenis_kelompok" class="segmented-label kelompok-label">
+                                    <i class="bi bi-people-fill"></i> Kelompok
+                                </label>
                             </div>
                         </div>
-                        <div class="assignments-feed" id="assignments-list">
-                            <!-- Mock Assignment 1 -->
-                            <div class="tugas-item" data-id="mock-1" data-jenis="Individu">
-                                <div class="tugas-item-header">
-                                    <div class="tugas-title-meta">
-                                        <h4>Implementasi Jaringan Saraf Tiruan (Backpropagation)</h4>
-                                        <p class="subject"><i class="bi bi-book"></i> Kecerdasan Buatan (AI)</p>
-                                    </div>
-                                    <span class="type-badge individu">Individu</span>
-                                </div>
-                                <div class="tugas-item-body">
-                                    <span class="val text-danger"><i class="bi bi-clock-fill"></i> 3 Juni 2026, 23:59 WIB</span>
-                                    <p class="desc text-truncate-3">Buatlah rancangan dan kode implementasi Jaringan Saraf Tiruan dengan algoritma Backpropagation dari awal tanpa menggunakan framework ML eksternal.</p>
-                                </div>
-                                <div class="tugas-item-footer">
-                                    <button class="btn-toggle-detail" onclick="toggleDetails(this)"><i class="bi bi-chevron-down"></i> Detail</button>
-                                    <div class="actions">
-                                        <button class="btn-action edit" onclick="editMockTask('mock-1')"><i class="bi bi-pencil-square"></i></button>
-                                        <button class="btn-action delete" onclick="deleteMockTask('mock-1')"><i class="bi bi-trash3-fill"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Mock Assignment 2 -->
-                            <div class="tugas-item" data-id="mock-2" data-jenis="Kelompok">
-                                <div class="tugas-item-header">
-                                    <div class="tugas-title-meta">
-                                        <h4>Pembangunan Portal Web dengan Odoo Controller</h4>
-                                        <p class="subject"><i class="bi bi-book"></i> Pemrograman Web II</p>
-                                    </div>
-                                    <span class="type-badge kelompok">Kelompok</span>
-                                </div>
-                                <div class="tugas-item-body">
-                                    <span class="val text-danger"><i class="bi bi-clock-fill"></i> 7 Juni 2026, 23:59 WIB</span>
-                                    <p class="desc text-truncate-3">Bangunlah sebuah modul Odoo custom yang berisi template website frontend terintegrasi dengan session Odoo backend.</p>
-                                </div>
-                                <div class="tugas-item-footer">
-                                    <button class="btn-toggle-detail" onclick="toggleDetails(this)"><i class="bi bi-chevron-down"></i> Detail</button>
-                                    <div class="actions">
-                                        <button class="btn-action edit" onclick="editMockTask('mock-2')"><i class="bi bi-pencil-square"></i></button>
-                                        <button class="btn-action delete" onclick="deleteMockTask('mock-2')"><i class="bi bi-trash3-fill"></i></button>
-                                    </div>
-                                </div>
-                            </div>
+
+                        <div class="form-group">
+                            <label for="judul">Judul Tugas <span class="required">*</span></label>
+                            <input type="text" id="judul" name="judul" class="form-control" placeholder="Contoh: Proyek Akhir Web Portal" required="required"/>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label for="deadline">Batas Pengumpulan (Deadline) <span class="required">*</span></label>
+                            <input type="datetime-local" id="deadline" name="deadline" class="form-control" required="required"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deskripsi">Deskripsi Tugas <span class="required">*</span></label>
+                            <textarea id="deskripsi" name="deskripsi" class="form-control" rows="4" placeholder="Tuliskan petunjuk pengerjaan dan ketentuan tugas di sini..." required="required"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit-tugas">
+                            <i class="bi bi-send-fill"></i> Simpan &amp; Publikasikan Tugas
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="glowing-toast-container" id="toast-container"></div>
@@ -207,7 +138,7 @@
                         </div>
                     </div>
                     <a href="/dosen/tugas" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> Kembali ke Menu Tugas
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Tugas</span>
                     </a>
                 </div>
 
@@ -286,7 +217,7 @@
                         </div>
                     </div>
                     <a href="/dosen/tugas/pengumpulan" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> Kembali ke Daftar Tugas
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Daftar Tugas</span>
                     </a>
                 </div>
 

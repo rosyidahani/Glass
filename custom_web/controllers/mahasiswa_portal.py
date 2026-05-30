@@ -48,7 +48,9 @@ class MahasiswaPortalController(http.Controller):
             return request.redirect('/login')
             
         return request.render('custom_web.menu', {
+            'mahasiswa': mahasiswa,
             'mahasiswa_name': mahasiswa.name,
+            'courses': mahasiswa.mata_kuliah_ids,
         })
 
     @http.route('/menu/submenu', auth='public', website=True, type='http')
