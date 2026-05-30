@@ -6,7 +6,7 @@
     <field name="arch" type="xml">
       <tree>
         <field name="name"/>
-        <field name="mata_kuliah"/>
+        <field name="mata_kuliah_id"/>
         <field name="status"/>
         <field name="waktu_buka"/>
         <field name="total_hadir"/>
