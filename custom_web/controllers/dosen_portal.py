@@ -1,3 +1,6 @@
+import json
+import pytz
+from datetime import datetime
 from odoo import http
 from odoo.http import request
 from .utils import get_active_mahasiswa, get_active_dosen
@@ -102,3 +105,94 @@ class DosenPortalController(http.Controller):
             'dosen': dosen,
             'tugas_id': tugas_id,
         })
+
+    # =======================================================
+    # API BACKEND TUGAS
+    # =======================================================
+    @http.route('/api/tugas/buat', type='http', auth='user', methods=['POST'], cors='*', csrf=False)
+    def api_tugas_buat(self, **kw):
+        try:
+            body = json.loads(request.httprequest.data)
+            dosen = get_active_dosen()
+            if not dosen:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'Unauthorized'}), status=401)
+            
+            # Konversi format JS (YYYY-MM-DDTHH:MM) ke UTC Odoo
+            dt_str = body['deadline'].replace('T', ' ')
+            if len(dt_str) == 16:
+                dt_str += ':00'
+            local_dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+            local_tz = pytz.timezone('Asia/Jakarta')
+            utc_dt = local_tz.localize(local_dt).astimezone(pytz.utc)
+
+            tugas = request.env['tugas.tugas'].sudo().create({
+                'judul': body['judul'],
+                'mata_kuliah_id': int(body['mk_id']),
+                'dosen_id': dosen.id,
+                'jenis_tugas': body['jenis_tugas'],
+                'deskripsi': body['deskripsi'],
+                'deadline': utc_dt.strftime('%Y-%m-%d %H:%M:%S'),
+            })
+
+            return request.make_response(json.dumps({
+                'status': 'success', 
+                'data': {'id': tugas.id}
+            }), headers=[('Content-Type', 'application/json')])
+        except Exception as e:
+            return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
+
+    @http.route('/api/tugas/hapus', type='http', auth='user', methods=['POST'], cors='*', csrf=False)
+    def api_tugas_hapus(self, **kw):
+        try:
+            body = json.loads(request.httprequest.data)
+            tugas = request.env['tugas.tugas'].sudo().browse(int(body['tugas_id']))
+            if tugas.exists():
+                tugas.unlink()
+            return request.make_response(json.dumps({'status': 'success'}), headers=[('Content-Type', 'application/json')])
+        except Exception as e:
+            return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
+
+    @http.route('/api/tugas/detail/<int:tugas_id>', type='http', auth='user', methods=['GET'], cors='*', csrf=False)
+    def api_tugas_detail(self, tugas_id, **kw):
+        tugas = request.env['tugas.tugas'].sudo().browse(tugas_id)
+        if not tugas.exists():
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Tugas tidak ditemukan'}), headers=[('Content-Type', 'application/json')])
+
+        local_tz = pytz.timezone('Asia/Jakarta')
+        waktu_wib = pytz.utc.localize(tugas.deadline).astimezone(local_tz).strftime('%d %b %Y, %H:%M WIB') if tugas.deadline else '-'
+
+        submissions = []
+        for sub in tugas.pengumpulan_ids:
+            sub_wib = pytz.utc.localize(sub.waktu_kumpul).astimezone(local_tz).strftime('%d %b %Y, %H:%M WIB') if sub.waktu_kumpul else '-'
+            submissions.append({
+                'id': sub.id,
+                'name': sub.mahasiswa_id.name,
+                'nim': sub.mahasiswa_id.nim,
+                'date': sub_wib,
+                'file': sub.link_jawaban or 'Berkas ZIP',
+                'type': sub.tipe_file or 'zip',
+                'note': sub.catatan or '-',
+                'grade': sub.nilai,
+                'status': sub.status_penilaian
+            })
+
+        data = {
+            'title': tugas.judul,
+            'subject': tugas.mata_kuliah_id.nama,
+            'type': tugas.jenis_tugas,
+            'deadline': waktu_wib,
+            'desc': tugas.deskripsi,
+            'submissions': submissions
+        }
+        return request.make_response(json.dumps({'status': 'success', 'data': data}), headers=[('Content-Type', 'application/json')])
+
+    @http.route('/api/tugas/nilai', type='http', auth='user', methods=['POST'], cors='*', csrf=False)
+    def api_tugas_nilai(self, **kw):
+        try:
+            body = json.loads(request.httprequest.data)
+            sub = request.env['tugas.pengumpulan'].sudo().browse(int(body['pengumpulan_id']))
+            if sub.exists():
+                sub.write({'nilai': int(body['nilai']), 'status_penilaian': 'graded'})
+            return request.make_response(json.dumps({'status': 'success'}), headers=[('Content-Type', 'application/json')])
+        except Exception as e:
+            return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])

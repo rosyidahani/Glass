@@ -1,0 +1,19 @@
+<odoo>
+    <record id="view_tugas_tree" model="ir.ui.view">
+        <field name="name">tugas.tugas.tree</field>
+        <field name="model">tugas.tugas</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="judul"/>
+                <field name="deadline"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_tugas" model="ir.actions.act_window">
+        <field name="name">Tugas</field>
+        <field name="res_model">tugas.tugas</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_tugas_root" name="Manajemen Tugas"/>
+    <menuitem id="menu_tugas_list" name="Daftar Tugas" parent="menu_tugas_root" action="action_tugas"/>
+</odoo>

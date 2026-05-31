@@ -90,146 +90,112 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// Mock database untuk data detail tugas
-var mockTasksDb = {
-    "mock-1": {
-        title: "Implementasi Jaringan Saraf Tiruan (Backpropagation)",
-        subject: "Kecerdasan Buatan (AI)",
-        type: "Individu",
-        deadline: "3 Juni 2026, 23:59 WIB",
-        desc: "Buatlah rancangan dan kode implementasi Jaringan Saraf Tiruan dengan algoritma Backpropagation dari awal tanpa menggunakan framework ML eksternal (gunakan NumPy jika menggunakan Python). Tugas dikumpulkan berupa file PDF laporan analisis dan file source code.",
-        submissions: [
-            { id: "sub-1", name: "Rosyidah Ani", nim: "22/498214/TK/54123", date: "29 Mei 2026, 14:32 WIB", file: "backpropagation_rosyidah.zip", type: "zip", note: "Sudah saya unggah versi revisi Pak. Program sukses diuji untuk Iris Dataset.", grade: 92, status: "graded" },
-            { id: "sub-2", name: "Budi Santoso", nim: "22/498215/TK/54124", date: "29 Mei 2026, 16:15 WIB", file: "backprop_numpy_budi.zip", type: "zip", note: "Implementasi menggunakan 3 hidden layer dengan fungsi aktivasi Sigmoid.", grade: 88, status: "graded" },
-            { id: "sub-3", name: "Siti Rahma", nim: "22/498216/TK/54125", date: "30 Mei 2026, 08:24 WIB", file: "http://github.com/sitirahma/ann-backprop", type: "link", note: "Mohon izin Pak, tautan repository GitHub berisi source code dan laporan PDF.", grade: "", status: "pending" },
-            { id: "sub-4", name: "Andi Wijaya", nim: "22/498217/TK/54126", date: "30 Mei 2026, 09:02 WIB", file: "jst_backpropagation_andi.zip", type: "zip", note: "Dikumpulkan tepat waktu pak. Terima kasih.", grade: "", status: "pending" }
-        ]
-    },
-    "mock-2": {
-        title: "Pembangunan Portal Web dengan Odoo Controller",
-        subject: "Pemrograman Web II",
-        type: "Kelompok",
-        deadline: "7 Juni 2026, 23:59 WIB",
-        desc: "Bangunlah sebuah modul Odoo custom yang berisi template website frontend terintegrasi dengan session Odoo backend. Dosen dan mahasiswa wajib memiliki autentikasi portal terpisah. Tugas dikerjakan berkelompok maksimal 3 orang.",
-        submissions: [
-            { id: "sub-5", name: "Kelompok 5 (Rosyidah, Budi, Siti)", nim: "NIM Perwakilan: 22/498214/TK/54123", date: "28 Mei 2026, 10:11 WIB", file: "custom_web_portal_k5.zip", type: "zip", note: "Portal login mahasiswa dan guru lengkap dengan glassmorphism UI.", grade: "", status: "pending" },
-            { id: "sub-6", name: "Kelompok 2 (Andi, Roni, Eka)", nim: "NIM Perwakilan: 22/498217/TK/54126", date: "29 Mei 2026, 19:40 WIB", file: "odoo_portal_kel2.zip", type: "zip", note: "Dilengkapi fitur geolokasi presensi dosen bypass GPS.", grade: 95, status: "graded" }
-        ]
-    },
-    "mock-3": {
-        title: "Desain Arsitektur Sistem dengan UML Diagram",
-        subject: "Rekayasa Perangkat Lunak",
-        type: "Kelompok",
-        deadline: "10 Juni 2026, 23:59 WIB",
-        desc: "Buatlah rancangan arsitektur perangkat lunak untuk sistem e-learning interaktif menggunakan UML (Use Case, Activity, Sequence, Class Diagram). Kelompok terdiri dari maksimal 4 anggota.",
-        submissions: []
-    }
-};
-
 // Load and populate detail specs and submission tables
-function loadTugasDetailAndSubmissions(taskId) {
-    var task = mockTasksDb[taskId];
-    if (!task) {
-        // Fallback for dynamically created tasks
-        task = {
-            title: "Tugas Mandiri Tambahan",
-            subject: "Mata Kuliah Pilihan",
-            type: "Individu",
-            deadline: "15 Juni 2026, 23:59 WIB",
-            desc: "Kerjakan soal latihan mandiri bab 4 di buku pegangan kuliah.",
-            submissions: []
-        };
-    }
+async function loadTugasDetailAndSubmissions(taskId) {
+    try {
+        let response = await fetch('/api/tugas/detail/' + taskId);
+        let result = await response.json();
+        
+        if (result.status !== 'success') {
+            showToast("Error", "Gagal memuat data tugas.", "bi-exclamation-triangle-fill text-danger");
+            return;
+        }
+        
+        var task = result.data;
 
-    // Populate Spec Card
-    var titleEl = document.getElementById("detail-spec-title");
-    var subjectEl = document.getElementById("detail-spec-subject");
-    var typeEl = document.getElementById("detail-spec-type");
-    var deadlineEl = document.getElementById("detail-spec-deadline");
-    var descEl = document.getElementById("detail-spec-desc");
-    var hudTitle = document.getElementById("detail-hud-title");
+        // Populate Spec Card
+        var titleEl = document.getElementById("detail-spec-title");
+        var subjectEl = document.getElementById("detail-spec-subject");
+        var typeEl = document.getElementById("detail-spec-type");
+        var deadlineEl = document.getElementById("detail-spec-deadline");
+        var descEl = document.getElementById("detail-spec-desc");
+        var hudTitle = document.getElementById("detail-hud-title");
 
-    if (titleEl) titleEl.innerText = task.title;
-    if (hudTitle) hudTitle.innerText = task.title;
-    if (subjectEl) {
-        subjectEl.innerText = task.subject;
-        // set class based on subject
-        if (task.subject.includes("AI")) subjectEl.className = "badge-tag purple";
-        else if (task.subject.includes("Web II")) subjectEl.className = "badge-tag blue";
-        else subjectEl.className = "badge-tag teal";
-    }
-    if (typeEl) {
-        typeEl.innerText = task.type;
-        typeEl.className = "badge-tag outline";
-    }
-    if (deadlineEl) deadlineEl.innerHTML = '<i class="bi bi-clock-fill"></i> Batas Waktu: ' + task.deadline;
-    if (descEl) descEl.innerText = task.desc;
+        if (titleEl) titleEl.innerText = task.title;
+        if (hudTitle) hudTitle.innerText = task.title;
+        if (subjectEl) {
+            subjectEl.innerText = task.subject;
+            if (task.subject.includes("AI")) subjectEl.className = "badge-tag purple";
+            else if (task.subject.includes("Web II")) subjectEl.className = "badge-tag blue";
+            else subjectEl.className = "badge-tag teal";
+        }
+        if (typeEl) {
+            typeEl.innerText = task.type;
+            typeEl.className = "badge-tag outline";
+        }
+        if (deadlineEl) deadlineEl.innerHTML = '<i class="bi bi-clock-fill"></i> Batas Waktu: ' + task.deadline;
+        if (descEl) descEl.innerText = task.desc;
 
-    // Populate Submissions Table
-    var tbody = document.getElementById("submissions-table-body");
-    if (!tbody) return;
+        // Populate Submissions Table
+        var tbody = document.getElementById("submissions-table-body");
+        if (!tbody) return;
 
-    if (task.submissions.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center py-40 text-muted font-bold">
-                    <i class="bi bi-folder-x" style="font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
-                    Belum ada pengumpulan tugas dari mahasiswa untuk saat ini.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    var rowsHTML = "";
-    task.submissions.forEach(function(sub) {
-        var fileBtn = "";
-        if (sub.type === "zip") {
-            fileBtn = `<a href="#" class="btn-zip-download" onclick="event.preventDefault(); showToast('Mengunduh', 'Mengunduh berkas ${sub.file}...', 'bi-cloud-download text-primary');"><i class="bi bi-file-earmark-zip-fill"></i> Unduh ZIP</a>`;
-        } else {
-            fileBtn = `<a href="${sub.file}" target="_blank" class="btn-link-view"><i class="bi bi-link-45deg"></i> Buka Tautan</a>`;
+        if (!task.submissions || task.submissions.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-40 text-muted font-bold">
+                        <i class="bi bi-folder-x" style="font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
+                        Belum ada pengumpulan tugas dari mahasiswa untuk saat ini.
+                    </td>
+                </tr>
+            `;
+            return;
         }
 
-        var gradeBadge = "";
-        var gradeInput = "";
+        var rowsHTML = "";
+        task.submissions.forEach(function(sub) {
+            var fileBtn = "";
+            if (sub.type === "zip") {
+                fileBtn = `<a href="#" class="btn-zip-download" onclick="event.preventDefault(); showToast('Mengunduh', 'Mengunduh berkas ${sub.file}...', 'bi-cloud-download text-primary');"><i class="bi bi-file-earmark-zip-fill"></i> Unduh ZIP</a>`;
+            } else {
+                fileBtn = `<a href="${sub.file}" target="_blank" class="btn-link-view"><i class="bi bi-link-45deg"></i> Buka Tautan</a>`;
+            }
 
-        if (sub.status === "graded") {
-            gradeBadge = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> Dinilai (${sub.grade})</span>`;
-            gradeInput = `<input type="number" class="input-grade" value="${sub.grade}" min="0" max="100"/>`;
-        } else {
-            gradeBadge = `<span class="grade-badge pending"><i class="bi bi-hourglass-split"></i> Belum Dinilai</span>`;
-            gradeInput = `<input type="number" class="input-grade" placeholder="-" min="0" max="100"/>`;
-        }
+            var gradeBadge = "";
+            var gradeInput = "";
 
-        rowsHTML += `
-            <tr data-sub-id="${sub.id}">
-                <td>
-                    <div class="student-meta-block">
-                        <p class="name">${sub.name}</p>
-                        <p class="nim">${sub.nim}</p>
-                    </div>
-                </td>
-                <td><i class="bi bi-calendar3"></i> ${sub.date}</td>
-                <td>${fileBtn}</td>
-                <td class="catatan">${sub.note || '-'}</td>
-                <td class="status-td">${gradeBadge}</td>
-                <td>
-                    <div class="grading-input-wrapper">
-                        ${gradeInput}
-                        <button class="btn-save-grade" onclick="saveMockGrade('${sub.id}', '${sub.name}', this)">
-                            <i class="bi bi-check-lg"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
+            if (sub.status === "graded") {
+                gradeBadge = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> Dinilai (${sub.grade})</span>`;
+                gradeInput = `<input type="number" class="input-grade" value="${sub.grade}" min="0" max="100"/>`;
+            } else {
+                gradeBadge = `<span class="grade-badge pending"><i class="bi bi-hourglass-split"></i> Belum Dinilai</span>`;
+                gradeInput = `<input type="number" class="input-grade" placeholder="-" min="0" max="100"/>`;
+            }
 
-    tbody.innerHTML = rowsHTML;
+            rowsHTML += `
+                <tr data-sub-id="${sub.id}">
+                    <td>
+                        <div class="student-meta-block">
+                            <p class="name">${sub.name}</p>
+                            <p class="nim">${sub.nim}</p>
+                        </div>
+                    </td>
+                    <td><i class="bi bi-calendar3"></i> ${sub.date}</td>
+                    <td>${fileBtn}</td>
+                    <td class="catatan">${sub.note || '-'}</td>
+                    <td class="status-td">${gradeBadge}</td>
+                    <td>
+                        <div class="grading-input-wrapper">
+                            ${gradeInput}
+                            <button class="btn-save-grade" onclick="saveMockGrade('${sub.id}', '${sub.name}', this)">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = rowsHTML;
+
+    } catch (error) {
+        console.error(error);
+        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+    }
 }
 
 // Interactive Grade Submission Simulator
-function saveMockGrade(subId, studentName, btn) {
+async function saveMockGrade(subId, studentName, btn) {
     var wrapper = btn.closest(".grading-input-wrapper");
     var input = wrapper.querySelector(".input-grade");
     var scoreValue = input.value.trim();
@@ -245,19 +211,35 @@ function saveMockGrade(subId, studentName, btn) {
         return;
     }
 
-    // Success transition
-    btn.style.transform = "scale(0.8)";
-    setTimeout(function() {
-        btn.style.transform = "scale(1)";
+    try {
+        let res = await fetch('/api/tugas/nilai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pengumpulan_id: subId, nilai: score })
+        });
+        let data = await res.json();
         
-        // Update table badge status
-        var tr = btn.closest("tr");
-        var statusTd = tr.querySelector(".status-td");
-        statusTd.innerHTML = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> Dinilai (${score})</span>`;
-        
-        // Success Toast
-        showToast("Penilaian Sukses!", "Nilai tugas " + studentName + " berhasil disimpan: " + score, "bi-patch-check-fill text-success");
-    }, 200);
+        if (data.status === 'success') {
+            // Success transition
+            btn.style.transform = "scale(0.8)";
+            setTimeout(function() {
+                btn.style.transform = "scale(1)";
+                
+                // Update table badge status
+                var tr = btn.closest("tr");
+                var statusTd = tr.querySelector(".status-td");
+                statusTd.innerHTML = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> Dinilai (${score})</span>`;
+                
+                // Success Toast
+                showToast("Penilaian Sukses!", "Nilai tugas " + studentName + " berhasil disimpan: " + score, "bi-patch-check-fill text-success");
+            }, 200);
+        } else {
+            showToast("Error", data.message || "Gagal menyimpan nilai.", "bi-exclamation-triangle-fill text-danger");
+        }
+    } catch (e) {
+        console.error(e);
+        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+    }
 }
 
 // Original helper functions
@@ -300,16 +282,34 @@ function showToast(title, message, iconClass) {
     }, 4000);
 }
 
-function deleteMockTask(id) {
-    var el = document.querySelector(`[data-id="${id}"]`);
-    if (el) {
-        el.style.transform = "scale(0.9) translateY(-10px)";
-        el.style.opacity = "0";
-        setTimeout(function() {
-            el.remove();
-            updateDosenTugasStats();
-            showToast("Tugas Dihapus", "Tugas berhasil dihapus.", "bi-trash3-fill text-danger");
-        }, 300);
+async function deleteMockTask(id) {
+    if (!confirm("Apakah Anda yakin ingin menghapus tugas ini?")) return;
+    
+    try {
+        let res = await fetch('/api/tugas/hapus', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tugas_id: id })
+        });
+        let data = await res.json();
+        
+        if (data.status === 'success') {
+            var el = document.querySelector(`[data-id="${id}"]`);
+            if (el) {
+                el.style.transform = "scale(0.9) translateY(-10px)";
+                el.style.opacity = "0";
+                setTimeout(function() {
+                    el.remove();
+                    updateDosenTugasStats();
+                    showToast("Tugas Dihapus", "Tugas berhasil dihapus.", "bi-trash3-fill text-danger");
+                }, 300);
+            }
+        } else {
+            showToast("Error", "Gagal menghapus tugas.", "bi-exclamation-triangle-fill text-danger");
+        }
+    } catch (e) {
+        console.error(e);
+        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
     }
 }
 
