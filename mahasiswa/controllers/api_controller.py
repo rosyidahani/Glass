@@ -2,6 +2,8 @@ from odoo import http
 from odoo.http import request
 from odoo.exceptions import UserError
 import json
+import base64
+from odoo import fields
 
 class MahasiswaAPI(http.Controller):
 
@@ -163,3 +165,62 @@ class MahasiswaAPI(http.Controller):
             
         except Exception as e:
             return self._error(f'Terjadi kesalahan internal: {str(e)}', 500)
+
+    # ================================================
+    # ENDPOINT: Mahasiswa Kumpul Tugas
+    # POST /api/tugas/kumpul
+    # Karena menggunakan input file, endpoint menerima FormData
+    # ================================================
+    @http.route('/api/tugas/kumpul', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
+    def kumpul_tugas(self, **kw):
+        mhs = self._get_mahasiswa_from_session()
+        if not mhs:
+            return self._error('Belum login atau sesi habis.', 401)
+        
+        tugas_id = kw.get('tugas_id')
+        tipe_file = kw.get('tipe_file')
+        catatan = kw.get('catatan', '')
+        
+        if not tugas_id or not tipe_file:
+            return self._error('ID Tugas dan Tipe Pengumpulan wajib diisi.')
+            
+        tugas = request.env['tugas.tugas'].sudo().browse(int(tugas_id))
+        if not tugas.exists():
+            return self._error('Tugas tidak ditemukan.', 404)
+            
+        submission_vals = {
+            'tugas_id': tugas.id,
+            'mahasiswa_id': mhs.id,
+            'tipe_file': tipe_file,
+            'catatan': catatan,
+            'waktu_kumpul': fields.Datetime.now()
+        }
+        
+        if tipe_file == 'link':
+            link_jawaban = kw.get('link_jawaban')
+            if not link_jawaban:
+                return self._error('Tautan/Link tugas wajib diisi.')
+            submission_vals['link_jawaban'] = link_jawaban
+            submission_vals['file_jawaban'] = False
+        elif tipe_file == 'zip':
+            file_upload = request.httprequest.files.get('file_jawaban')
+            if not file_upload:
+                return self._error('File tugas wajib diunggah.')
+            # Baca file dan konversi ke Base64 agar dapat disimpan di field Binary Odoo
+            submission_vals['file_jawaban'] = base64.b64encode(file_upload.read())
+            submission_vals['link_jawaban'] = False
+            
+        # Cek apakah sebelumnya mahasiswa sudah pernah mengumpulkan tugas ini
+        existing_sub = request.env['tugas.pengumpulan'].sudo().search([
+            ('tugas_id', '=', tugas.id),
+            ('mahasiswa_id', '=', mhs.id)
+        ], limit=1)
+        
+        if existing_sub:
+            # Jika sudah, timpa (update) pengumpulan sebelumnya
+            existing_sub.write(submission_vals)
+        else:
+            # Jika belum, buat record baru
+            request.env['tugas.pengumpulan'].sudo().create(submission_vals)
+            
+        return self._success({'message': 'Tugas berhasil dikumpulkan!'})
