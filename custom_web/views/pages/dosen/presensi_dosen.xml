@@ -1,5 +1,54 @@
 <odoo>
-    <template id="presensi_dosen" name="Presensi Dosen">
+    <!-- 1. TEMPLATE MENU UTAMA PRESENSI DOSEN -->
+    <template id="presensi_dosen_menu" name="Menu Utama Presensi Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
+            
+            <div class="dosen-presensi-container">
+                <!-- Top Header HUD -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name"><t t-esc="dosen.name"/></h2>
+                            <p class="dosen-role"><i class="bi bi-person-workspace"></i> Portal Presensi Dosen</p>
+                        </div>
+                    </div>
+                    <a href="/dashboard" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Intermediate Navigation Cards (Unified Premium Styles) -->
+                <div class="dosen-menu-tugas-grid">
+                    
+                    <!-- Card 1: Buka Sesi Presensi Baru -->
+                    <a href="/dosen/presensi/buat" class="glass-menu-card purple-glow">
+                        <div class="card-glow-bg"></div>
+                        <div class="card-icon-circle">
+                            <i class="bi bi-plus-circle-fill"></i>
+                        </div>
+                        <h3>Buka Sesi Presensi</h3>
+                    </a>
+
+                    <!-- Card 2: Riwayat Presensi Dosen -->
+                    <a href="/dosen/presensi/histori" class="glass-menu-card blue-glow">
+                        <div class="card-glow-bg"></div>
+                        <div class="card-icon-circle">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h3>Riwayat Presensi</h3>
+                    </a>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- 2. TEMPLATE BUAT / BUKA SESI PRESENSI BARU -->
+    <template id="presensi_dosen_buat" name="Buka Sesi Presensi Dosen">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
             <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
@@ -12,12 +61,12 @@
                             <t t-esc="dosen.name[0].upper()"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name"><t t-esc="dosen.name"/></h2>
-                            <p class="dosen-role"><i class="bi bi-person-workspace"></i> Dosen Pengajar</p>
+                            <h2 class="dosen-name">Buka Sesi Presensi</h2>
+                            <p class="dosen-role"><i class="bi bi-broadcast"></i> Mulai dan kelola sesi presensi aktif mahasiswa Anda</p>
                         </div>
                     </div>
-                    <a href="/dashboard" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
+                    <a href="/dosen/presensi" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Presensi</span>
                     </a>
                 </div>
 
@@ -172,8 +221,33 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </t>
+    </template>
 
-                <!-- SECTION BAWAH: Riwayat Sesi Presensi -->
+    <!-- 3. TEMPLATE RIWAYAT / HISTORI SESI PRESENSI -->
+    <template id="presensi_dosen_histori" name="Riwayat Presensi Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
+
+            <div class="dosen-presensi-container">
+                <!-- Top Header HUD -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name">Riwayat Sesi Presensi</h2>
+                            <p class="dosen-role"><i class="bi bi-clock-history"></i> Daftar lengkap sesi presensi yang telah diselesaikan</p>
+                        </div>
+                    </div>
+                    <a href="/dosen/presensi" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Presensi</span>
+                    </a>
+                </div>
+
+                <!-- Riwayat Sesi Presensi Table Section -->
                 <div class="riwayat-section glass-panel">
                     <div class="card-header">
                         <span class="header-icon"><i class="bi bi-clock-history"></i></span>

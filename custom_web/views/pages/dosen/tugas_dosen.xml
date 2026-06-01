@@ -84,17 +84,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Jenis Tugas <span class="required">*</span></label>
-                            <div class="segmented-control">
-                                <input type="radio" id="jenis_individu" name="jenis_tugas" value="Individu" checked="checked"/>
-                                <label for="jenis_individu" class="segmented-label individu-label">
-                                    <i class="bi bi-person-fill"></i> Individu
-                                </label>
-                                <input type="radio" id="jenis_kelompok" name="jenis_tugas" value="Kelompok"/>
-                                <label for="jenis_kelompok" class="segmented-label kelompok-label">
-                                    <i class="bi bi-people-fill"></i> Kelompok
-                                </label>
-                            </div>
+                            <label for="jenis_tugas">Jenis Tugas <span class="required">*</span></label>
+                            <input type="text" id="jenis_tugas" name="jenis_tugas" class="form-control" placeholder="Contoh: Individu, Kelompok, Kuis, Proyek..." required="required"/>
                         </div>
 
                         <div class="form-group">
@@ -110,6 +101,12 @@
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi Tugas <span class="required">*</span></label>
                             <textarea id="deskripsi" name="deskripsi" class="form-control" rows="4" placeholder="Tuliskan petunjuk pengerjaan dan ketentuan tugas di sini..." required="required"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="file_materi">Lampiran File Materi <span class="text-muted">(Opsional)</span></label>
+                            <input type="file" id="file_materi" name="file_materi" class="form-control" accept=".pdf,.doc,.docx,.zip,.rar,.png,.jpg,.jpeg"/>
+                            <span class="input-helper">Unggah berkas pendukung pembelajaran atau instruksi tambahan (Maks. 5MB).</span>
                         </div>
 
                         <button type="submit" class="btn-submit-tugas">
@@ -156,46 +153,27 @@
 
                 <!-- Assignment Cards Feed (Titles Only as requested) -->
                 <div class="dosen-submissions-feed-grid" id="submissions-tasks-container">
-                    
-                    <!-- Task 1 (Kecerdasan Buatan - AI) -->
-                    <a href="/dosen/tugas/detail/mock-1" class="dosen-submission-task-card" data-course-id="1">
-                        <div class="task-card-header">
-                            <span class="badge-tag purple">Kecerdasan Buatan (AI)</span>
-                            <span class="badge-tag outline">Individu</span>
+                    <t t-if="not tugas_data">
+                        <div class="empty-state text-center py-40" style="grid-column: 1 / -1;">
+                            <i class="bi bi-journal-x" style="font-size: 32px; color: #8f97ab;"></i>
+                            <p class="text-muted mt-2">Belum ada tugas yang dibuat.</p>
                         </div>
-                        <h3 class="task-card-title">Implementasi Jaringan Saraf Tiruan (Backpropagation)</h3>
-                        <div class="task-card-footer">
-                            <span><i class="bi bi-people"></i> 4 Mahasiswa Mengumpulkan</span>
-                            <span class="btn-action-detail">Periksa <i class="bi bi-chevron-right"></i></span>
-                        </div>
-                    </a>
-
-                    <!-- Task 2 (Pemrograman Web II) -->
-                    <a href="/dosen/tugas/detail/mock-2" class="dosen-submission-task-card" data-course-id="2">
-                        <div class="task-card-header">
-                            <span class="badge-tag blue">Pemrograman Web II</span>
-                            <span class="badge-tag outline">Kelompok</span>
-                        </div>
-                        <h3 class="task-card-title">Pembangunan Portal Web dengan Odoo Controller</h3>
-                        <div class="task-card-footer">
-                            <span><i class="bi bi-people"></i> 3 Kelompok Mengumpulkan</span>
-                            <span class="btn-action-detail">Periksa <i class="bi bi-chevron-right"></i></span>
-                        </div>
-                    </a>
-
-                    <!-- Task 3 (Rekayasa Perangkat Lunak) -->
-                    <a href="/dosen/tugas/detail/mock-3" class="dosen-submission-task-card" data-course-id="3">
-                        <div class="task-card-header">
-                            <span class="badge-tag teal">Rekayasa Perangkat Lunak</span>
-                            <span class="badge-tag outline">Kelompok</span>
-                        </div>
-                        <h3 class="task-card-title">Desain Arsitektur Sistem dengan UML Diagram</h3>
-                        <div class="task-card-footer">
-                            <span><i class="bi bi-people"></i> 0 Mengumpulkan</span>
-                            <span class="btn-action-detail">Periksa <i class="bi bi-chevron-right"></i></span>
-                        </div>
-                    </a>
-
+                    </t>
+                    <t t-else="">
+                        <t t-foreach="tugas_data" t-as="tugas">
+                            <a t-att-href="'/dosen/tugas/detail/' + str(tugas['id'])" class="dosen-submission-task-card" t-att-data-course-id="tugas['mk_id']">
+                                <div class="task-card-header">
+                                    <span t-attf-class="badge-tag {{ tugas['color'] }}"><t t-esc="tugas['mk_nama']"/></span>
+                                    <span class="badge-tag outline"><t t-esc="tugas['jenis_tugas']"/></span>
+                                </div>
+                                <h3 class="task-card-title"><t t-esc="tugas['judul']"/></h3>
+                                <div class="task-card-footer">
+                                    <span><i class="bi bi-people"></i> <t t-esc="tugas['submission_count']"/> Mengumpulkan</span>
+                                    <span class="btn-action-detail">Periksa <i class="bi bi-chevron-right"></i></span>
+                                </div>
+                            </a>
+                        </t>
+                    </t>
                 </div>
             </div>
         </t>
@@ -234,7 +212,13 @@
                     <hr class="divider"/>
                     <div class="detail-specs-body">
                         <h5>Spesifikasi/Petunjuk Tugas:</h5>
-                        <p id="detail-spec-desc">Deskripsi pengerjaan tugas...</p>
+                        <p id="detail-spec-desc" class="mb-15">Deskripsi pengerjaan tugas...</p>
+                        
+                        <!-- File Lampiran Materi (Dynamic via JS) -->
+                        <div id="detail-spec-materi-wrapper" class="materi-attachment-wrapper hidden" style="margin-top: 16px;">
+                            <h5><i class="bi bi-paperclip"></i> Lampiran File Materi:</h5>
+                            <a id="detail-spec-materi-link" href="#" class="btn-zip-download" style="display: inline-flex; text-decoration: none;"><i class="bi bi-file-earmark-arrow-down-fill"></i> <span id="detail-spec-materi-name">nama_file.pdf</span></a>
+                        </div>
                     </div>
                 </div>
 

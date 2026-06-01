@@ -4,59 +4,90 @@ document.addEventListener("DOMContentLoaded", function() {
     // --- 1. Form Pembuatan Tugas (Halaman: /dosen/tugas/buat) ---
     var form = document.getElementById("form-buat-tugas");
     if (form) {
-        form.addEventListener("submit", function(e) {
+        form.addEventListener("submit", async function(e) {
             e.preventDefault();
             
             var mkSelect = document.getElementById("mk_id");
-            var mkName = mkSelect.options[mkSelect.selectedIndex].text;
             var judul = document.getElementById("judul").value.trim();
             var deadlineRaw = document.getElementById("deadline").value;
             var deskripsi = document.getElementById("deskripsi").value.trim();
-            var jenis_tugas = document.querySelector('input[name="jenis_tugas"]:checked').value;
+            var jenis_tugas = document.getElementById("jenis_tugas").value.trim();
+            var fileInput = document.getElementById("file_materi");
             
             if (!mkSelect.value || !judul || !deadlineRaw || !deskripsi) {
                 showToast("Peringatan", "Harap isi semua kolom wajib (*)!", "bi-exclamation-triangle-fill text-warning");
                 return;
             }
 
-            var deadlineDate = new Date(deadlineRaw);
-            var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            var formattedDeadline = deadlineDate.getDate() + " " + months[deadlineDate.getMonth()] + " " + deadlineDate.getFullYear() + ", " + 
-                                    String(deadlineDate.getHours()).padStart(2, '0') + ":" + String(deadlineDate.getMinutes()).padStart(2, '0') + " WIB";
+            var btnSubmit = form.querySelector(".btn-submit-tugas");
+            var originalBtnHTML = btnSubmit.innerHTML;
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Mempublikasikan...';
 
-            var randomId = "task-" + Date.now();
-
-            var newItemHTML = `
-                <div class="tugas-item" data-id="${randomId}" data-jenis="${jenis_tugas}" style="animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
-                    <div class="tugas-item-header">
-                        <div class="tugas-title-meta">
-                            <h4>${judul}</h4>
-                            <p class="subject"><i class="bi bi-book"></i> ${mkName}</p>
-                        </div>
-                        <span class="type-badge ${jenis_tugas.toLowerCase()}">${jenis_tugas}</span>
-                    </div>
-                    <div class="tugas-item-body">
-                        <span class="val text-danger"><i class="bi bi-clock-fill"></i> ${formattedDeadline}</span>
-                        <p class="desc text-truncate-3">${deskripsi}</p>
-                    </div>
-                    <div class="tugas-item-footer">
-                        <button class="btn-toggle-detail" onclick="toggleDetails(this)"><i class="bi bi-chevron-down"></i> Detail</button>
-                        <div class="actions">
-                            <button class="btn-action edit" onclick="editMockTask('${randomId}')"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn-action delete" onclick="deleteMockTask('${randomId}')"><i class="bi bi-trash3-fill"></i></button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            var container = document.getElementById("assignments-list");
-            if (container) {
-                container.insertAdjacentHTML("afterbegin", newItemHTML);
-                updateDosenTugasStats();
+            async function getBase64(file) {
+                return new Promise(function(resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function() { resolve(reader.result.split(',')[1]); };
+                    reader.onerror = function(error) { reject(error); };
+                    reader.readAsDataURL(file);
+                });
             }
 
-            form.reset();
-            showToast("Tugas Dibuat!", "Tugas baru berhasil dipublikasikan untuk mahasiswa.", "bi-check-circle-fill text-success");
+            var fileBase64 = "";
+            var fileName = "";
+            if (fileInput && fileInput.files.length > 0) {
+                var file = fileInput.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast("Peringatan", "Ukuran file lampiran maksimal 5MB!", "bi-exclamation-triangle-fill text-warning");
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = originalBtnHTML;
+                    return;
+                }
+                fileName = file.name;
+                try {
+                    fileBase64 = await getBase64(file);
+                } catch (err) {
+                    showToast("Error", "Gagal membaca berkas lampiran.", "bi-exclamation-triangle-fill text-danger");
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = originalBtnHTML;
+                    return;
+                }
+            }
+
+            var payload = {
+                mk_id: mkSelect.value,
+                judul: judul,
+                deadline: deadlineRaw,
+                deskripsi: deskripsi,
+                jenis_tugas: jenis_tugas,
+                file_materi: fileBase64,
+                file_materi_name: fileName
+            };
+
+            try {
+                var res = await fetch("/api/tugas/buat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                var data = await res.json();
+                
+                if (data.status === "success") {
+                    showToast("Tugas Dibuat!", "Tugas baru berhasil dipublikasikan untuk mahasiswa.", "bi-check-circle-fill text-success");
+                    form.reset();
+                    setTimeout(function() {
+                        window.location.href = "/dosen/tugas/pengumpulan";
+                    }, 1500);
+                } else {
+                    showToast("Error", data.message || "Gagal mempublikasikan tugas.", "bi-exclamation-triangle-fill text-danger");
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = originalBtnHTML;
+                }
+            } catch (e) {
+                showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalBtnHTML;
+            }
         });
     }
 
@@ -125,6 +156,21 @@ async function loadTugasDetailAndSubmissions(taskId) {
         }
         if (deadlineEl) deadlineEl.innerHTML = '<i class="bi bi-clock-fill"></i> Batas Waktu: ' + task.deadline;
         if (descEl) descEl.innerText = task.desc;
+
+        // Populate optional file materi
+        var materiWrapper = document.getElementById("detail-spec-materi-wrapper");
+        var materiLink = document.getElementById("detail-spec-materi-link");
+        var materiName = document.getElementById("detail-spec-materi-name");
+        
+        if (materiWrapper && materiLink && materiName) {
+            if (task.has_file_materi) {
+                materiWrapper.classList.remove("hidden");
+                materiLink.setAttribute("href", task.file_materi_url);
+                materiName.innerText = task.file_materi_name;
+            } else {
+                materiWrapper.classList.add("hidden");
+            }
+        }
 
         // Populate Submissions Table
         var tbody = document.getElementById("submissions-table-body");

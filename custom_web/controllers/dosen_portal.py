@@ -28,14 +28,22 @@ class DosenPortalController(http.Controller):
         })
 
     @http.route('/dosen/presensi', auth='public', website=True, type='http')
-    def presensi_dosen(self, **kwargs):
+    def presensi_dosen_menu(self, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+        return request.render('custom_web.presensi_dosen_menu', {
+            'dosen': dosen,
+        })
+
+    @http.route('/dosen/presensi/buat', auth='public', website=True, type='http')
+    def presensi_dosen_buat(self, **kwargs):
         dosen = get_active_dosen()
         if not dosen:
             return request.redirect('/login')
 
         sesi_obj = request.env['presensi.sesi'].sudo()
         open_sessions = sesi_obj.search([('status', '=', 'open'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
-        closed_sessions = sesi_obj.search([('status', '=', 'closed'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
 
         # Load courses specifically taught by this Dosen
         courses_list = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
@@ -43,11 +51,24 @@ class DosenPortalController(http.Controller):
             # Fallback to all active courses if no relationship is defined yet
             courses_list = request.env['mata.kuliah'].sudo().search([], order='nama asc')
 
-        return request.render('custom_web.presensi_dosen', {
+        return request.render('custom_web.presensi_dosen_buat', {
             'dosen': dosen,
             'open_sessions': open_sessions,
-            'closed_sessions': closed_sessions,
             'courses_list': courses_list,
+        })
+
+    @http.route('/dosen/presensi/histori', auth='public', website=True, type='http')
+    def presensi_dosen_histori(self, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        sesi_obj = request.env['presensi.sesi'].sudo()
+        closed_sessions = sesi_obj.search([('status', '=', 'closed'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
+
+        return request.render('custom_web.presensi_dosen_histori', {
+            'dosen': dosen,
+            'closed_sessions': closed_sessions,
         })
 
     @http.route('/dosen/tugas', auth='public', website=True, type='http')
@@ -89,10 +110,34 @@ class DosenPortalController(http.Controller):
             real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
         
         mata_kuliah = [{'id': mk.id, 'name': mk.nama} for mk in real_mk]
+        
+        # Fetch real assignments created for these courses
+        mk_ids = [mk.id for mk in real_mk]
+        tugas_list = request.env['tugas.tugas'].sudo().search([('mata_kuliah_id', 'in', mk_ids)], order='create_date desc')
+        
+        tugas_data = []
+        for t in tugas_list:
+            count = len(t.pengumpulan_ids)
+            color = 'purple'
+            if 'web' in t.mata_kuliah_id.nama.lower():
+                color = 'blue'
+            elif 'rekayasa' in t.mata_kuliah_id.nama.lower():
+                color = 'teal'
+            
+            tugas_data.append({
+                'id': t.id,
+                'judul': t.judul,
+                'mk_id': t.mata_kuliah_id.id,
+                'mk_nama': t.mata_kuliah_id.nama,
+                'jenis_tugas': t.jenis_tugas,
+                'submission_count': count,
+                'color': color,
+            })
 
         return request.render('custom_web.tugas_dosen_pengumpulan', {
             'dosen': dosen,
             'mata_kuliah': mata_kuliah,
+            'tugas_data': tugas_data,
         })
 
     @http.route('/dosen/tugas/detail/<string:tugas_id>', auth='public', website=True, type='http')
@@ -109,13 +154,14 @@ class DosenPortalController(http.Controller):
     # =======================================================
     # API BACKEND TUGAS
     # =======================================================
-    @http.route('/api/tugas/buat', type='http', auth='user', methods=['POST'], cors='*', csrf=False)
+    @http.route('/api/tugas/buat', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_tugas_buat(self, **kw):
         try:
-            body = json.loads(request.httprequest.data)
             dosen = get_active_dosen()
             if not dosen:
                 return request.make_response(json.dumps({'status': 'error', 'message': 'Unauthorized'}), status=401)
+            
+            body = json.loads(request.httprequest.data)
             
             # Konversi format JS (YYYY-MM-DDTHH:MM) ke UTC Odoo
             dt_str = body['deadline'].replace('T', ' ')
@@ -132,6 +178,8 @@ class DosenPortalController(http.Controller):
                 'jenis_tugas': body['jenis_tugas'],
                 'deskripsi': body['deskripsi'],
                 'deadline': utc_dt.strftime('%Y-%m-%d %H:%M:%S'),
+                'file_materi': body.get('file_materi'),
+                'file_materi_name': body.get('file_materi_name'),
             })
 
             return request.make_response(json.dumps({
@@ -141,9 +189,13 @@ class DosenPortalController(http.Controller):
         except Exception as e:
             return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
 
-    @http.route('/api/tugas/hapus', type='http', auth='user', methods=['POST'], cors='*', csrf=False)
+    @http.route('/api/tugas/hapus', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_tugas_hapus(self, **kw):
         try:
+            dosen = get_active_dosen()
+            if not dosen:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'Unauthorized'}), status=401)
+
             body = json.loads(request.httprequest.data)
             tugas = request.env['tugas.tugas'].sudo().browse(int(body['tugas_id']))
             if tugas.exists():
@@ -152,8 +204,12 @@ class DosenPortalController(http.Controller):
         except Exception as e:
             return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
 
-    @http.route('/api/tugas/detail/<int:tugas_id>', type='http', auth='user', methods=['GET'], cors='*', csrf=False)
+    @http.route('/api/tugas/detail/<int:tugas_id>', type='http', auth='public', methods=['GET'], cors='*', csrf=False)
     def api_tugas_detail(self, tugas_id, **kw):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Unauthorized'}), status=401)
+
         tugas = request.env['tugas.tugas'].sudo().browse(tugas_id)
         if not tugas.exists():
             return request.make_response(json.dumps({'status': 'error', 'message': 'Tugas tidak ditemukan'}), headers=[('Content-Type', 'application/json')])
@@ -177,18 +233,26 @@ class DosenPortalController(http.Controller):
             })
 
         data = {
+            'id': tugas.id,
             'title': tugas.judul,
             'subject': tugas.mata_kuliah_id.nama,
             'type': tugas.jenis_tugas,
             'deadline': waktu_wib,
             'desc': tugas.deskripsi,
+            'file_materi_name': tugas.file_materi_name or '',
+            'has_file_materi': bool(tugas.file_materi),
+            'file_materi_url': f'/dosen/tugas/materi/{tugas.id}' if tugas.file_materi else '',
             'submissions': submissions
         }
         return request.make_response(json.dumps({'status': 'success', 'data': data}), headers=[('Content-Type', 'application/json')])
 
-    @http.route('/api/tugas/nilai', type='http', auth='user', methods=['POST'], cors='*', csrf=False)
+    @http.route('/api/tugas/nilai', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_tugas_nilai(self, **kw):
         try:
+            dosen = get_active_dosen()
+            if not dosen:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'Unauthorized'}), status=401)
+
             body = json.loads(request.httprequest.data)
             sub = request.env['tugas.pengumpulan'].sudo().browse(int(body['pengumpulan_id']))
             if sub.exists():
@@ -196,3 +260,18 @@ class DosenPortalController(http.Controller):
             return request.make_response(json.dumps({'status': 'success'}), headers=[('Content-Type', 'application/json')])
         except Exception as e:
             return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
+
+    @http.route('/dosen/tugas/materi/<int:tugas_id>', auth='public', website=True, type='http')
+    def download_tugas_materi(self, tugas_id, **kwargs):
+        tugas = request.env['tugas.tugas'].sudo().browse(tugas_id)
+        if not tugas.exists() or not tugas.file_materi:
+            return request.not_found()
+        
+        import base64
+        file_data = base64.b64decode(tugas.file_materi)
+        filename = tugas.file_materi_name or f"materi_tugas_{tugas_id}"
+        
+        return request.make_response(file_data, headers=[
+            ('Content-Type', 'application/octet-stream'),
+            ('Content-Disposition', f'attachment; filename="{filename}"')
+        ])

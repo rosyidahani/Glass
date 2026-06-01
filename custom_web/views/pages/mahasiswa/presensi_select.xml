@@ -26,59 +26,70 @@
 
                 <!-- Course Cards Grid -->
                 <div class="courses-grid" id="coursesGrid">
-                    <t t-foreach="courses" t-as="course">
-                        <!-- If finished, show disabled styling -->
-                        <div t-att-class="'course-card glass-panel ' + course['status'] + (' disabled-card' if course['status'] == 'selesai' else ' active-card')"
-                             t-att-data-name="course['name'].lower() + ' ' + course['dosen'].lower()"
-                             t-att-data-status="course['status']">
-                            
-                            <!-- Status Badge -->
-                            <div class="card-status-badge">
-                                <span t-att-class="'status-dot ' + course['status']"></span>
-                                <span class="status-text"><t t-esc="course['status_label']"/></span>
+                    <t t-if="not courses">
+                        <div class="empty-state-attendance glass-panel text-center" style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 60px 40px; border-radius: 24px; background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); text-align: center;">
+                            <div class="empty-icon" style="font-size: 48px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2)); width: 88px; height: 88px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 8px;">
+                                <i class="bi bi-calendar2-x text-purple" style="color: #a78bfa; filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.4));"></i>
                             </div>
-
-                            <div class="course-icon">
-                                <t t-if="course['status'] == 'online'">
-                                    <i class="bi bi-laptop-fill text-green"></i>
-                                </t>
-                                <t t-elif="course['status'] == 'offline'">
-                                    <i class="bi bi-building-fill text-blue"></i>
-                                </t>
-                                <t t-else="">
-                                    <i class="bi bi-calendar-x-fill text-gray"></i>
-                                </t>
-                            </div>
-
-                            <div class="course-details">
-                                <h3 class="course-title"><t t-esc="course['name']"/></h3>
-                                <p class="course-dosen"><i class="bi bi-person-fill"></i> <t t-esc="course['dosen']"/></p>
+                            <h4 style="font-weight: 800; margin: 0; font-size: 20px; color: #1e293b; letter-spacing: -0.02em;">Belum Ada Sesi Presensi Aktif</h4>
+                            <p style="color: #64748b; font-size: 14.5px; margin: 0; max-width: 340px; line-height: 1.6;">Dosen pengampu Anda belum membuka sesi presensi kelas untuk saat ini. Silakan hubungi dosen bersangkutan.</p>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <t t-foreach="courses" t-as="course">
+                            <!-- If finished, show disabled styling -->
+                            <div t-att-class="'course-card glass-panel ' + course['status'] + (' disabled-card' if course['status'] == 'selesai' else ' active-card')"
+                                 t-att-data-name="course['name'].lower() + ' ' + course['dosen'].lower()"
+                                 t-att-data-status="course['status']">
                                 
-                                <div class="course-meta">
-                                    <span><i class="bi bi-clock-fill"></i> <t t-esc="course['jam']"/></span>
-                                    <span><i class="bi bi-geo-alt-fill"></i> <t t-esc="course['ruang']"/></span>
+                                <!-- Status Badge -->
+                                <div class="card-status-badge">
+                                    <span t-att-class="'status-dot ' + course['status']"></span>
+                                    <span class="status-text"><t t-esc="course['status_label']"/></span>
                                 </div>
 
-                                <!-- Offline extra alert for GPS -->
-                                <t t-if="course['status'] == 'offline'">
-                                    <div class="gps-badge">
-                                        <i class="bi bi-pin-map-fill"></i> Validasi GPS Aktif (Radius Kampus)
-                                    </div>
-                                </t>
-                            </div>
+                                <div class="course-icon">
+                                    <t t-if="course['status'] == 'online'">
+                                        <i class="bi bi-laptop-fill text-green"></i>
+                                    </t>
+                                    <t t-elif="course['status'] == 'offline'">
+                                        <i class="bi bi-building-fill text-blue"></i>
+                                    </t>
+                                    <t t-else="">
+                                        <i class="bi bi-calendar-x-fill text-gray"></i>
+                                    </t>
+                                </div>
 
-                            <!-- Footer Card Button -->
-                            <div class="card-footer-action">
-                                <t t-if="course['status'] == 'selesai'">
-                                    <button class="btn-action btn-disabled" disabled="disabled"><t t-esc="course.get('action_label', 'Selesai')"/></button>
-                                </t>
-                                <t t-else="">
-                                    <a t-att-href="'/presensi/scan/' + str(course['id'])" class="btn-action btn-active">
-                                        Mulai Presensi <i class="bi bi-arrow-right"></i>
-                                    </a>
-                                </t>
+                                <div class="course-details">
+                                    <h3 class="course-title"><t t-esc="course['name']"/></h3>
+                                    <p class="course-dosen"><i class="bi bi-person-fill"></i> <t t-esc="course['dosen']"/></p>
+                                    
+                                    <div class="course-meta">
+                                        <span><i class="bi bi-clock-fill"></i> <t t-esc="course['jam']"/></span>
+                                        <span><i class="bi bi-geo-alt-fill"></i> <t t-esc="course['ruang']"/></span>
+                                    </div>
+
+                                    <!-- Offline extra alert for GPS -->
+                                    <t t-if="course['status'] == 'offline'">
+                                        <div class="gps-badge">
+                                            <i class="bi bi-pin-map-fill"></i> Validasi GPS Aktif (Radius Kampus)
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <!-- Footer Card Button -->
+                                <div class="card-footer-action">
+                                    <t t-if="course['status'] == 'selesai'">
+                                        <button class="btn-action btn-disabled" disabled="disabled"><t t-esc="course.get('action_label', 'Selesai')"/></button>
+                                    </t>
+                                    <t t-else="">
+                                        <a t-att-href="'/presensi/scan/' + str(course['id'])" class="btn-action btn-active">
+                                            Mulai Presensi <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
+                        </t>
                     </t>
                 </div>
             </div>
