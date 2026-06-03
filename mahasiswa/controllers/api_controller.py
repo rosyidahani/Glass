@@ -4,6 +4,10 @@ from odoo.exceptions import UserError
 import json
 import base64
 from odoo import fields
+import jwt
+import datetime
+
+JWT_SECRET = 'GlassSuperSecretKey2024'  # Ganti dengan secret key yang aman di production
 
 class MahasiswaAPI(http.Controller):
 
@@ -23,14 +27,21 @@ class MahasiswaAPI(http.Controller):
             status=status
         )
 
-    def _get_mahasiswa_from_session(self):
-        """Ambil mahasiswa berdasarkan NIM yang disimpan di session."""
-        nim = request.session.get('mahasiswa_nim')
-        if not nim:
+    def _get_mahasiswa_from_token(self):
+        """Ambil mahasiswa berdasarkan JWT token dari header Authorization."""
+        auth_header = request.httprequest.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
             return None
-        return request.env['mahasiswa.mahasiswa'].sudo().search(
-            [('nim', '=', nim), ('active', '=', True)], limit=1
-        )
+        
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            nim = payload.get('nim')
+            return request.env['mahasiswa.mahasiswa'].sudo().search(
+                [('nim', '=', nim), ('active', '=', True)], limit=1
+            )
+        except Exception:
+            return None
 
     # ================================================
     # ENDPOINT LOGIN: POST /api/auth/login
@@ -56,14 +67,19 @@ class MahasiswaAPI(http.Controller):
         if not mahasiswa:
             return self._error('NIM atau password salah.', 401)
 
-        # Simpan NIM di session agar endpoint lain bisa kenal siapa yang login
-        request.session['mahasiswa_nim'] = mahasiswa.nim
+        # Generate JWT Token
+        payload = {
+            'nim': mahasiswa.nim,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
+        }
+        token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
 
         return self._success({
             'nama': mahasiswa.name,
             'nim': mahasiswa.nim,
             'total_xp': mahasiswa.total_xp,
             'koin': mahasiswa.koin,
+            'token': token
         })
 
     # ================================================
@@ -72,7 +88,7 @@ class MahasiswaAPI(http.Controller):
     @http.route('/api/auth/logout', type='http',
                 auth='public', methods=['POST'], cors='*', csrf=False)
     def logout(self, **kw):
-        request.session.pop('mahasiswa_nim', None)
+        # Klien bertanggung jawab menghapus token di sisi mereka
         return self._success({'message': 'Logout berhasil.'})
 
     # ================================================
@@ -81,7 +97,7 @@ class MahasiswaAPI(http.Controller):
     @http.route('/api/mahasiswa/status', type='http',
                 auth='public', methods=['GET'], cors='*')
     def get_status(self, **kw):
-        mhs = self._get_mahasiswa_from_session()
+        mhs = self._get_mahasiswa_from_token()
         if not mhs:
             return self._error('Belum login atau sesi habis.', 401)
 
@@ -96,7 +112,7 @@ class MahasiswaAPI(http.Controller):
     @http.route('/api/mahasiswa/action', type='http',
                 auth='public', methods=['POST'], cors='*', csrf=False)
     def post_action(self, **kw):
-        mhs = self._get_mahasiswa_from_session()
+        mhs = self._get_mahasiswa_from_token()
         if not mhs:
             return self._error('Belum login atau sesi habis.', 401)
 
@@ -139,7 +155,7 @@ class MahasiswaAPI(http.Controller):
                 auth='public', methods=['GET'], cors='*')
     def get_leaderboard(self, **kw):
         # 1. Cek Autentikasi
-        mhs = self._get_mahasiswa_from_session()
+        mhs = self._get_mahasiswa_from_token()
         if not mhs:
             return self._error('Belum login atau sesi habis.', 401)
 
@@ -173,7 +189,7 @@ class MahasiswaAPI(http.Controller):
     # ================================================
     @http.route('/api/tugas/kumpul', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def kumpul_tugas(self, **kw):
-        mhs = self._get_mahasiswa_from_session()
+        mhs = self._get_mahasiswa_from_token()
         if not mhs:
             return self._error('Belum login atau sesi habis.', 401)
         
