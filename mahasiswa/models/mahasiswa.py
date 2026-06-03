@@ -46,6 +46,25 @@ class Mahasiswa(models.Model):
         string='Active',
         default=True,
     )
+    
+    # Field Tambahan Sesuai Spesifikasi Baru
+    device_id = fields.Char(
+        string='Device ID',
+        help='ID perangkat terdaftar untuk Device Binding (Anti-Kecurangan).'
+    )
+    face_descriptor = fields.Text(
+        string='Face Descriptor',
+        help='Data biometrik vektor wajah mahasiswa (Terenkripsi AES-256).'
+    )
+    tema_aplikasi = fields.Selection(
+        [('light', 'Light'), ('dark', 'Dark')],
+        string='Tema Aplikasi',
+        default='light'
+    )
+    bahasa = fields.Char(
+        string='Bahasa',
+        default='id'
+    )
 
     _sql_constraints = [
         ('nim_unique', 'UNIQUE(nim)', 'NIM sudah terdaftar!'),

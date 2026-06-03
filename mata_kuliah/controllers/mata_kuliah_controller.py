@@ -1,6 +1,9 @@
 from odoo import http
 from odoo.http import request
 import json
+import jwt
+
+JWT_SECRET = 'GlassSuperSecretKey2024'
 
 
 class MataKuliahController(http.Controller):
@@ -19,12 +22,17 @@ class MataKuliahController(http.Controller):
         )
 
     def _get_mahasiswa(self):
-        nim = request.session.get('mahasiswa_nim')
-        if not nim:
+        auth_header = request.httprequest.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
             return None
-        return request.env['mahasiswa.mahasiswa'].sudo().search(
-            [('nim', '=', nim), ('active', '=', True)], limit=1
-        )
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            return request.env['mahasiswa.mahasiswa'].sudo().search(
+                [('nim', '=', payload.get('nim')), ('active', '=', True)], limit=1
+            )
+        except Exception:
+            return None
 
     # ================================================
     # ENDPOINT: Ambil daftar matkul milik mahasiswa

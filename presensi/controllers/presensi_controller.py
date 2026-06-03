@@ -4,6 +4,9 @@ from odoo.exceptions import UserError
 import json
 import math
 import datetime
+import jwt
+
+JWT_SECRET = 'GlassSuperSecretKey2024'
 
 
 class PresensiController(http.Controller):
@@ -25,12 +28,17 @@ class PresensiController(http.Controller):
         )
 
     def _get_mahasiswa(self):
-        nim = request.session.get('mahasiswa_nim')
-        if not nim:
+        auth_header = request.httprequest.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
             return None
-        return request.env['mahasiswa.mahasiswa'].sudo().search(
-            [('nim', '=', nim), ('active', '=', True)], limit=1
-        )
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            return request.env['mahasiswa.mahasiswa'].sudo().search(
+                [('nim', '=', payload.get('nim')), ('active', '=', True)], limit=1
+            )
+        except Exception:
+            return None
 
     def _hitung_jarak_meter(self, lat1, lon1, lat2, lon2):
         """Rumus Haversine — hitung jarak dua koordinat dalam meter."""
@@ -220,16 +228,17 @@ class PresensiController(http.Controller):
         now = Datetime.now()
         is_telat = (sesi.batas_waktu_telat and now > sesi.batas_waktu_telat)
 
-        # Cek apakah pertama presensi
-        is_pertama = (len(sesi.record_ids) == 0)
+        # Cek apakah termasuk 3 mahasiswa pertama yang melakukan presensi
+        jumlah_hadir = request.env['presensi.record'].sudo().search_count([('sesi_id', '=', sesi.id)])
+        is_pertama = (jumlah_hadir < 3)
 
         # Hitung reward
-        if is_pertama:
-            xp, koin = 25, 5
-        elif not is_telat:
-            xp, koin = 5, 1
-        else:
+        if is_telat:
             xp, koin = 0, 0
+        elif is_pertama:
+            xp, koin = 25, 5
+        else:
+            xp, koin = 15, 3
 
         # Simpan record
         record = request.env['presensi.record'].sudo().create({
