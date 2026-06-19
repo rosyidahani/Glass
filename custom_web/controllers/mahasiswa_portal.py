@@ -12,8 +12,20 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
 
+        # Hitung ranking mahasiswa berdasarkan total_xp
+        all_students = request.env['mahasiswa.mahasiswa'].sudo().search([
+            ('active', '=', True)
+        ], order='total_xp desc')
+        
+        rank = 1
+        for idx, student in enumerate(all_students, start=1):
+            if student.id == mahasiswa.id:
+                rank = idx
+                break
+
         return request.render('custom_web.dashboard', {
             'mahasiswa': mahasiswa,
+            'rank': rank,
         })
 
     @http.route('/dashboard/mahasiswa/profile', auth='public', website=True, type='http')
@@ -40,6 +52,140 @@ class MahasiswaPortalController(http.Controller):
             })
 
         return request.redirect('/dashboard/mahasiswa/profile')
+
+    @http.route('/dashboard/mahasiswa/shop', auth='public', website=True, type='http')
+    def shop_mahasiswa(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return request.redirect('/login')
+
+        return request.render('custom_web.shop', {
+            'mahasiswa': mahasiswa,
+        })
+
+    @http.route('/leaderboard', auth='public', website=True, type='http')
+    def leaderboard_mahasiswa(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return request.redirect('/login')
+
+        # Ambil seluruh mahasiswa aktif diurutkan berdasarkan total XP terbanyak
+        students = request.env['mahasiswa.mahasiswa'].sudo().search([
+            ('active', '=', True)
+        ], order='total_xp desc')
+
+        return request.render('custom_web.leaderboard', {
+            'mahasiswa': mahasiswa,
+            'students': students,
+        })
+
+    @http.route('/api/shop/state', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
+    def api_shop_state(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return {'status': 'error', 'message': 'Session expired or not logged in'}
+
+        owned_avatars = mahasiswa.owned_avatar_ids.mapped('code') or ['char_default']
+        equipped_avatar = mahasiswa.equipped_avatar_id.code or 'char_default'
+        
+        # Get list of voucher codes claimed by this student
+        claimed_vouchers = request.env['shop.transaction'].sudo().search([
+            ('mahasiswa_id', '=', mahasiswa.id),
+            ('item_id.item_type', '=', 'voucher')
+        ]).mapped('item_id.code')
+
+        return {
+            'status': 'success',
+            'coins': mahasiswa.koin,
+            'ownedAvatars': owned_avatars,
+            'equippedAvatar': equipped_avatar,
+            'claimedVouchers': claimed_vouchers,
+        }
+
+    @http.route('/api/shop/buy', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
+    def api_shop_buy(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return {'status': 'error', 'message': 'Session expired or not logged in'}
+
+        item_code = kwargs.get('item_code')
+        if not item_code:
+            return {'status': 'error', 'message': 'Kode item wajib diisi.'}
+
+        item = request.env['shop.item'].sudo().search([('code', '=', item_code), ('active', '=', True)], limit=1)
+        if not item.exists():
+            return {'status': 'error', 'message': 'Item tidak ditemukan atau tidak aktif.'}
+
+        if mahasiswa.koin < item.price:
+            return {'status': 'error', 'message': 'Koin Anda tidak mencukupi.'}
+
+        # Check if already owned/claimed
+        if item.item_type == 'avatar':
+            if item in mahasiswa.owned_avatar_ids:
+                return {'status': 'error', 'message': 'Anda sudah memiliki avatar ini.'}
+        else:
+            # Voucher
+            existing_tx = request.env['shop.transaction'].sudo().search([
+                ('mahasiswa_id', '=', mahasiswa.id),
+                ('item_id', '=', item.id)
+            ], limit=1)
+            if existing_tx:
+                return {'status': 'error', 'message': 'Anda sudah menukarkan voucher ini.'}
+
+        # Process transaction
+        try:
+            # Deduct koin
+            mahasiswa.sudo().write({'koin': mahasiswa.koin - item.price})
+            
+            # Create transaction
+            tx = request.env['shop.transaction'].sudo().create({
+                'mahasiswa_id': mahasiswa.id,
+                'item_id': item.id,
+            })
+
+            # If avatar, add to owned
+            if item.item_type == 'avatar':
+                mahasiswa.sudo().write({
+                    'owned_avatar_ids': [(4, item.id)]
+                })
+
+            return {
+                'status': 'success',
+                'coins': mahasiswa.koin,
+                'code_generated': tx.code_generated or ''
+            }
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    @http.route('/api/shop/equip', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
+    def api_shop_equip(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return {'status': 'error', 'message': 'Session expired or not logged in'}
+
+        avatar_code = kwargs.get('avatar_code')
+        if not avatar_code:
+            return {'status': 'error', 'message': 'Kode avatar wajib diisi.'}
+
+        item = request.env['shop.item'].sudo().search([
+            ('code', '=', avatar_code),
+            ('item_type', '=', 'avatar'),
+            ('active', '=', True)
+        ], limit=1)
+        if not item.exists():
+            return {'status': 'error', 'message': 'Avatar tidak ditemukan.'}
+
+        if item not in mahasiswa.owned_avatar_ids:
+            return {'status': 'error', 'message': 'Anda belum memiliki avatar ini.'}
+
+        try:
+            mahasiswa.sudo().write({
+                'equipped_avatar_id': item.id
+            })
+            return {'status': 'success'}
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
 
     @http.route('/menu', auth='public', website=True, type='http')
     def menu(self, **kwargs):

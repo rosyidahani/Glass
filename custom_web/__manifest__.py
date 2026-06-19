@@ -2,7 +2,7 @@
     'name': 'Custom Web App',
     'version': '1.2',
     'summary': 'Custom web portal with student authentication',
-    'depends': ['website', 'mahasiswa', 'feature_dosen', 'presensi'],
+    'depends': ['website', 'mahasiswa', 'feature_dosen', 'presensi', 'shop'],
     'data': [
         'security/ir.model.access.csv',
         'views/layout.xml',
@@ -11,6 +11,8 @@
         'views/pages/mahasiswa/profile.xml',
         'views/pages/mahasiswa/presensi_select.xml',
         'views/pages/mahasiswa/presensi_scan.xml',
+        'views/pages/mahasiswa/shop.xml',
+        'views/pages/mahasiswa/leaderboard.xml',
         'views/pages/dosen/dashboard.xml',
         'views/pages/dosen/presensi_dosen.xml',
         'views/pages/dosen/tugas_dosen.xml',

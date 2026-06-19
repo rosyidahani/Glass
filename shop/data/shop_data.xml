@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Avatars Master Data -->
+        <record id="avatar_char_default" model="shop.avatar">
+            <field name="avatar_id">char_default</field>
+            <field name="nama_avatar">Ksatria Default</field>
+            <field name="harga_koin">0</field>
+            <field name="gambar_url">/custom_web/static/src/img/char_default.png</field>
+        </record>
+
+        <record id="avatar_char_cyber" model="shop.avatar">
+            <field name="avatar_id">char_cyber</field>
+            <field name="nama_avatar">Cyber Ninja</field>
+            <field name="harga_koin">15</field>
+            <field name="gambar_url">/custom_web/static/src/img/char_cyber.png</field>
+        </record>
+
+        <record id="avatar_char_royal" model="shop.avatar">
+            <field name="avatar_id">char_royal</field>
+            <field name="nama_avatar">Cendekiawan Kerajaan</field>
+            <field name="harga_koin">30</field>
+            <field name="gambar_url">/custom_web/static/src/img/char_royal.png</field>
+        </record>
+
+        <record id="avatar_char_neon" model="shop.avatar">
+            <field name="avatar_id">char_neon</field>
+            <field name="nama_avatar">Hacker Neon</field>
+            <field name="harga_koin">50</field>
+            <field name="gambar_url">/custom_web/static/src/img/char_neon.png</field>
+        </record>
+
+        <!-- Shop Items (Using Master Data references) -->
+        <record id="shop_item_char_default" model="shop.item">
+            <field name="item_type">avatar</field>
+            <field name="avatar_id" ref="avatar_char_default"/>
+            <field name="description">Karakter legendaris awal perjuangan akademik Anda.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="shop_item_char_cyber" model="shop.item">
+            <field name="item_type">avatar</field>
+            <field name="avatar_id" ref="avatar_char_cyber"/>
+            <field name="description">Armor cybernetik dengan lampu neon pelindung konsentrasi belajar.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="shop_item_char_royal" model="shop.item">
+            <field name="item_type">avatar</field>
+            <field name="avatar_id" ref="avatar_char_royal"/>
+            <field name="description">Jubah kehormatan perpustakaan agung penanda wawasan luas.</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="shop_item_char_neon" model="shop.item">
+            <field name="item_type">avatar</field>
+            <field name="avatar_id" ref="avatar_char_neon"/>
+            <field name="description">Kacamata HUD transparan pemantau pergerakan data sistem.</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Vouchers (Maintained directly as they are not Avatars) -->
+        <record id="shop_item_v_wifi" model="shop.item">
+            <field name="name">WiFi Kampus Premium (24 Jam)</field>
+            <field name="item_type">voucher</field>
+            <field name="code">v_wifi</field>
+            <field name="price">5</field>
+            <field name="description">Akses internet ultra cepat dan tanpa batas kuota di seluruh area kampus.</field>
+            <field name="voucher_prefix">WIF</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="shop_item_v_canteen" model="shop.item">
+            <field name="name">Kupon Makan Kantin Rp 10.000</field>
+            <field name="item_type">voucher</field>
+            <field name="code">v_canteen</field>
+            <field name="price">12</field>
+            <field name="description">Kupon potongan harga makanan di seluruh tenant kantin utama kampus.</field>
+            <field name="voucher_prefix">CAN</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="shop_item_v_library" model="shop.item">
+            <field name="name">Bebas Denda Buku Perpustakaan</field>
+            <field name="item_type">voucher</field>
+            <field name="code">v_library</field>
+            <field name="price">15</field>
+            <field name="description">Kupon pembebasan denda satu kali keterlambatan pengembalian buku.</field>
+            <field name="voucher_prefix">LIB</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="shop_item_v_print" model="shop.item">
+            <field name="name">Cetak Gratis Tugas (50 Lembar)</field>
+            <field name="item_type">voucher</field>
+            <field name="code">v_print</field>
+            <field name="price">20</field>
+            <field name="description">Gratis biaya cetak tugas hitam-putih di laboratorium komputer kampus.</field>
+            <field name="voucher_prefix">PRT</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

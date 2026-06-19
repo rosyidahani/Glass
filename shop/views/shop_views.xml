@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!-- Form View: Shop Avatar (Sub Module)                          -->
+    <!-- ============================================================ -->
+    <record id="view_shop_avatar_form" model="ir.ui.view">
+        <field name="name">shop.avatar.form</field>
+        <field name="model">shop.avatar</field>
+        <field name="arch" type="xml">
+            <form string="Master Data Avatar">
+                <sheet>
+                    <field name="foto_avatar" widget="image" class="oe_avatar" options="{'preview_image': 'foto_avatar'}"/>
+                    <div class="oe_title">
+                        <label for="nama_avatar" class="oe_edit_only"/>
+                        <h1>
+                            <field name="nama_avatar" placeholder="Nama Avatar (contoh: Cyber Ninja)"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="custom_avatar_id"/>
+                            <field name="avatar_id" readonly="not custom_avatar_id" force_save="1"/>
+                            <field name="harga_koin"/>
+                        </group>
+                        <group>
+                            <field name="gambar_url"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree View: Shop Avatar (Sub Module)                          -->
+    <!-- ============================================================ -->
+    <record id="view_shop_avatar_tree" model="ir.ui.view">
+        <field name="name">shop.avatar.tree</field>
+        <field name="model">shop.avatar</field>
+        <field name="arch" type="xml">
+            <tree string="Master Data Avatar">
+                <field name="avatar_id"/>
+                <field name="nama_avatar"/>
+                <field name="harga_koin"/>
+                <field name="gambar_url"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Form View: Shop Item                                         -->
+    <!-- ============================================================ -->
+    <record id="view_shop_item_form" model="ir.ui.view">
+        <field name="name">shop.item.form</field>
+        <field name="model">shop.item</field>
+        <field name="arch" type="xml">
+            <form string="Item Toko">
+                <sheet>
+                    <group>
+                        <group string="Pengaturan Tipe &amp; Referensi">
+                            <field name="item_type"/>
+                            <field name="avatar_id" invisible="item_type != 'avatar'" required="item_type == 'avatar'"/>
+                        </group>
+                        <group string="Status">
+                            <field name="active"/>
+                            <field name="voucher_prefix" invisible="item_type != 'voucher'" required="item_type == 'voucher'"/>
+                        </group>
+                    </group>
+                    <group string="Detail Item">
+                        <field name="name" readonly="item_type == 'avatar'" force_save="1" placeholder="Nama Item"/>
+                        <field name="code" readonly="item_type == 'avatar'" force_save="1" placeholder="Kode Unik Item"/>
+                        <field name="price" readonly="item_type == 'avatar'" force_save="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Deskripsi">
+                            <field name="description" placeholder="Tulis deskripsi item di sini..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree View: Shop Item                                         -->
+    <!-- ============================================================ -->
+    <record id="view_shop_item_tree" model="ir.ui.view">
+        <field name="name">shop.item.tree</field>
+        <field name="model">shop.item</field>
+        <field name="arch" type="xml">
+            <tree string="Item Toko">
+                <field name="name"/>
+                <field name="item_type"/>
+                <field name="code"/>
+                <field name="price"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Form View: Shop Transaction                                  -->
+    <!-- ============================================================ -->
+    <record id="view_shop_transaction_form" model="ir.ui.view">
+        <field name="name">shop.transaction.form</field>
+        <field name="model">shop.transaction</field>
+        <field name="arch" type="xml">
+            <form string="Transaksi Pembelian">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="mahasiswa_id"/>
+                            <field name="item_id"/>
+                        </group>
+                        <group>
+                            <field name="purchase_date"/>
+                            <field name="code_generated" readonly="1"/>
+                            <field name="status"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree View: Shop Transaction                                  -->
+    <!-- ============================================================ -->
+    <record id="view_shop_transaction_tree" model="ir.ui.view">
+        <field name="name">shop.transaction.tree</field>
+        <field name="model">shop.transaction</field>
+        <field name="arch" type="xml">
+            <tree string="Transaksi Pembelian" create="false" edit="false">
+                <field name="mahasiswa_id"/>
+                <field name="item_id"/>
+                <field name="purchase_date"/>
+                <field name="code_generated"/>
+                <field name="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Actions                                                      -->
+    <!-- ============================================================ -->
+    <record id="action_shop_avatar" model="ir.actions.act_window">
+        <field name="name">Master Data Avatar</field>
+        <field name="res_model">shop.avatar</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada data master avatar. Klik "New" untuk menambahkan avatar baru ke dalam pustaka sistem.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_shop_item" model="ir.actions.act_window">
+        <field name="name">Item Toko Koin</field>
+        <field name="res_model">shop.item</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada item toko. Klik "New" untuk membuat item (avatar/voucher) baru.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_shop_transaction" model="ir.actions.act_window">
+        <field name="name">Transaksi Toko Koin</field>
+        <field name="res_model">shop.transaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada transaksi pembelian. Transaksi akan muncul otomatis saat mahasiswa menukar koin.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Menu Items                                                   -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_shop_avatar"
+              name="Master Avatar"
+              parent="mahasiswa.menu_mahasiswa_root"
+              action="action_shop_avatar"
+              sequence="15"/>
+
+    <menuitem id="menu_shop_item"
+              name="Pengaturan Toko"
+              parent="mahasiswa.menu_mahasiswa_root"
+              action="action_shop_item"
+              sequence="20"/>
+
+    <menuitem id="menu_shop_transaction"
+              name="Transaksi Toko"
+              parent="mahasiswa.menu_mahasiswa_root"
+              action="action_shop_transaction"
+              sequence="30"/>
+</odoo>

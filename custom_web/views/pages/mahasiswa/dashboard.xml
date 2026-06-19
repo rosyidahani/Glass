@@ -23,14 +23,14 @@
                              </div>
                              <!-- Rank Badge on the right inside profile-pill -->
                              <div class="profile-rank-badge" title="Rank Leaderboard">
-                                 <span>#4</span>
+                                 <span>#<t t-esc="rank"/></span>
                              </div>
                         </a>
                         
                         <!-- Action Buttons stacked below profile pill -->
                         <div class="hud-actions-vertical">
                             <!-- Shop Button -->
-                            <a href="#" class="icon-btn shop-btn glass-panel" title="Shop">
+                            <a href="/dashboard/mahasiswa/shop" class="icon-btn shop-btn glass-panel" title="Shop">
                                 <i class="bi bi-bag-fill"></i>
                             </a>
                             <!-- Setting Button -->
@@ -60,7 +60,7 @@
                     <!-- LEFT: 2D Character Area -->
                     <div class="avatar-section glass-panel">
                         <div class="avatar-glow"/>
-                        <img src="/custom_web/static/src/img/char_default.png" class="user-image" alt="Character Glass"/>
+                        <img t-att-src="mahasiswa.equipped_avatar_id.avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" class="user-image" alt="Character Glass"/>
                     </div>
 
                 </div>

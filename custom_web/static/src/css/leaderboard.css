@@ -1,0 +1,620 @@
+/* --- LEADERBOARD PAGE DESIGN (CLEAN WITH OVERFLOWING AURA STAR COMETS) --- */
+
+.leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px 10px 40px 10px;
+}
+
+/* Glassmorphism General Panel - Toned slightly darker with cool slate for contrast */
+.glass-panel {
+    background: rgba(241, 245, 249, 0.82); /* Slightly darker cool slate-gray tint */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.25); /* Border adjusted to match slate tint */
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.05);
+}
+
+/* Topbar */
+.leaderboard-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    min-height: 65px;
+}
+
+.leaderboard-topbar .back-btn {
+    color: #475569;
+    font-size: 22px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.leaderboard-topbar .back-btn:hover {
+    transform: translateX(-3px);
+    color: #6366f1;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.leaderboard-topbar .topbar-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.leaderboard-topbar .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.leaderboard-topbar .xp-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    font-weight: 700;
+    font-size: 14px;
+    color: #3b82f6;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.leaderboard-topbar .topbar-profile {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(59, 130, 241, 0.2);
+    overflow: hidden;
+}
+
+.leaderboard-topbar .topbar-profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Podium Section */
+.podium-section {
+    padding: 40px 20px 25px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.podium-row-wrapper {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.podium-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+}
+
+/* Outer Podium Bars wrapper - SET TO overflow: visible to allow the aura glow to spill out */
+.podium-bar {
+    width: 100%;
+    border-radius: 24px;
+    position: relative;
+    overflow: visible; /* Allows glowing comets and particles to bleed into background */
+    padding: 3.5px;
+    display: flex;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.podium-bar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.rank-1 { order: 2; }
+.rank-2 { order: 1; }
+.rank-3 { order: 3; }
+
+/* Heights for Podium Columns (Compact) */
+.rank-1 .podium-bar {
+    height: 215px;
+    box-shadow: 0 10px 25px rgba(251, 191, 36, 0.1);
+}
+
+.rank-2 .podium-bar {
+    height: 175px;
+    box-shadow: 0 10px 25px rgba(148, 163, 184, 0.06);
+}
+
+.rank-3 .podium-bar {
+    height: 145px;
+    box-shadow: 0 10px 25px rgba(234, 88, 12, 0.06);
+}
+
+/* 4-Pointed Star Flare Heads (Large Glowing Lens Flare) */
+.comet-head-star {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    z-index: 10; /* Raised above content block to float directly on top */
+    background: #ffffff;
+    clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+    animation: orbit-path-head 4s linear infinite;
+    pointer-events: none;
+}
+
+/* Head Colors and Intense Glow - Overlapping both card and background */
+.head-gold {
+    background: #ffffff;
+    filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #fbbf24) drop-shadow(0 0 16px #f59e0b) drop-shadow(0 0 28px #d97706);
+}
+
+.head-silver {
+    background: #ffffff;
+    filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #cbd5e1) drop-shadow(0 0 16px #94a3b8) drop-shadow(0 0 28px #475569);
+}
+
+.head-bronze {
+    background: #ffffff;
+    filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #f97316) drop-shadow(0 0 16px #ea580c) drop-shadow(0 0 28px #9a3412);
+}
+
+/* Equidistant Delay for the 2 Comet Heads (spaced exactly 180 degrees apart in a 4s loop) */
+.head-1 { animation-delay: 0s; }
+.head-2 { animation-delay: -2s; }
+
+/* Trailing Sparkle Particles (Magical Star Dust) */
+.comet-particle {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 9; /* Raised above content block to float directly on top */
+    pointer-events: none;
+    animation: orbit-path 4s linear infinite;
+}
+
+/* Particle Colors & Dense Spark Glow */
+.part-gold {
+    background: #ffffff;
+    box-shadow: 0 0 5px #fef08a, 0 0 10px #f59e0b, 0 0 15px #d97706;
+}
+
+.part-silver {
+    background: #ffffff;
+    box-shadow: 0 0 5px #ffffff, 0 0 10px #cbd5e1, 0 0 15px #64748b;
+}
+
+.part-bronze {
+    background: #ffffff;
+    box-shadow: 0 0 5px #ffedd5, 0 0 10px #f97316, 0 0 15px #ea580c;
+}
+
+/* 12 Particles: Wide spacing and decreasing size to bridge the gap between comets */
+/* Comet 1 Tail (p1 to p6) - Follows head-1 (0s) and stretches almost to head-2 (-2s) */
+.p1 {
+    width: 8px; /* Largest close to head */
+    height: 8px;
+    opacity: 0.95;
+    animation-delay: -0.2s;
+    transform: translate(1px, 1px);
+}
+.p2 {
+    width: 6.5px;
+    height: 6.5px;
+    opacity: 0.85;
+    animation-delay: -0.5s;
+    transform: translate(-3px, -2px);
+}
+.p3 {
+    width: 5px;
+    height: 5px;
+    opacity: 0.7;
+    animation-delay: -0.8s;
+    transform: translate(2px, -3px);
+}
+.p4 {
+    width: 3.5px;
+    height: 3.5px;
+    opacity: 0.55;
+    animation-delay: -1.1s;
+    transform: translate(-3px, 2px);
+}
+.p5 {
+    width: 2px;
+    height: 2px;
+    opacity: 0.4;
+    animation-delay: -1.4s;
+    transform: translate(2px, -1px);
+}
+.p6 {
+    width: 1.2px; /* Smallest, furthest tip - almost meets head-2 */
+    height: 1.2px;
+    opacity: 0.25;
+    animation-delay: -1.7s;
+    transform: translate(-1px, -3px);
+}
+
+/* Comet 2 Tail (p7 to p12) - Follows head-2 (-2s) and stretches almost to head-1 (0s / -4s) */
+.p7 {
+    width: 8px;
+    height: 8px;
+    opacity: 0.95;
+    animation-delay: -2.2s;
+    transform: translate(2px, 2px);
+}
+.p8 {
+    width: 6.5px;
+    height: 6.5px;
+    opacity: 0.85;
+    animation-delay: -2.5s;
+    transform: translate(-1px, -2px);
+}
+.p9 {
+    width: 5px;
+    height: 5px;
+    opacity: 0.7;
+    animation-delay: -2.8s;
+    transform: translate(3px, -1px);
+}
+.p10 {
+    width: 3.5px;
+    height: 3.5px;
+    opacity: 0.55;
+    animation-delay: -3.1s;
+    transform: translate(-2px, 3px);
+}
+.p11 {
+    width: 2px;
+    height: 2px;
+    opacity: 0.4;
+    animation-delay: -3.4s;
+    transform: translate(2px, -2px);
+}
+.p12 {
+    width: 1.2px;
+    height: 1.2px;
+    opacity: 0.25;
+    animation-delay: -3.7s;
+    transform: translate(-3px, 1px);
+}
+
+/* Inner Box - Made FLAT SOLID background (no gradients) to clean the layout */
+.podium-bar-content {
+    position: relative;
+    z-index: 5; /* Stays below stars (z-index 10) and particles (z-index 9) */
+    width: 100%;
+    height: 100%;
+    border-radius: 22px; /* Smooth corners matching inner space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 15px 10px;
+}
+
+.content-gold {
+    background: #fef3c7; /* Flat Solid Gold */
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.content-silver {
+    background: #f1f5f9; /* Flat Solid Silver */
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.content-bronze {
+    background: #fff7ed; /* Flat Solid Bronze */
+    border: 1px solid rgba(234, 88, 12, 0.15);
+}
+
+/* Crown Effect above Rank 1 Bar */
+.crown-glow {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fbbf24;
+    font-size: 22px;
+    filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.5));
+    animation: bounce 2.5s infinite ease-in-out;
+}
+
+/* Avatar container styling inside Podium Bar */
+.podium-avatar-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 2px auto;
+}
+
+.rank-1 .podium-avatar-container {
+    width: 70px;
+    height: 70px;
+}
+
+.podium-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background: #f8fafc;
+    display: block;
+}
+
+.rank-1 .podium-avatar {
+    border-color: #fbbf24;
+}
+
+/* Original Badge overlaying bottom of avatar container */
+.podium-badge {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 800;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 6;
+}
+
+.badge-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.badge-silver { background: linear-gradient(135deg, #cbd5e1, #94a3b8); }
+.badge-bronze { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+/* Name and XP styling inside Podium Bar */
+.podium-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    max-width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.podium-xp {
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748b;
+}
+
+/* Highlight Current User */
+.podium-card.highlight .podium-name {
+    color: #2563eb;
+    font-weight: 800;
+}
+
+/* Section 2: Remaining Rank List (Rank 4+) */
+.leaderboard-list-section {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.leaderboard-list-section .list-header {
+    padding-left: 5px;
+}
+
+.leaderboard-list-section .list-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.leaderboard-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    gap: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leaderboard-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+}
+
+.row-rank-num-container {
+    width: 35px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.row-rank-badge {
+    font-size: 13px;
+    font-weight: 800;
+    color: #64748b;
+    background: rgba(100, 116, 139, 0.08);
+    padding: 3px 8px;
+    border-radius: 8px;
+}
+
+.row-avatar-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f1f5f9;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.row-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.row-student-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.row-student-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.row-student-nim {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.row-xp-score {
+    font-size: 14px;
+    font-weight: 800;
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(59, 130, 246, 0.08);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+/* Highlight Row for Current User */
+.current-user-row {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1.5px solid rgba(59, 130, 246, 0.3);
+}
+
+.current-user-row .row-student-name {
+    color: #2563eb;
+}
+
+.current-user-row .row-rank-num {
+    color: #2563eb;
+}
+
+.no-more-rank {
+    padding: 20px;
+    text-align: center;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* Keyframes */
+@keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+@keyframes rotate-aura {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Path animation for star heads (perfectly centered on border line for 22px star on 3.5px border) */
+@keyframes orbit-path-head {
+    0% {
+        top: -9px;
+        left: -9px;
+    }
+    25% {
+        top: -9px;
+        left: calc(100% - 13px);
+    }
+    50% {
+        top: calc(100% - 13px);
+        left: calc(100% - 13px);
+    }
+    75% {
+        top: calc(100% - 13px);
+        left: -9px;
+    }
+    100% {
+        top: -9px;
+        left: -9px;
+    }
+}
+
+/* Rectangle boundary path animation for trailing sparks */
+@keyframes orbit-path {
+    0% {
+        top: 0px;
+        left: 0px;
+    }
+    25% {
+        top: 0px;
+        left: calc(100% - 6px);
+    }
+    50% {
+        top: calc(100% - 6px);
+        left: calc(100% - 6px);
+    }
+    75% {
+        top: calc(100% - 6px);
+        left: 0px;
+    }
+    100% {
+        top: 0px;
+        left: 0px;
+    }
+}
+
+/* Responsive adjustment for small phones */
+@media (max-width: 480px) {
+    .podium-avatar-container { width: 45px; height: 45px; }
+    .rank-1 .podium-avatar-container { width: 55px; height: 55px; }
+    .crown-glow { top: -20px; font-size: 18px; }
+    .podium-name { font-size: 11px; max-width: 75px; }
+    .rank-1 .podium-bar { height: 185px; }
+    .rank-2 .podium-bar { height: 155px; }
+    .rank-3 .podium-bar { height: 130px; }
+    .podium-badge { width: 20px; height: 20px; font-size: 10px; bottom: -4px; }
+    .comet-head-star { width: 14px; height: 14px; }
+    @keyframes orbit-path-head {
+        0% { top: -5px; left: -5px; }
+        25% { top: -5px; left: calc-size(100% - 9px); }
+        50% { top: calc(100% - 9px); left: calc(100% - 9px); }
+        75% { top: calc(100% - 9px); left: -5px; }
+        100% { top: -5px; left: -5px; }
+    }
+}

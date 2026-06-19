@@ -12,9 +12,12 @@
                 <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/tugas_dosen.css"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/tugas_mahasiswa.css"/>
+                <link rel="stylesheet" href="/custom_web/static/src/css/shop.css"/>
+                <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css"/>
                 <script src="/custom_web/static/src/js/presensi.js" type="text/javascript"></script>
                 <script src="/custom_web/static/src/js/tugas_dosen.js" type="text/javascript"></script>
                 <script src="/custom_web/static/src/js/tugas_mahasiswa.js" type="text/javascript"></script>
+                <script src="/custom_web/static/src/js/shop.js" type="text/javascript"></script>
             </head>
             <body>
                 <div class="app-container">

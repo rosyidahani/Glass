@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="shop" name="Toko Koin Mahasiswa">
+        <t t-call="custom_web.layout">
+            <!-- Fetch active shop items from database -->
+            <t t-set="avatar_items" t-value="request.env['shop.item'].sudo().search([('item_type', '=', 'avatar'), ('active', '=', True)])"/>
+            <t t-set="voucher_items" t-value="request.env['shop.item'].sudo().search([('item_type', '=', 'voucher'), ('active', '=', True)])"/>
+
+            <!-- Inject dynamic shop item metadata for frontend modals -->
+            <script type="text/javascript">
+                window.avatarData = {
+                    <t t-foreach="avatar_items" t-as="item">
+                        "<t t-esc="item.code"/>": { 
+                            "name": "<t t-esc="item.name"/>", 
+                            "price": <t t-esc="item.price"/>, 
+                            "img": "<t t-esc="item.avatar_id.image_src"/>" 
+                        },
+                    </t>
+                };
+                window.voucherData = {
+                    <t t-foreach="voucher_items" t-as="item">
+                        "<t t-esc="item.code"/>": { 
+                            "name": "<t t-esc="item.name"/>", 
+                            "price": <t t-esc="item.price"/>, 
+                            "prefix": "<t t-esc="item.voucher_prefix or 'VOU'"/>" 
+                        },
+                    </t>
+                };
+            </script>
+
+            <!-- Hidden coin data from database for initialization -->
+            <span id="raw-student-coins" style="display: none;"><t t-esc="mahasiswa.koin"/></span>
+
+            <div class="shop-container">
+                <!-- Shop Header -->
+                <div class="shop-topbar glass-panel">
+                    <a href="/dashboard/mahasiswa" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+                    <div class="topbar-title">Toko Koin</div>
+                    
+                    <div class="topbar-right">
+                        <!-- Coins Pill -->
+                        <div class="coin-display sync-coins" title="Saldo koin Anda">
+                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> Poin
+                        </div>
+                        <!-- Profile Image -->
+                        <div class="topbar-profile">
+                            <t t-if="mahasiswa.foto_profil">
+                                <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="mahasiswa.name[0].upper()"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Segmented Control -->
+                <div class="shop-tabs-wrapper">
+                    <div class="shop-tabs">
+                        <button type="button" class="shop-tab-btn active" id="tab-avatar-btn" onclick="switchShopTab('avatar')">
+                            <i class="bi bi-person-circle"></i> Avatar
+                        </button>
+                        <button type="button" class="shop-tab-btn" id="tab-voucher-btn" onclick="switchShopTab('voucher')">
+                            <i class="bi bi-gift"></i> Voucher
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Content Panes -->
+                <div class="shop-content-section">
+                    
+                    <!-- PANE 1: AVATAR SHOP -->
+                    <div class="shop-pane active" id="shop-avatar-pane">
+                        <div class="avatar-grid">
+                            <t t-foreach="avatar_items" t-as="item">
+                                <div t-attf-class="avatar-card glass-panel #{'equipped-active' if mahasiswa.equipped_avatar_id.id == item.id else ''}" t-att-data-id="item.code">
+                                    <div class="avatar-card-image-box">
+                                        <img t-att-src="item.avatar_id.image_src" t-att-alt="item.name"/>
+                                    </div>
+                                    <div class="avatar-info-box">
+                                        <h4 class="avatar-name"><t t-esc="item.name"/></h4>
+                                        <p class="avatar-desc"><t t-esc="item.description or ''"/></p>
+                                    </div>
+                                    
+                                    <!-- Action Button based on state -->
+                                    <t t-if="mahasiswa.equipped_avatar_id.id == item.id">
+                                        <button type="button" class="avatar-action-btn btn-equipped" t-att-data-id="item.code">
+                                            <i class="bi bi-check-circle-fill"></i> Digunakan
+                                        </button>
+                                    </t>
+                                    <t t-elif="item in mahasiswa.owned_avatar_ids">
+                                        <button type="button" class="avatar-action-btn btn-equip" t-att-data-id="item.code">
+                                            Pasang
+                                        </button>
+                                    </t>
+                                    <t t-else="">
+                                        <button type="button" class="avatar-action-btn btn-buy" t-att-data-id="item.code">
+                                            <i class="bi bi-coin"></i> Beli <t t-esc="item.price"/>
+                                        </button>
+                                    </t>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- PANE 2: VOUCHER SHOP -->
+                    <div class="shop-pane" id="shop-voucher-pane">
+                        <div class="voucher-list">
+                            <t t-set="color_classes" t-value="['bar-green', 'bar-amber', 'bar-blue', 'bar-purple']"/>
+                            <t t-set="idx" t-value="0"/>
+                            <t t-foreach="voucher_items" t-as="item">
+                                <t t-set="color_class" t-value="color_classes[idx % 4]"/>
+                                <t t-set="idx" t-value="idx + 1"/>
+                                
+                                <t t-set="claimed" t-value="request.env['shop.transaction'].sudo().search([('mahasiswa_id', '=', mahasiswa.id), ('item_id', '=', item.id)], limit=1)"/>
+                                
+                                <div class="voucher-card glass-panel" t-att-data-id="item.code">
+                                    <div t-attf-class="voucher-left-bar #{color_class}"></div>
+                                    <div class="voucher-main-body">
+                                        <h4 class="voucher-title"><t t-esc="item.name"/></h4>
+                                        <p class="voucher-desc"><t t-esc="item.description or ''"/></p>
+                                        <span class="voucher-price-tag"><i class="bi bi-coin"></i> <t t-esc="item.price"/> Poin</span>
+                                    </div>
+                                    <div class="voucher-divider"></div>
+                                    <div class="voucher-right-action">
+                                        <t t-if="claimed">
+                                            <button type="button" class="voucher-action-btn btn-claimed" t-att-data-id="item.code" disabled="disabled">Ditukar</button>
+                                        </t>
+                                        <t t-else="">
+                                            <button type="button" class="voucher-action-btn btn-claim" t-att-data-id="item.code">Tukar</button>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
