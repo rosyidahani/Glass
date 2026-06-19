@@ -175,13 +175,44 @@ class PresensiController(http.Controller):
         is_mock = body.get('is_mock_location', False)
         accuracy = body.get('accuracy', 0)
         face_verified = body.get('face_verified', False)
+        # FaceID server-side verification (Backend 1)
+        # Ambil descriptor dari client untuk dihitung kesamaannya di server.
+        client_face_descriptor = body.get('face_descriptor')
+        face_method = body.get('face_method', 'cosine')
+        face_threshold = body.get('face_threshold', 0.82)
+
+        # Backend 1 - FaceID server-side only (device binding ditiadakan)
+        device_id = body.get('device_id')
+
+
 
         if not sesi_id:
             return self._error('sesi_id wajib diisi.')
 
-        # Cek face ID
+        # Backend 1 - verifikasi FaceID server-side
+        # - Kompatibilitas: face_verified tetap dicek sebagai gate awal.
+        # - Jika face_verified False => tetap ditolak.
         if not face_verified:
             return self._error('Verifikasi wajah gagal. Presensi ditolak.', 403)
+
+        # Pastikan client kirim descriptor face vektor untuk dibandingkan di server.
+        if not client_face_descriptor:
+            return self._error('face_descriptor wajib dikirim untuk verifikasi server-side.', 403)
+
+
+
+        # FaceID similarity check
+        from presensi.models.faceid_service import verify_face_server_side
+        res = verify_face_server_side(
+            request.env,
+            stored_encrypted_descriptor_b64=mhs.face_descriptor,
+            client_descriptor=client_face_descriptor,
+            method=face_method,
+            threshold=face_threshold,
+        )
+        if not res.get('ok'):
+            return self._error('FaceID server-side verification gagal. Presensi ditolak.', 403)
+
 
         # Ambil sesi
         sesi = request.env['presensi.sesi'].sudo().browse(int(sesi_id))
