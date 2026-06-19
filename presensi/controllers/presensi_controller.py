@@ -4,6 +4,9 @@ from odoo.exceptions import UserError
 import json
 import math
 import datetime
+import jwt
+
+JWT_SECRET = 'GlassSuperSecretKey2024'
 
 
 class PresensiController(http.Controller):
@@ -25,12 +28,17 @@ class PresensiController(http.Controller):
         )
 
     def _get_mahasiswa(self):
-        nim = request.session.get('mahasiswa_nim')
-        if not nim:
+        auth_header = request.httprequest.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
             return None
-        return request.env['mahasiswa.mahasiswa'].sudo().search(
-            [('nim', '=', nim), ('active', '=', True)], limit=1
-        )
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            return request.env['mahasiswa.mahasiswa'].sudo().search(
+                [('nim', '=', payload.get('nim')), ('active', '=', True)], limit=1
+            )
+        except Exception:
+            return None
 
     def _hitung_jarak_meter(self, lat1, lon1, lat2, lon2):
         """Rumus Haversine — hitung jarak dua koordinat dalam meter."""
@@ -167,13 +175,44 @@ class PresensiController(http.Controller):
         is_mock = body.get('is_mock_location', False)
         accuracy = body.get('accuracy', 0)
         face_verified = body.get('face_verified', False)
+        # FaceID server-side verification (Backend 1)
+        # Ambil descriptor dari client untuk dihitung kesamaannya di server.
+        client_face_descriptor = body.get('face_descriptor')
+        face_method = body.get('face_method', 'cosine')
+        face_threshold = body.get('face_threshold', 0.82)
+
+        # Backend 1 - FaceID server-side only (device binding ditiadakan)
+        device_id = body.get('device_id')
+
+
 
         if not sesi_id:
             return self._error('sesi_id wajib diisi.')
 
-        # Cek face ID
+        # Backend 1 - verifikasi FaceID server-side
+        # - Kompatibilitas: face_verified tetap dicek sebagai gate awal.
+        # - Jika face_verified False => tetap ditolak.
         if not face_verified:
             return self._error('Verifikasi wajah gagal. Presensi ditolak.', 403)
+
+        # Pastikan client kirim descriptor face vektor untuk dibandingkan di server.
+        if not client_face_descriptor:
+            return self._error('face_descriptor wajib dikirim untuk verifikasi server-side.', 403)
+
+
+
+        # FaceID similarity check
+        from presensi.models.faceid_service import verify_face_server_side
+        res = verify_face_server_side(
+            request.env,
+            stored_encrypted_descriptor_b64=mhs.face_descriptor,
+            client_descriptor=client_face_descriptor,
+            method=face_method,
+            threshold=face_threshold,
+        )
+        if not res.get('ok'):
+            return self._error('FaceID server-side verification gagal. Presensi ditolak.', 403)
+
 
         # Ambil sesi
         sesi = request.env['presensi.sesi'].sudo().browse(int(sesi_id))
@@ -220,16 +259,17 @@ class PresensiController(http.Controller):
         now = Datetime.now()
         is_telat = (sesi.batas_waktu_telat and now > sesi.batas_waktu_telat)
 
-        # Cek apakah pertama presensi
-        is_pertama = (len(sesi.record_ids) == 0)
+        # Cek apakah termasuk 3 mahasiswa pertama yang melakukan presensi
+        jumlah_hadir = request.env['presensi.record'].sudo().search_count([('sesi_id', '=', sesi.id)])
+        is_pertama = (jumlah_hadir < 3)
 
         # Hitung reward
-        if is_pertama:
-            xp, koin = 25, 5
-        elif not is_telat:
-            xp, koin = 5, 1
-        else:
+        if is_telat:
             xp, koin = 0, 0
+        elif is_pertama:
+            xp, koin = 25, 5
+        else:
+            xp, koin = 15, 3
 
         # Simpan record
         record = request.env['presensi.record'].sudo().create({
