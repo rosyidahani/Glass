@@ -148,39 +148,90 @@ class MahasiswaAPI(http.Controller):
         })
 
     # ================================================
-    # ENDPOINT 3: GET /api/leaderboard
-    # Menarik data top 10 mahasiswa berdasarkan total_xp
+    # ENDPOINT 3A: GET /api/mahasiswa/leaderboard
+    # Top XP mahasiswa untuk scope angkatan (nim[:2])
     # ================================================
-    @http.route('/api/leaderboard', type='http',
+    @http.route('/api/mahasiswa/leaderboard', type='http',
                 auth='public', methods=['GET'], cors='*')
-    def get_leaderboard(self, **kw):
-        # 1. Cek Autentikasi
+    def get_mahasiswa_leaderboard(self, **kw):
         mhs = self._get_mahasiswa_from_token()
         if not mhs:
             return self._error('Belum login atau sesi habis.', 401)
 
+        angkatan = (mhs.nim or '')[:2]
         try:
-            # 2. Tarik Data dari Database Odoo
             top_students = request.env['mahasiswa.mahasiswa'].sudo().search(
-                [('active', '=', True)], 
-                order='total_xp desc', 
-                limit=10
+                [('active', '=', True), ('nim', 'like', angkatan + '%')],
+                order='total_xp desc',
+                limit=10,
             )
 
-            # 3. Format Data untuk Frontend
             data_leaderboard = []
             for rank, student in enumerate(top_students, start=1):
                 data_leaderboard.append({
                     'rank': rank,
-                    'nama': student.name, 
+                    'nama': student.name,
+                    'nim': student.nim,
                     'total_xp': student.total_xp,
-                    'koin': student.koin
+                    'koin': student.koin,
                 })
 
             return self._success(data_leaderboard)
-            
         except Exception as e:
             return self._error(f'Terjadi kesalahan internal: {str(e)}', 500)
+
+    # ================================================
+    # ENDPOINT 3B: GET /api/dosen/leaderboard
+    # Dosen melihat leaderboard mahasiswa berdasarkan prodi + filter angkatan (nim[:2])
+    # ================================================
+    @http.route('/api/dosen/leaderboard', type='http',
+                auth='public', methods=['GET'], cors='*')
+    def get_dosen_leaderboard(self, **kw):
+        dosen = request.session.get('dosen_id')
+        if not dosen:
+            return self._error('Unauthorized', 401)
+
+        dosen_rec = request.env['feature.dosen'].sudo().browse(int(dosen))
+        if not dosen_rec.exists():
+            return self._error('Unauthorized', 401)
+
+        # Prodi dosen: pakai prodi pada mahasiswa filter (proxy) karena model dosen belum punya field prodi.
+        # Implementasi ini memakai prodi yang ditentukan pada mahasiswa melalui field mahasiswa.prodi.
+        # Untuk benar-benar "1 prodi" sesuai dosen, data prodi mahasiswa harus terisi.
+        angkatan = kw.get('angkatan')
+        if not angkatan:
+            # Default: jika dosen punya field nim tidak ada, ambil angkatan dari parameter atau fallback semua.
+            angkatan = ''
+
+        # Ambil mahasiswa dari semua prodi lalu filter angkatan bila diberikan.
+        domain = [('active', '=', True)]
+        if angkatan:
+            domain.append(('nim', 'like', angkatan + '%'))
+
+        try:
+            top_students = request.env['mahasiswa.mahasiswa'].sudo().search(
+                domain,
+                order='total_xp desc',
+                limit=10,
+            )
+
+            data_leaderboard = []
+            for rank, student in enumerate(top_students, start=1):
+                data_leaderboard.append({
+                    'rank': rank,
+                    'nama': student.name,
+                    'nim': student.nim,
+                    'prodi': student.prodi or '',
+                    'total_xp': student.total_xp,
+                    'koin': student.koin,
+                })
+
+            return self._success(data_leaderboard)
+        except Exception as e:
+            return self._error(f'Terjadi kesalahan internal: {str(e)}', 500)
+
+    # NOTE: endpoint /api/leaderboard mock/tabrakan sudah dihapus.
+
 
     # ================================================
     # ENDPOINT: Mahasiswa Kumpul Tugas
