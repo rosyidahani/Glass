@@ -89,9 +89,9 @@
                 <div id="active-tasks-container" class="tasks-tab-content-wrapper">
                     <div class="mhs-assignments-feed-layout">
                         <t t-if="not tugas_aktif">
-                            <div class="empty-state" style="grid-column: span 2; text-align: center; padding: 40px; background: rgba(255,255,255,0.4); border-radius: 16px;">
-                                <i class="bi bi-slash-circle" style="font-size: 32px; color: #64748b;"></i>
-                                <p style="margin-top: 10px; color: #64748b; font-weight: 600;">Belum ada tugas aktif yang perlu dikerjakan.</p>
+                            <div class="empty-state" style="grid-column: span 2; text-align: center; padding: 40px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; color: var(--text-color);">
+                                <i class="bi bi-slash-circle" style="font-size: 32px; color: var(--text-muted);"></i>
+                                <p style="margin-top: 10px; color: var(--text-muted); font-weight: 600;">Belum ada tugas aktif yang perlu dikerjakan.</p>
                             </div>
                         </t>
                         <t t-else="" t-foreach="tugas_aktif" t-as="t">
@@ -147,9 +147,9 @@
                 <div id="history-tasks-container" class="tasks-tab-content-wrapper hidden">
                     <div class="history-cards-feed-wrapper">
                         <t t-if="not tugas_riwayat">
-                            <div class="empty-state" style="text-align: center; padding: 40px; background: rgba(255,255,255,0.4); border-radius: 16px;">
-                                <i class="bi bi-slash-circle" style="font-size: 32px; color: #64748b;"></i>
-                                <p style="margin-top: 10px; color: #64748b; font-weight: 600;">Belum ada riwayat tugas.</p>
+                            <div class="empty-state" style="text-align: center; padding: 40px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; color: var(--text-color);">
+                                <i class="bi bi-slash-circle" style="font-size: 32px; color: var(--text-muted);"></i>
+                                <p style="margin-top: 10px; color: var(--text-muted); font-weight: 600;">Belum ada riwayat tugas.</p>
                             </div>
                         </t>
                         <t t-else="" t-foreach="tugas_riwayat" t-as="t">

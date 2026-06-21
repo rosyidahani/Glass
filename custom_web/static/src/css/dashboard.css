@@ -52,11 +52,11 @@
 
 /* Glassmorphism Utilities */
 .glass-panel {
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--card-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.05);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     border-radius: 24px;
 }
 
@@ -87,11 +87,11 @@
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 72px;
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--card-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     width: max-content;
     min-width: 320px;
     /* Slightly wider to fit the gorgeous rank circle vector */
@@ -127,8 +127,8 @@
 
 .profile-pill:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.85);
+    box-shadow: var(--card-shadow);
+    background: var(--accent-light);
 }
 
 .profile-pill .avatar-large {
@@ -163,14 +163,14 @@
 .profile-info .profile-name {
     font-weight: 800;
     font-size: 16px;
-    color: #0f172a;
+    color: var(--text-color);
     line-height: 1.2;
     letter-spacing: -0.4px;
 }
 
 .profile-info .profile-level {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 600;
     line-height: 1.2;
 }
@@ -209,10 +209,9 @@
     width: 160px;
     /* Fixed width, won't grow/shrink based on text */
     padding: 0 18px;
-    background: #ffffff !important;
-    /* Solid white background like the coin pill in screenshot */
-    border: 1px solid rgba(226, 232, 240, 0.8) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
 }
 
 .coin-pill {
@@ -241,9 +240,9 @@
 .rank-pill {
     padding: 0 20px;
     font-weight: 700;
-    color: #4f46e5;
-    background: rgba(79, 70, 229, 0.06) !important;
-    border: 1px solid rgba(79, 70, 229, 0.12) !important;
+    color: var(--accent-color) !important;
+    background: var(--accent-light) !important;
+    border: 1px solid var(--card-border) !important;
     width: auto;
     /* Width fits the text content */
     max-width: 160px;
@@ -567,9 +566,9 @@
     .xp-pill {
         width: 120px !important;
         /* Uniform fixed width on mobile view as well! */
-        background: #ffffff !important;
-        border: 1px solid rgba(226, 232, 240, 0.8) !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        box-shadow: var(--card-shadow) !important;
     }
 
     .rank-pill {
