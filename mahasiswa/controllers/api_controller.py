@@ -195,16 +195,12 @@ class MahasiswaAPI(http.Controller):
         if not dosen_rec.exists():
             return self._error('Unauthorized', 401)
 
-        # Prodi dosen: pakai prodi pada mahasiswa filter (proxy) karena model dosen belum punya field prodi.
-        # Implementasi ini memakai prodi yang ditentukan pada mahasiswa melalui field mahasiswa.prodi.
-        # Untuk benar-benar "1 prodi" sesuai dosen, data prodi mahasiswa harus terisi.
-        angkatan = kw.get('angkatan')
-        if not angkatan:
-            # Default: jika dosen punya field nim tidak ada, ambil angkatan dari parameter atau fallback semua.
-            angkatan = ''
+        angkatan = kw.get('angkatan') or ''
 
-        # Ambil mahasiswa dari semua prodi lalu filter angkatan bila diberikan.
+        # Filter berdasarkan prodi dosen jika ada
         domain = [('active', '=', True)]
+        if dosen_rec.prodi:
+            domain.append(('prodi', '=', dosen_rec.prodi))
         if angkatan:
             domain.append(('nim', 'like', angkatan + '%'))
 

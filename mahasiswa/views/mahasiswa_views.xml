@@ -23,6 +23,7 @@
                             <field name="nim"/>
                             <field name="password" password="True"/>
                             <field name="semester"/>
+                            <field name="prodi"/>
                         </group>
                         <group string="Statistik">
                             <field name="total_xp"/>

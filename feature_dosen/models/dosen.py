@@ -15,6 +15,10 @@ class Dosen(models.Model):
     telepon = fields.Char(string='Nomor Telepon')
     alamat = fields.Text(string='Alamat')
     spesialisasi = fields.Char(string='Bidang Keahlian')
+    prodi = fields.Char(
+        string='Program Studi',
+        help='Program studi dosen.',
+    )
     description = fields.Text(string='Catatan Internal')
 
     @api.model

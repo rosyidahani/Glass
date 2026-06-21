@@ -19,6 +19,7 @@
                             <field name="password" password="True" placeholder="Masukkan Password..."/>
                             <field name="gender" widget="radio" options="{'horizontal': true}"/>
                             <field name="spesialisasi" placeholder="Misal: Backend Engineer"/>
+                            <field name="prodi" placeholder="Misal: Teknik Informatika..."/>
                         </group>
                         
                         <group name="kontak" string="Kontak &amp; Komunikasi">
@@ -52,6 +53,7 @@
                 <field name="nip"/>
                 <field name="gender"/>
                 <field name="spesialisasi"/>
+                <field name="prodi"/>
                 <field name="email"/>
             </tree>
         </field>
