@@ -3,28 +3,49 @@ document.addEventListener("DOMContentLoaded", () => {
     // Intercept settings items clicks
     const settingsItems = document.querySelectorAll(".settings-item");
     settingsItems.forEach(item => {
-        const iconEl = item.querySelector(".item-icon i");
-        if (!iconEl) return;
+        const href = item.getAttribute("href");
+        if (!href || href === "#" || href === "/logout" || item.classList.contains("logout-item")) {
+            return;
+        }
 
         item.addEventListener("click", (e) => {
-            // If it is logout, let the default href (/logout) handle it
-            if (item.classList.contains("logout-item") || item.getAttribute("href") === "/logout") {
-                return;
-            }
             e.preventDefault();
-
-            if (iconEl.classList.contains("bi-shield-lock-fill")) {
-                openPasswordModal();
-            } else if (iconEl.classList.contains("bi-palette-fill")) {
-                openThemeModal();
-            } else if (iconEl.classList.contains("bi-translate")) {
-                openLanguageModal();
-            } else if (iconEl.classList.contains("bi-question-circle-fill")) {
-                openFAQModal();
-            }
+            // Update URL without reload
+            history.pushState(null, '', href);
+            // Open modal based on new path
+            openModalByUrlPath();
         });
     });
+
+    // Handle browser back/forward buttons
+    window.addEventListener("popstate", () => {
+        openModalByUrlPath();
+    });
+
+    // Check URL on initial load
+    openModalByUrlPath();
 });
+
+function openModalByUrlPath() {
+    const path = window.location.pathname;
+    
+    // First close any existing modal
+    const existing = document.getElementById("settings-modal-overlay");
+    if (existing) {
+        existing.remove();
+    }
+
+    // Determine which modal to open based on the ending digit
+    if (path.endsWith("/1")) {
+        openPasswordModal();
+    } else if (path.endsWith("/2")) {
+        openThemeModal();
+    } else if (path.endsWith("/3")) {
+        openLanguageModal();
+    } else if (path.endsWith("/4")) {
+        openFAQModal();
+    }
+}
 
 // Helper to create and show a glassmorphic modal
 function createModal(titleId, defaultTitle, contentHTML) {
@@ -89,23 +110,24 @@ function createModal(titleId, defaultTitle, contentHTML) {
     // Close button
     const closeBtn = document.createElement("span");
     closeBtn.id = "modal-close-btn";
-    closeBtn.innerHTML = '<i class="bi bi-x-lg" style="pointer-events: none;"></i>';
+    closeBtn.innerHTML = "✕";
     closeBtn.style.cssText = `
         position: absolute;
         top: 15px;
         right: 15px;
         font-size: 20px;
+        font-weight: bold;
         cursor: pointer;
         color: var(--text-muted);
         transition: color 0.2s, transform 0.2s;
-        z-index: 1000;
+        z-index: 10000;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        pointer-events: auto !important;
+        font-family: Arial, sans-serif;
     `;
     closeBtn.addEventListener("mouseenter", () => {
         closeBtn.style.color = "var(--text-color)";
@@ -151,6 +173,13 @@ function createModal(titleId, defaultTitle, contentHTML) {
 }
 
 window.closeModal = function(overlay, modal) {
+    // Determine the parent path (remove the /1, /2, etc.)
+    const path = window.location.pathname;
+    const parentPath = path.replace(/\/\d+$/, '');
+    
+    // Update the browser URL without reload
+    history.pushState(null, '', parentPath);
+
     const activeOverlay = document.getElementById("settings-modal-overlay");
     if (activeOverlay) {
         activeOverlay.remove();
@@ -385,8 +414,8 @@ window.toggleFaq = function(index) {
 document.addEventListener("click", function(e) {
     const target = e.target;
     
-    // Check close button click (either the span wrapper or the icon itself)
-    if (target.closest("#modal-close-btn") || target.closest(".bi-x-lg")) {
+    // Check close button click (either the span wrapper or the text itself)
+    if (target.closest("#modal-close-btn") || target.innerText === "✕") {
         console.log("Global close click intercepted.");
         const overlay = document.getElementById("settings-modal-overlay");
         if (overlay) {
