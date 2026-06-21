@@ -42,7 +42,7 @@ function openModalByUrlPath() {
         openThemeModal();
     } else if (path.endsWith("/3")) {
         openLanguageModal();
-    } else if (path.endsWith("/4")) {
+    } else if (path.endsWith("/4") && !path.includes("/dosen/")) {
         openFAQModal();
     }
 }
