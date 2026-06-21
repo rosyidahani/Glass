@@ -6,6 +6,24 @@ from .utils import get_active_mahasiswa
 
 class MahasiswaPortalController(http.Controller):
 
+    @http.route('/avatar/image/<int:avatar_id>', auth='public', website=True, type='http')
+    def get_avatar_image(self, avatar_id, **kwargs):
+        """Serve avatar image using sudo() context to bypass Odoo public user access restrictions."""
+        avatar = request.env['shop.avatar'].sudo().browse(avatar_id)
+        if avatar.exists() and avatar.foto_avatar:
+            try:
+                image_data = base64.b64decode(avatar.foto_avatar)
+                content_type = 'image/png'
+                if avatar.gambar_url and (avatar.gambar_url.lower().endswith('.jpg') or avatar.gambar_url.lower().endswith('.jpeg')):
+                    content_type = 'image/jpeg'
+                return request.make_response(image_data, headers=[
+                    ('Content-Type', content_type),
+                    ('Cache-Control', 'public, max-age=86400')
+                ])
+            except Exception:
+                pass
+        return request.not_found()
+
     @http.route('/dashboard/mahasiswa', auth='public', website=True, type='http')
     def dashboard_mahasiswa(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
@@ -85,14 +103,14 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return {'status': 'error', 'message': 'Session expired or not logged in'}
 
-        owned_avatars = mahasiswa.owned_avatar_ids.mapped('code') or ['char_default']
-        equipped_avatar = mahasiswa.equipped_avatar_id.code or 'char_default'
+        owned_avatars = mahasiswa.owned_avatar_ids.mapped('avatar_id') or ['char_default']
+        equipped_avatar = mahasiswa.equipped_avatar_id.avatar_id or 'char_default'
         
         # Get list of voucher codes claimed by this student
         claimed_vouchers = request.env['shop.transaction'].sudo().search([
             ('mahasiswa_id', '=', mahasiswa.id),
-            ('item_id.item_type', '=', 'voucher')
-        ]).mapped('item_id.code')
+            ('item_type', '=', 'voucher')
+        ]).mapped('voucher_id.code')
 
         return {
             'status': 'success',
@@ -112,22 +130,34 @@ class MahasiswaPortalController(http.Controller):
         if not item_code:
             return {'status': 'error', 'message': 'Kode item wajib diisi.'}
 
-        item = request.env['shop.item'].sudo().search([('code', '=', item_code), ('active', '=', True)], limit=1)
-        if not item.exists():
-            return {'status': 'error', 'message': 'Item tidak ditemukan atau tidak aktif.'}
+        avatar = request.env['shop.avatar'].sudo().search([('avatar_id', '=', item_code), ('active', '=', True)], limit=1)
+        voucher = None
+        if avatar:
+            item_type = 'avatar'
+            price = avatar.harga_koin
+            item_id = avatar.id
+        else:
+            voucher = request.env['shop.voucher'].sudo().search([('code', '=', item_code), ('active', '=', True)], limit=1)
+            if voucher:
+                item_type = 'voucher'
+                price = voucher.price
+                item_id = voucher.id
+            else:
+                return {'status': 'error', 'message': 'Item tidak ditemukan atau tidak aktif.'}
 
-        if mahasiswa.koin < item.price:
+        if mahasiswa.koin < price:
             return {'status': 'error', 'message': 'Koin Anda tidak mencukupi.'}
 
         # Check if already owned/claimed
-        if item.item_type == 'avatar':
-            if item in mahasiswa.owned_avatar_ids:
+        if item_type == 'avatar':
+            if avatar in mahasiswa.owned_avatar_ids:
                 return {'status': 'error', 'message': 'Anda sudah memiliki avatar ini.'}
         else:
             # Voucher
             existing_tx = request.env['shop.transaction'].sudo().search([
                 ('mahasiswa_id', '=', mahasiswa.id),
-                ('item_id', '=', item.id)
+                ('item_type', '=', 'voucher'),
+                ('voucher_id', '=', item_id)
             ], limit=1)
             if existing_tx:
                 return {'status': 'error', 'message': 'Anda sudah menukarkan voucher ini.'}
@@ -135,18 +165,24 @@ class MahasiswaPortalController(http.Controller):
         # Process transaction
         try:
             # Deduct koin
-            mahasiswa.sudo().write({'koin': mahasiswa.koin - item.price})
+            mahasiswa.sudo().write({'koin': mahasiswa.koin - price})
             
             # Create transaction
-            tx = request.env['shop.transaction'].sudo().create({
+            tx_vals = {
                 'mahasiswa_id': mahasiswa.id,
-                'item_id': item.id,
-            })
+                'item_type': item_type,
+            }
+            if item_type == 'avatar':
+                tx_vals['avatar_id'] = item_id
+            else:
+                tx_vals['voucher_id'] = item_id
+
+            tx = request.env['shop.transaction'].sudo().create(tx_vals)
 
             # If avatar, add to owned
-            if item.item_type == 'avatar':
+            if item_type == 'avatar':
                 mahasiswa.sudo().write({
-                    'owned_avatar_ids': [(4, item.id)]
+                    'owned_avatar_ids': [(4, item_id)]
                 })
 
             return {
@@ -167,28 +203,27 @@ class MahasiswaPortalController(http.Controller):
         if not avatar_code:
             return {'status': 'error', 'message': 'Kode avatar wajib diisi.'}
 
-        item = request.env['shop.item'].sudo().search([
-            ('code', '=', avatar_code),
-            ('item_type', '=', 'avatar'),
+        avatar = request.env['shop.avatar'].sudo().search([
+            ('avatar_id', '=', avatar_code),
             ('active', '=', True)
         ], limit=1)
-        if not item.exists():
+        if not avatar.exists():
             return {'status': 'error', 'message': 'Avatar tidak ditemukan.'}
 
-        if item not in mahasiswa.owned_avatar_ids:
+        if avatar not in mahasiswa.owned_avatar_ids:
             return {'status': 'error', 'message': 'Anda belum memiliki avatar ini.'}
 
         try:
             mahasiswa.sudo().write({
-                'equipped_avatar_id': item.id
+                'equipped_avatar_id': avatar.id
             })
             return {'status': 'success'}
         except Exception as e:
             return {'status': 'error', 'message': str(e)}
 
 
-    @http.route('/menu', auth='public', website=True, type='http')
-    def menu(self, **kwargs):
+    @http.route('/tugas', auth='public', website=True, type='http')
+    def tugas(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')

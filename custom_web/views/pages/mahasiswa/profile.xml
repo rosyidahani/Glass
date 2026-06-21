@@ -5,12 +5,10 @@
             <link rel="stylesheet" href="/custom_web/static/src/css/profile.css"/>
 
             <div class="profile-container">
-                <!-- Topbar -->
-                <div class="profile-topbar">
-                    <a href="/dashboard/mahasiswa" class="back-btn"><i class="bi bi-arrow-left"></i></a>
-                    <div class="topbar-title">Profil</div>
-                    <div class="topbar-action"></div>
-                </div>
+                <t t-call="custom_web.shared_student_header">
+                    <t t-set="title" t-value="'Profil'"/>
+                    <t t-set="back_url" t-value="'/dashboard/mahasiswa'"/>
+                </t>
 
                 <!-- Header Section -->
                 <div class="profile-header">

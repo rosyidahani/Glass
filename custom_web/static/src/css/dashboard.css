@@ -1,20 +1,44 @@
 /* Animations */
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
 @keyframes pulse-glow {
-    0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
-    70% { box-shadow: 0 0 0 20px rgba(79, 70, 229, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    }
 }
 
 @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .dashboard-container {
@@ -69,20 +93,23 @@
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
     width: max-content;
-    min-width: 320px; /* Slightly wider to fit the gorgeous rank circle vector */
+    min-width: 320px;
+    /* Slightly wider to fit the gorgeous rank circle vector */
 }
 
 .profile-rank-badge {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #f59e0b, #d97706); /* Premium gold gradient */
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    /* Premium gold gradient */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2);
     border: 2px solid #ffffff;
-    margin-left: auto; /* Push it to the far right side of the pill */
+    margin-left: auto;
+    /* Push it to the far right side of the pill */
     flex-shrink: 0;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -100,7 +127,7 @@
 
 .profile-pill:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
     background: rgba(255, 255, 255, 0.85);
 }
 
@@ -150,7 +177,8 @@
 
 .hud-actions-vertical {
     display: flex;
-    flex-direction: row; /* Side-by-side on desktop as requested! */
+    flex-direction: row;
+    /* Side-by-side on desktop as requested! */
     gap: 12px;
     padding-left: 12px;
 }
@@ -163,7 +191,9 @@
 }
 
 /* Custom Uniform Pill Design */
-.rank-pill, .xp-pill, .coin-pill {
+.rank-pill,
+.xp-pill,
+.coin-pill {
     height: 48px;
     border-radius: 24px;
     display: inline-flex;
@@ -174,17 +204,21 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.coin-pill, .xp-pill {
-    width: 160px; /* Fixed width, won't grow/shrink based on text */
+.coin-pill,
+.xp-pill {
+    width: 160px;
+    /* Fixed width, won't grow/shrink based on text */
     padding: 0 18px;
-    background: #ffffff !important; /* Solid white background like the coin pill in screenshot */
+    background: #ffffff !important;
+    /* Solid white background like the coin pill in screenshot */
     border: 1px solid rgba(226, 232, 240, 0.8) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
 .coin-pill {
     font-weight: 800;
-    color: #f59e0b; /* Golden Orange */
+    color: #f59e0b;
+    /* Golden Orange */
 }
 
 .coin-pill i {
@@ -194,7 +228,8 @@
 
 .xp-pill {
     font-weight: 800;
-    color: #6366f1; /* Purple */
+    color: #6366f1;
+    /* Purple */
 }
 
 .xp-pill i {
@@ -209,8 +244,10 @@
     color: #4f46e5;
     background: rgba(79, 70, 229, 0.06) !important;
     border: 1px solid rgba(79, 70, 229, 0.12) !important;
-    width: auto; /* Width fits the text content */
-    max-width: 160px; /* Cannot exceed fixed width of other pills */
+    width: auto;
+    /* Width fits the text content */
+    max-width: 160px;
+    /* Cannot exceed fixed width of other pills */
 }
 
 .rank-pill i {
@@ -218,7 +255,9 @@
     font-size: 16px;
 }
 
-.coin-pill:hover, .xp-pill:hover, .rank-pill:hover {
+.coin-pill:hover,
+.xp-pill:hover,
+.rank-pill:hover {
     transform: scale(1.05) translateY(-2px);
     box-shadow: 0 8px 25px rgba(31, 38, 135, 0.08) !important;
 }
@@ -280,9 +319,12 @@
 .user-image {
     position: relative;
     z-index: 2;
-    max-height: 450px;
+    max-width: 95%;
+    max-height: 380px;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 25px 35px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.2));
     animation: float 6s ease-in-out infinite;
 }
 
@@ -345,8 +387,15 @@
     font-size: 24px;
 }
 
-.icon-blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.icon-purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+.icon-blue {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.icon-purple {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
 
 .stat-info h4 {
     margin: 0;
@@ -407,7 +456,7 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .activity-text h5 {
@@ -428,9 +477,11 @@
     .main-dashboard-area {
         flex-direction: column;
     }
+
     .stats-section {
         width: 100%;
     }
+
     .avatar-section {
         min-height: 300px;
     }
@@ -443,6 +494,7 @@
         align-items: flex-start;
         gap: 12px;
     }
+
     .hud-left {
         width: 60%;
         max-width: 60%;
@@ -451,6 +503,7 @@
         gap: 10px;
         align-items: flex-start;
     }
+
     .profile-pill {
         width: 100%;
         margin-left: 0;
@@ -460,31 +513,39 @@
         border-radius: 20px;
         min-width: unset;
     }
+
     .profile-pill .avatar-large {
         width: 44px;
         height: 44px;
         font-size: 16px;
         box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
     }
+
     .profile-info .profile-name {
         font-size: 14px;
     }
+
     .profile-info .profile-level {
         font-size: 11px;
     }
+
     .profile-rank-badge {
         width: 32px !important;
         height: 32px !important;
         border-width: 1.5px !important;
     }
+
     .profile-rank-badge span {
         font-size: 10px !important;
     }
+
     .hud-actions-vertical {
-        flex-direction: row; /* Horizontal row on mobile under the profile pill to save height space */
+        flex-direction: row;
+        /* Horizontal row on mobile under the profile pill to save height space */
         gap: 8px;
         padding-left: 4px;
     }
+
     .hud-right-vertical {
         width: auto;
         display: flex;
@@ -492,29 +553,40 @@
         align-items: flex-end;
         gap: 8px;
     }
-    .rank-pill, .xp-pill, .coin-pill {
+
+    .rank-pill,
+    .xp-pill,
+    .coin-pill {
         height: 36px;
         font-size: 11px;
         border-radius: 12px;
         padding: 0 12px;
     }
-    .coin-pill, .xp-pill {
-        width: 120px !important; /* Uniform fixed width on mobile view as well! */
+
+    .coin-pill,
+    .xp-pill {
+        width: 120px !important;
+        /* Uniform fixed width on mobile view as well! */
         background: #ffffff !important;
         border: 1px solid rgba(226, 232, 240, 0.8) !important;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
     }
+
     .rank-pill {
-        width: auto !important; /* Dynamic fitting on mobile view */
+        width: auto !important;
+        /* Dynamic fitting on mobile view */
         max-width: 120px;
     }
-    .rank-pill i, .xp-pill i, .coin-pill i {
+
+    .rank-pill i,
+    .xp-pill i,
+    .coin-pill i {
         font-size: 12px;
     }
+
     .icon-btn {
         width: 36px;
         height: 36px;
         font-size: 15px;
     }
 }
-

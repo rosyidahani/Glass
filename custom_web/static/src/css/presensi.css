@@ -113,9 +113,18 @@
     height: 8px;
     border-radius: 50%;
 }
-.dot-green { background-color: #10b981; }
-.dot-blue { background-color: #3b82f6; }
-.dot-gray { background-color: #94a3b8; }
+
+.dot-green {
+    background-color: #10b981;
+}
+
+.dot-blue {
+    background-color: #3b82f6;
+}
+
+.dot-gray {
+    background-color: #94a3b8;
+}
 
 /* --- Course Cards Grid --- */
 .courses-grid {
@@ -167,9 +176,20 @@
     height: 7px;
     border-radius: 50%;
 }
-.status-dot.online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
-.status-dot.offline { background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
-.status-dot.selesai { background-color: #94a3b8; }
+
+.status-dot.online {
+    background-color: #10b981;
+    box-shadow: 0 0 8px #10b981;
+}
+
+.status-dot.offline {
+    background-color: #3b82f6;
+    box-shadow: 0 0 8px #3b82f6;
+}
+
+.status-dot.selesai {
+    background-color: #94a3b8;
+}
 
 .status-text {
     font-size: 11px;
@@ -185,9 +205,17 @@
     display: inline-block;
 }
 
-.text-green { color: #10b981; }
-.text-blue { color: #3b82f6; }
-.text-gray { color: #94a3b8; }
+.text-green {
+    color: #10b981;
+}
+
+.text-blue {
+    color: #3b82f6;
+}
+
+.text-gray {
+    color: #94a3b8;
+}
 
 .course-details {
     flex: 1;
@@ -353,7 +381,7 @@
     font-size: 14px;
     overflow: hidden;
     border: 2px solid #ffffff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .presensi-top-bar .bar-avatar img {
@@ -393,7 +421,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: scaleX(-1); /* mirror effect */
+    transform: scaleX(-1);
+    /* mirror effect */
 }
 
 /* Fallback wireframe graphics */
@@ -456,7 +485,8 @@
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
     top: 0;
     animation: scannerScan 3.5s infinite ease-in-out;
-    display: none; /* starts disabled, enabled during processing */
+    display: none;
+    /* starts disabled, enabled during processing */
 }
 
 /* The Face oval frame exactly matching the mockup */
@@ -467,7 +497,8 @@
     transform: translate(-50%, -50%);
     width: 80%;
     height: 85%;
-    border-radius: 50% / 55%; /* custom oval border shape */
+    border-radius: 50% / 55%;
+    /* custom oval border shape */
     border: 2.5px solid rgba(255, 255, 255, 0.85);
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.25), 0 0 15px rgba(255, 255, 255, 0.4);
     z-index: 4;
@@ -479,6 +510,7 @@
     border-color: #3b82f6;
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 25px rgba(59, 130, 246, 0.8);
 }
+
 .scanner-card.scanning .laser-scanner {
     display: block;
 }
@@ -684,6 +716,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -691,10 +724,13 @@
 }
 
 @keyframes heartbeat {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 0.5;
     }
+
     50% {
         transform: translate(-50%, -50%) scale(1.1);
         opacity: 0.8;
@@ -702,26 +738,34 @@
 }
 
 @keyframes scannerScan {
-    0%, 100% {
+
+    0%,
+    100% {
         top: 5%;
         opacity: 0;
     }
+
     10% {
         opacity: 1;
     }
+
     90% {
         opacity: 1;
     }
+
     50% {
         top: 95%;
     }
 }
 
 @keyframes dotPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
         box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     }
+
     50% {
         transform: scale(1.12);
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
@@ -729,8 +773,13 @@
 }
 
 @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes zoomInSuccess {
@@ -738,6 +787,7 @@
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -757,9 +807,12 @@
 }
 
 @keyframes scaleBounce {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: none;
     }
+
     50% {
         transform: scale3d(1.1, 1.1, 1);
     }
@@ -775,27 +828,32 @@
     .presensi-select-container {
         padding: 0 4px;
     }
+
     .filter-bar {
         flex-direction: column;
         align-items: stretch;
         padding: 16px;
     }
+
     .filter-options {
         justify-content: space-between;
     }
+
     .filter-btn {
         flex: 1;
         justify-content: center;
         padding: 8px 10px;
         font-size: 12px;
     }
-    
+
     .presensi-scan-container {
         padding: 0 4px;
     }
+
     .scanner-card {
         padding: 16px;
     }
+
     .btn-scan-oval {
         width: 80%;
     }

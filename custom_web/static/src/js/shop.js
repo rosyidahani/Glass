@@ -9,19 +9,23 @@ let studentState = {
 };
 
 // Data list yang ada di toko (Dibaca secara dinamis dari database Odoo)
-const avatarData = window.avatarData || {
-    'char_default': { name: 'Ksatria Default', price: 0, img: '/custom_web/static/src/img/char_default.png' },
-    'char_cyber': { name: 'Cyber Ninja', price: 15, img: '/custom_web/static/src/img/char_cyber.png' },
-    'char_royal': { name: 'Cendekiawan Kerajaan', price: 30, img: '/custom_web/static/src/img/char_royal.png' },
-    'char_neon': { name: 'Hacker Neon', price: 50, img: '/custom_web/static/src/img/char_neon.png' }
-};
+function getAvatarData() {
+    return window.avatarData || {
+        'char_default': { name: 'Ksatria Default', price: 0, img: '/custom_web/static/src/img/char_default.png' },
+        'char_cyber': { name: 'Cyber Ninja', price: 15, img: '/custom_web/static/src/img/char_cyber.png' },
+        'char_royal': { name: 'Cendekiawan Kerajaan', price: 30, img: '/custom_web/static/src/img/char_royal.png' },
+        'char_neon': { name: 'Hacker Neon', price: 50, img: '/custom_web/static/src/img/char_neon.png' }
+    };
+}
 
-const voucherData = window.voucherData || {
-    'v_wifi': { name: 'Akses WiFi Cepat Kampus (24 Jam)', price: 5, prefix: 'WIF' },
-    'v_canteen': { name: 'Kupon Makan Kantin Rp 10.000', price: 12, prefix: 'CAN' },
-    'v_library': { name: 'Bebas Denda Buku Perpustakaan (1x)', price: 15, prefix: 'LIB' },
-    'v_print': { name: 'Cetak Gratis Tugas 50 Lembar', price: 20, prefix: 'PRT' }
-};
+function getVoucherData() {
+    return window.voucherData || {
+        'v_wifi': { name: 'Akses WiFi Cepat Kampus (24 Jam)', price: 5, prefix: 'WIF' },
+        'v_canteen': { name: 'Kupon Makan Kantin Rp 10.000', price: 12, prefix: 'CAN' },
+        'v_library': { name: 'Bebas Denda Buku Perpustakaan (1x)', price: 15, prefix: 'LIB' },
+        'v_print': { name: 'Cetak Gratis Tugas 50 Lembar', price: 20, prefix: 'PRT' }
+    };
+}
 
 // Modal handlers
 let activeModal = null;
@@ -188,7 +192,8 @@ function updateShopUI() {
         } else {
             actionBtn.className = 'avatar-action-btn btn-buy';
             actionBtn.setAttribute('data-id', avatarId);
-            actionBtn.innerHTML = `<i class="bi bi-coin"></i> Beli ${avatarData[avatarId].price}`;
+            const aData = getAvatarData()[avatarId] || { price: 0 };
+            actionBtn.innerHTML = `<i class="bi bi-coin"></i> Beli ${aData.price}`;
         }
     });
 
@@ -239,7 +244,7 @@ function syncDashboardAvatar() {
     const dashboardAvatarImg = document.querySelector('.user-image');
     if (dashboardAvatarImg) {
         const equipped = localStorage.getItem('equipped_avatar') || 'char_default';
-        const imgItem = avatarData[equipped];
+        const imgItem = getAvatarData()[equipped];
         if (imgItem && imgItem.img) {
             dashboardAvatarImg.src = imgItem.img;
         } else {
@@ -286,12 +291,12 @@ function showPurchaseConfirmModal(itemType, itemId) {
     
     let title, text, price;
     if (itemType === 'avatar') {
-        const item = avatarData[itemId];
+        const item = getAvatarData()[itemId] || { name: 'Avatar', price: 0 };
         title = `Tukar Avatar`;
         text = `Apakah Anda yakin ingin menukar <strong>${item.price} Koin</strong> untuk mendapatkan avatar <strong>${item.name}</strong>?`;
         price = item.price;
     } else {
-        const item = voucherData[itemId];
+        const item = getVoucherData()[itemId] || { name: 'Voucher', price: 0 };
         title = `Tukar Voucher`;
         text = `Apakah Anda yakin ingin menukar <strong>${item.price} Koin</strong> untuk voucher <strong>${item.name}</strong>?`;
         price = item.price;
@@ -361,11 +366,11 @@ function showPurchaseSuccessModal(itemType, itemId, serverCode = '') {
     let title, text, couponBox = '';
     
     if (itemType === 'avatar') {
-        const item = avatarData[itemId];
+        const item = getAvatarData()[itemId] || { name: 'Avatar' };
         title = `Penukaran Berhasil!`;
         text = `Selamat! Avatar <strong>${item.name}</strong> sekarang milik Anda. Anda dapat langsung menggunakannya di dashboard.`;
     } else {
-        const item = voucherData[itemId];
+        const item = getVoucherData()[itemId] || { name: 'Voucher', prefix: 'VOU' };
         const displayCode = serverCode || `${item.prefix}-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(100 + Math.random() * 900)}`;
         title = `Voucher Didapatkan!`;
         text = `Berikut adalah kode kupon untuk voucher <strong>${item.name}</strong> Anda. Simpan atau tunjukkan kode ini untuk menggunakannya:`;

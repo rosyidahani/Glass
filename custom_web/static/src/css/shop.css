@@ -66,7 +66,7 @@
     font-weight: 700;
     font-size: 14px;
     color: #f59e0b;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 }
 
 .shop-topbar .coin-display i {
@@ -112,7 +112,7 @@
     max-width: 450px;
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
 }
 
 .shop-tab-btn {
@@ -205,7 +205,7 @@
     max-height: 90%;
     max-width: 90%;
     object-fit: contain;
-    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15));
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
     transition: transform 0.5s ease;
 }
 
@@ -308,7 +308,7 @@
 
 .voucher-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
 }
 
 /* Colored indicator bar on left */
@@ -317,10 +317,21 @@
     height: 100%;
 }
 
-.voucher-left-bar.bar-green { background: #10b981; }
-.voucher-left-bar.bar-amber { background: #f59e0b; }
-.voucher-left-bar.bar-blue { background: #3b82f6; }
-.voucher-left-bar.bar-purple { background: #8b5cf6; }
+.voucher-left-bar.bar-green {
+    background: #10b981;
+}
+
+.voucher-left-bar.bar-amber {
+    background: #f59e0b;
+}
+
+.voucher-left-bar.bar-blue {
+    background: #3b82f6;
+}
+
+.voucher-left-bar.bar-purple {
+    background: #8b5cf6;
+}
 
 /* Main card body */
 .voucher-main-body {
@@ -364,15 +375,17 @@
 }
 
 /* Circular notch cuts on top and bottom of the divider (coupon style) */
-.voucher-divider::before, .voucher-divider::after {
+.voucher-divider::before,
+.voucher-divider::after {
     content: '';
     position: absolute;
     width: 14px;
     height: 14px;
-    background: #f0f4f8; /* Matches body background */
+    background: #f0f4f8;
+    /* Matches body background */
     border-radius: 50%;
     left: -7px;
-    box-shadow: inset 0 2px 3px rgba(0,0,0,0.05);
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.05);
 }
 
 .voucher-divider::before {
@@ -565,11 +578,11 @@
 .shop-toast {
     background: rgba(15, 23, 42, 0.9);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #ffffff;
     padding: 12px 18px;
     border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     font-size: 13.5px;
     font-weight: 600;
     display: flex;
@@ -591,18 +604,37 @@
 
 /* --- ANIMATIONS --- */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes toastIn {
-    from { opacity: 0; transform: translate3d(0, 20px, 0) scale(0.9); }
-    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translate3d(0, 20px, 0) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
 
 /* --- RESPONSIVE STYLE FOR TOKO --- */
@@ -611,57 +643,65 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-    
+
     .avatar-card {
         padding: 10px;
         border-radius: 18px;
     }
-    
+
     .avatar-name {
         font-size: 13px;
     }
-    
+
     .avatar-desc {
         font-size: 11px;
         min-height: 30px;
     }
-    
+
     .avatar-action-btn {
         padding: 8px 10px;
         font-size: 11px;
         border-radius: 10px;
     }
-    
+
     .voucher-card {
         min-height: 90px;
         border-radius: 16px;
     }
-    
+
     .voucher-main-body {
         padding: 12px 14px;
     }
-    
+
     .voucher-title {
         font-size: 13.5px;
     }
-    
+
     .voucher-desc {
         font-size: 11px;
         margin-bottom: 4px;
     }
-    
-    .voucher-divider::before, .voucher-divider::after {
+
+    .voucher-divider::before,
+    .voucher-divider::after {
         width: 10px;
         height: 10px;
     }
-    
-    .voucher-divider::before { left: -5px; top: -17px; }
-    .voucher-divider::after { left: -5px; bottom: -17px; }
-    
+
+    .voucher-divider::before {
+        left: -5px;
+        top: -17px;
+    }
+
+    .voucher-divider::after {
+        left: -5px;
+        bottom: -17px;
+    }
+
     .voucher-right-action {
         width: 100px;
     }
-    
+
     .voucher-action-btn {
         padding: 8px 12px;
         font-size: 11.5px;

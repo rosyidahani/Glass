@@ -24,6 +24,8 @@
                         </group>
                         <group>
                             <field name="gambar_url"/>
+                            <field name="is_video" readonly="1"/>
+                            <field name="active"/>
                         </group>
                     </group>
                 </sheet>
@@ -43,37 +45,40 @@
                 <field name="nama_avatar"/>
                 <field name="harga_koin"/>
                 <field name="gambar_url"/>
+                <field name="is_video"/>
+                <field name="active"/>
             </tree>
         </field>
     </record>
 
     <!-- ============================================================ -->
-    <!-- Form View: Shop Item                                         -->
+    <!-- Form View: Shop Voucher                                      -->
     <!-- ============================================================ -->
-    <record id="view_shop_item_form" model="ir.ui.view">
-        <field name="name">shop.item.form</field>
-        <field name="model">shop.item</field>
+    <record id="view_shop_voucher_form" model="ir.ui.view">
+        <field name="name">shop.voucher.form</field>
+        <field name="model">shop.voucher</field>
         <field name="arch" type="xml">
-            <form string="Item Toko">
+            <form string="Voucher Toko">
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Nama Voucher (contoh: Kupon Kantin Rp 10.000)"/>
+                        </h1>
+                    </div>
                     <group>
-                        <group string="Pengaturan Tipe &amp; Referensi">
-                            <field name="item_type"/>
-                            <field name="avatar_id" invisible="item_type != 'avatar'" required="item_type == 'avatar'"/>
+                        <group>
+                            <field name="code" placeholder="v_canteen"/>
+                            <field name="price"/>
                         </group>
-                        <group string="Status">
+                        <group>
+                            <field name="voucher_prefix" placeholder="CAN"/>
                             <field name="active"/>
-                            <field name="voucher_prefix" invisible="item_type != 'voucher'" required="item_type == 'voucher'"/>
                         </group>
-                    </group>
-                    <group string="Detail Item">
-                        <field name="name" readonly="item_type == 'avatar'" force_save="1" placeholder="Nama Item"/>
-                        <field name="code" readonly="item_type == 'avatar'" force_save="1" placeholder="Kode Unik Item"/>
-                        <field name="price" readonly="item_type == 'avatar'" force_save="1"/>
                     </group>
                     <notebook>
                         <page string="Deskripsi">
-                            <field name="description" placeholder="Tulis deskripsi item di sini..."/>
+                            <field name="description" placeholder="Tulis deskripsi voucher di sini..."/>
                         </page>
                     </notebook>
                 </sheet>
@@ -82,17 +87,17 @@
     </record>
 
     <!-- ============================================================ -->
-    <!-- Tree View: Shop Item                                         -->
+    <!-- Tree View: Shop Voucher                                      -->
     <!-- ============================================================ -->
-    <record id="view_shop_item_tree" model="ir.ui.view">
-        <field name="name">shop.item.tree</field>
-        <field name="model">shop.item</field>
+    <record id="view_shop_voucher_tree" model="ir.ui.view">
+        <field name="name">shop.voucher.tree</field>
+        <field name="model">shop.voucher</field>
         <field name="arch" type="xml">
-            <tree string="Item Toko">
+            <tree string="Voucher Toko">
                 <field name="name"/>
-                <field name="item_type"/>
                 <field name="code"/>
                 <field name="price"/>
+                <field name="voucher_prefix"/>
                 <field name="active"/>
             </tree>
         </field>
@@ -110,7 +115,9 @@
                     <group>
                         <group>
                             <field name="mahasiswa_id"/>
-                            <field name="item_id"/>
+                            <field name="item_type"/>
+                            <field name="avatar_id" invisible="item_type != 'avatar'" required="item_type == 'avatar'"/>
+                            <field name="voucher_id" invisible="item_type != 'voucher'" required="item_type == 'voucher'"/>
                         </group>
                         <group>
                             <field name="purchase_date"/>
@@ -132,7 +139,9 @@
         <field name="arch" type="xml">
             <tree string="Transaksi Pembelian" create="false" edit="false">
                 <field name="mahasiswa_id"/>
-                <field name="item_id"/>
+                <field name="item_type"/>
+                <field name="avatar_id" invisible="item_type != 'avatar'"/>
+                <field name="voucher_id" invisible="item_type != 'voucher'"/>
                 <field name="purchase_date"/>
                 <field name="code_generated"/>
                 <field name="status"/>
@@ -154,13 +163,13 @@
         </field>
     </record>
 
-    <record id="action_shop_item" model="ir.actions.act_window">
-        <field name="name">Item Toko Koin</field>
-        <field name="res_model">shop.item</field>
+    <record id="action_shop_voucher" model="ir.actions.act_window">
+        <field name="name">Master Data Voucher</field>
+        <field name="res_model">shop.voucher</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Belum ada item toko. Klik "New" untuk membuat item (avatar/voucher) baru.
+                Belum ada data voucher. Klik "New" untuk membuat voucher baru.
             </p>
         </field>
     </record>
@@ -185,10 +194,10 @@
               action="action_shop_avatar"
               sequence="15"/>
 
-    <menuitem id="menu_shop_item"
-              name="Pengaturan Toko"
+    <menuitem id="menu_shop_voucher"
+              name="Master Voucher"
               parent="mahasiswa.menu_mahasiswa_root"
-              action="action_shop_item"
+              action="action_shop_voucher"
               sequence="20"/>
 
     <menuitem id="menu_shop_transaction"

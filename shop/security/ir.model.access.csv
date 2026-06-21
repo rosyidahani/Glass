@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_shop_avatar,shop.avatar,model_shop_avatar,,1,1,1,1
-access_shop_item,shop.item,model_shop_item,,1,1,1,1
+access_shop_voucher,shop.voucher,model_shop_voucher,,1,1,1,1
 access_shop_transaction,shop.transaction,model_shop_transaction,,1,1,1,1

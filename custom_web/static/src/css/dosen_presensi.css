@@ -224,17 +224,17 @@
     gap: 8px;
 }
 
-.segmented-control input[type="radio"]:checked + .segmented-label {
+.segmented-control input[type="radio"]:checked+.segmented-label {
     background: #ffffff;
     color: #8b5cf6;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-.segmented-control input[type="radio"]:checked + .segmented-label.offline-label {
+.segmented-control input[type="radio"]:checked+.segmented-label.offline-label {
     color: #3b82f6;
 }
 
-.segmented-control input[type="radio"]:checked + .segmented-label.online-label {
+.segmented-control input[type="radio"]:checked+.segmented-label.online-label {
     color: #10b981;
 }
 
@@ -570,18 +570,41 @@
 
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideInUp {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes locationPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.15); opacity: 0.7; }
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.7;
+    }
 }
 
 /* --- Premium Custom Select with Search Box --- */
@@ -604,7 +627,8 @@
     transition: all 0.3s ease;
 }
 
-.select-trigger-btn:focus, .select-trigger-btn.active {
+.select-trigger-btn:focus,
+.select-trigger-btn.active {
     outline: none;
     border-color: #8b5cf6;
     box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
@@ -716,8 +740,15 @@
 }
 
 @keyframes slideDownIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
@@ -728,6 +759,7 @@
         padding: 16px 20px !important;
         gap: 10px !important;
     }
+
     .btn-back-dashboard {
         width: 40px !important;
         height: 40px !important;
@@ -738,12 +770,13 @@
         justify-content: center !important;
         flex-shrink: 0 !important;
     }
+
     .btn-back-dashboard span {
         display: none !important;
     }
+
     .btn-back-dashboard i {
         margin: 0 !important;
         font-size: 16px !important;
     }
 }
-

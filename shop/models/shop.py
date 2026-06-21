@@ -1,6 +1,36 @@
 from odoo import models, fields, api
 import random
 import re
+import io
+import base64
+from PIL import Image
+
+def _compress_avatar_image(base64_data, max_size=(512, 512), quality=85):
+    if not base64_data:
+        return base64_data
+    try:
+        if isinstance(base64_data, str):
+            base64_bytes = base64_data.encode('utf-8')
+        else:
+            base64_bytes = base64_data
+            
+        img_bytes = base64.b64decode(base64_bytes)
+        img = Image.open(io.BytesIO(img_bytes))
+        
+        fmt = img.format if img.format else 'PNG'
+        
+        if img.width > max_size[0] or img.height > max_size[1]:
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+        output = io.BytesIO()
+        if fmt == 'JPEG' or fmt == 'JPG':
+            img.save(output, format='JPEG', quality=quality, optimize=True)
+        else:
+            img.save(output, format='PNG', optimize=True)
+            
+        return base64.b64encode(output.getvalue()).decode('utf-8')
+    except Exception:
+        return base64_data
 
 class ShopAvatar(models.Model):
     _name = 'shop.avatar'
@@ -16,10 +46,24 @@ class ShopAvatar(models.Model):
     # Pendukung Upload File Gambar
     foto_avatar = fields.Image(string='Upload Gambar Avatar', max_width=512, max_height=512)
     image_src = fields.Char(string='Sumber Gambar', compute='_compute_image_src')
+    is_video = fields.Boolean(string='Apakah Video?', compute='_compute_is_video', store=True)
+    active = fields.Boolean(string='Aktif', default=True)
 
     _sql_constraints = [
         ('avatar_id_unique', 'UNIQUE(avatar_id)', 'ID Avatar sudah terdaftar!'),
     ]
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('foto_avatar'):
+                vals['foto_avatar'] = _compress_avatar_image(vals['foto_avatar'])
+        return super(ShopAvatar, self).create(vals_list)
+
+    def write(self, vals):
+        if vals.get('foto_avatar'):
+            vals['foto_avatar'] = _compress_avatar_image(vals['foto_avatar'])
+        return super(ShopAvatar, self).write(vals)
 
     @api.depends('nama_avatar', 'custom_avatar_id')
     def _compute_avatar_id(self):
@@ -38,55 +82,36 @@ class ShopAvatar(models.Model):
     def _compute_image_src(self):
         for rec in self:
             if rec.foto_avatar:
-                rec.image_src = f"/web/image?model=shop.avatar&id={rec.id}&field=foto_avatar"
+                rec.image_src = f"/avatar/image/{rec.id}"
             elif rec.gambar_url:
                 rec.image_src = rec.gambar_url
             else:
                 rec.image_src = f"/custom_web/static/src/img/{rec.avatar_id or 'char_default'}.png"
 
+    @api.depends('gambar_url', 'foto_avatar')
+    def _compute_is_video(self):
+        for rec in self:
+            if not rec.foto_avatar and rec.gambar_url and any(rec.gambar_url.lower().endswith(ext) for ext in ['.mp4', '.webm', '.ogg', '.mov']):
+                rec.is_video = True
+            else:
+                rec.is_video = False
 
-class ShopItem(models.Model):
-    _name = 'shop.item'
-    _description = 'Item Toko Koin'
+
+class ShopVoucher(models.Model):
+    _name = 'shop.voucher'
+    _description = 'Voucher Toko'
     _rec_name = 'name'
 
-    item_type = fields.Selection([
-        ('avatar', 'Avatar'),
-        ('voucher', 'Voucher')
-    ], string='Tipe Item', required=True, default='avatar')
-    
-    avatar_id = fields.Many2one('shop.avatar', string='Referensi Avatar')
-
-    name = fields.Char(string='Nama Item', compute='_compute_item_fields', store=True, readonly=False)
-    code = fields.Char(string='Kode Unik Item', compute='_compute_item_fields', store=True, readonly=False, help='Contoh: char_cyber, v_wifi')
-    price = fields.Integer(string='Harga Koin', compute='_compute_item_fields', store=True, readonly=False, default=0)
-    
-    description = fields.Text(string='Deskripsi Item')
-    voucher_prefix = fields.Char(string='Prefix Voucher', help='Contoh: WIF, CAN (untuk generate kupon)')
+    name = fields.Char(string='Nama Voucher', required=True)
+    code = fields.Char(string='Kode Unik', required=True, help='Contoh: v_canteen, v_library')
+    price = fields.Integer(string='Harga Koin', default=0)
     active = fields.Boolean(string='Aktif', default=True)
+    voucher_prefix = fields.Char(string='Prefix Voucher', help='Contoh: WIF, CAN (untuk generate kupon)')
+    description = fields.Text(string='Deskripsi')
 
     _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Kode unik item sudah terdaftar!'),
+        ('code_unique', 'UNIQUE(code)', 'Kode unik voucher sudah terdaftar!'),
     ]
-
-    @api.depends('avatar_id', 'item_type', 'avatar_id.nama_avatar', 'avatar_id.harga_koin', 'avatar_id.avatar_id')
-    def _compute_item_fields(self):
-        for rec in self:
-            if rec.item_type == 'avatar' and rec.avatar_id:
-                rec.name = rec.avatar_id.nama_avatar
-                rec.price = rec.avatar_id.harga_koin
-                rec.code = rec.avatar_id.avatar_id
-            else:
-                rec.name = rec.name or ''
-                rec.price = rec.price or 0
-                rec.code = rec.code or ''
-
-    @api.onchange('avatar_id', 'item_type')
-    def _onchange_avatar_id(self):
-        if self.item_type == 'avatar' and self.avatar_id:
-            self.name = self.avatar_id.nama_avatar
-            self.price = self.avatar_id.harga_koin
-            self.code = self.avatar_id.avatar_id
 
 
 class ShopTransaction(models.Model):
@@ -95,7 +120,14 @@ class ShopTransaction(models.Model):
     _order = 'purchase_date desc'
 
     mahasiswa_id = fields.Many2one('mahasiswa.mahasiswa', string='Mahasiswa', required=True, ondelete='cascade')
-    item_id = fields.Many2one('shop.item', string='Item', required=True, ondelete='restrict')
+    item_type = fields.Selection([
+        ('avatar', 'Avatar'),
+        ('voucher', 'Voucher')
+    ], string='Tipe Item', required=True, default='avatar')
+    
+    avatar_id = fields.Many2one('shop.avatar', string='Avatar')
+    voucher_id = fields.Many2one('shop.voucher', string='Voucher')
+    
     purchase_date = fields.Datetime(string='Tanggal Pembelian', default=fields.Datetime.now)
     code_generated = fields.Char(string='Kode Voucher', help='Kode kupon yang dihasilkan jika tipe item adalah voucher')
     status = fields.Selection([
@@ -106,9 +138,13 @@ class ShopTransaction(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            item = self.env['shop.item'].browse(vals.get('item_id'))
-            if item.item_type == 'voucher' and not vals.get('code_generated'):
-                prefix = item.voucher_prefix or 'VOU'
+            if vals.get('item_type') == 'voucher' and not vals.get('code_generated'):
+                voucher_id = vals.get('voucher_id')
+                if voucher_id:
+                    voucher = self.env['shop.voucher'].browse(voucher_id)
+                    prefix = voucher.voucher_prefix or 'VOU'
+                else:
+                    prefix = 'VOU'
                 rand1 = random.randint(1000, 9999)
                 rand2 = random.randint(100, 999)
                 vals['code_generated'] = f"{prefix}-{rand1}-{rand2}"

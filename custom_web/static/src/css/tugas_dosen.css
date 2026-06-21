@@ -187,8 +187,13 @@
     transition: all 0.2s;
 }
 
-.glass-menu-card.purple-glow .btn-action-go { color: #8b5cf6; }
-.glass-menu-card.blue-glow .btn-action-go { color: #3b82f6; }
+.glass-menu-card.purple-glow .btn-action-go {
+    color: #8b5cf6;
+}
+
+.glass-menu-card.blue-glow .btn-action-go {
+    color: #3b82f6;
+}
 
 .glass-menu-card:hover .btn-action-go {
     transform: translateX(4px);
@@ -281,10 +286,25 @@
     font-weight: 700;
 }
 
-.badge-tag.purple { background: rgba(139, 92, 246, 0.08); color: #8b5cf6; }
-.badge-tag.blue { background: rgba(59, 130, 246, 0.08); color: #3b82f6; }
-.badge-tag.teal { background: rgba(20, 184, 166, 0.08); color: #14b8a6; }
-.badge-tag.outline { border: 1.5px solid #e2e8f0; color: #64748b; }
+.badge-tag.purple {
+    background: rgba(139, 92, 246, 0.08);
+    color: #8b5cf6;
+}
+
+.badge-tag.blue {
+    background: rgba(59, 130, 246, 0.08);
+    color: #3b82f6;
+}
+
+.badge-tag.teal {
+    background: rgba(20, 184, 166, 0.08);
+    color: #14b8a6;
+}
+
+.badge-tag.outline {
+    border: 1.5px solid #e2e8f0;
+    color: #64748b;
+}
 
 .task-card-title {
     font-size: 16.5px;
@@ -399,7 +419,8 @@
     margin: 2px 0 0 0;
 }
 
-.btn-zip-download, .btn-link-view {
+.btn-zip-download,
+.btn-link-view {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -519,9 +540,18 @@
     box-shadow: 0 15px 35px rgba(31, 38, 135, 0.08);
 }
 
-.mb-30 { margin-bottom: 30px; }
-.py-40 { padding-top: 40px; padding-bottom: 40px; }
-.text-center { text-align: center; }
+.mb-30 {
+    margin-bottom: 30px;
+}
+
+.py-40 {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.text-center {
+    text-align: center;
+}
 
 .card-header {
     display: flex;
@@ -667,7 +697,7 @@
     gap: 8px;
 }
 
-.segmented-control input[type="radio"]:checked + .segmented-label {
+.segmented-control input[type="radio"]:checked+.segmented-label {
     background: #ffffff;
     color: #8b5cf6;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -961,6 +991,7 @@
         padding: 24px;
         border-radius: 20px;
     }
+
     .dosen-header-hud {
         flex-direction: row !important;
         align-items: center !important;
@@ -968,6 +999,7 @@
         padding: 16px 20px !important;
         gap: 10px !important;
     }
+
     .btn-back-dashboard {
         width: 40px !important;
         height: 40px !important;
@@ -978,13 +1010,16 @@
         justify-content: center !important;
         flex-shrink: 0 !important;
     }
+
     .btn-back-dashboard span {
         display: none !important;
     }
+
     .btn-back-dashboard i {
         margin: 0 !important;
         font-size: 16px !important;
     }
+
     .dosen-course-filters {
         width: 100% !important;
         display: flex !important;
@@ -994,11 +1029,13 @@
         gap: 8px !important;
         -webkit-overflow-scrolling: touch !important;
     }
+
     .course-filter-btn {
         flex-shrink: 0 !important;
         padding: 8px 14px !important;
         font-size: 12px !important;
     }
+
     .table-responsive {
         border-radius: 16px !important;
         overflow-x: auto !important;
@@ -1006,11 +1043,14 @@
         margin-top: 15px !important;
         border: 1px solid rgba(226, 232, 240, 0.8) !important;
     }
-    .modern-table th, .modern-table td {
+
+    .modern-table th,
+    .modern-table td {
         padding: 10px 12px !important;
         font-size: 12.5px !important;
         white-space: nowrap !important;
     }
+
     .modern-table td.catatan {
         max-width: 180px !important;
         white-space: normal !important;
@@ -1018,11 +1058,25 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes toastSlideIn {
-    from { transform: translateX(120%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }

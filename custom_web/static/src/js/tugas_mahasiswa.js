@@ -1,15 +1,22 @@
 /* --- Student Tugas Interactive Javascript (Custom Premium Layout) --- */
+console.log("tugas_mahasiswa.js loaded!");
 
 // State Management variables for Filter and Sort
 var currentCourseId = "all";
 var currentSortAndFilter = "default";
 
+var initStudentTugasDone = false;
+
 // 1. Toggle custom dropdown selectors & Dynamic Filter/Sort Engine
 function initStudentTugas() {
+    if (initStudentTugasDone) return;
+    initStudentTugasDone = true;
+    console.log("initStudentTugas starting!");
     // Course selectors
     var courseTrigger = document.getElementById("student_course_btn");
     var courseDropdown = document.getElementById("student_course_dropdown");
     var selectedCourseSpan = document.getElementById("selected_student_course");
+    console.log("courseTrigger:", courseTrigger, "courseDropdown:", courseDropdown);
     
     // Sort selectors
     var sortTrigger = document.getElementById("student_sort_btn");

@@ -1,5 +1,6 @@
 /* Background Decorative Blobs */
-body::before, body::after {
+body::before,
+body::after {
     content: '';
     position: absolute;
     border-radius: 50%;
@@ -7,17 +8,21 @@ body::before, body::after {
     filter: blur(80px);
     opacity: 0.5;
 }
+
 body::before {
     width: 400px;
     height: 400px;
-    background: #3b82f6; /* Blue */
+    background: #3b82f6;
+    /* Blue */
     top: -100px;
     left: -100px;
 }
+
 body::after {
     width: 300px;
     height: 300px;
-    background: #8b5cf6; /* Purple */
+    background: #8b5cf6;
+    /* Purple */
     bottom: -50px;
     right: -50px;
 }
@@ -35,6 +40,7 @@ body::after {
     text-align: center;
     margin-bottom: 35px;
 }
+
 .header-title {
     font-size: 56px;
     font-weight: 800;
@@ -44,6 +50,7 @@ body::after {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
 .header-subtitle {
     font-size: 15px;
     font-weight: 600;
@@ -63,8 +70,9 @@ body::after {
     padding: 45px 35px;
     width: 100%;
     max-width: 380px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255,255,255,0.2) inset;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
+
 .login-card h2 {
     text-align: center;
     color: #0f172a;
@@ -72,6 +80,7 @@ body::after {
     font-size: 26px;
     font-weight: 700;
 }
+
 .login-card p.subtitle {
     text-align: center;
     color: #64748b;
@@ -83,6 +92,7 @@ body::after {
 .form-group {
     margin-bottom: 22px;
 }
+
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -91,6 +101,7 @@ body::after {
     font-size: 13px;
     padding-left: 4px;
 }
+
 .form-group input {
     width: 100%;
     padding: 15px 18px;
@@ -104,10 +115,12 @@ body::after {
     outline: none;
     transition: all 0.3s ease;
 }
+
 .form-group input::placeholder {
     color: #94a3b8;
     font-weight: 400;
 }
+
 .form-group input:focus {
     background: #ffffff;
     border-color: #3b82f6;
@@ -130,10 +143,12 @@ body::after {
     margin-top: 15px;
     box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
 }
-.btn-login:hover { 
+
+.btn-login:hover {
     transform: translateY(-2px);
     box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.5);
 }
+
 .btn-login:active {
     transform: translateY(1px);
     box-shadow: 0 5px 15px -5px rgba(59, 130, 246, 0.4);
@@ -163,6 +178,7 @@ body::after {
     padding: 6px;
     border-radius: 14px;
 }
+
 .role-btn {
     flex: 1;
     padding: 10px;
@@ -176,8 +192,9 @@ body::after {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .role-btn.active {
     background: #ffffff;
     color: #3b82f6;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }

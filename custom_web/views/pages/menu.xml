@@ -3,21 +3,9 @@
     <template id="menu" name="Student Tugas Dashboard">
         <t t-call="custom_web.layout">
             <div class="mhs-tugas-container">
-                
-                <!-- Simple Header Card -->
-                <div class="mhs-header-hud">
-                    <div class="hud-profile-meta">
-                        <h2>Tugas</h2>
-                    </div>
-                    <div class="avatar-circle-header">
-                        <t t-if="mahasiswa and mahasiswa.foto_profil">
-                            <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile" class="avatar-img-round"/>
-                        </t>
-                        <t t-else="">
-                            <span class="avatar-shortcut"><i class="bi bi-person-fill"></i></span>
-                        </t>
-                    </div>
-                </div>
+                <t t-call="custom_web.shared_student_header">
+                    <t t-set="title" t-value="'Tugas'"/>
+                </t>
 
                 <!-- Glassmorphic Stats Panel Capsules -->
                 <div class="tugas-stats-capsules">
@@ -293,8 +281,6 @@
             </div>
 
             <div class="glowing-toast-container" id="mhs-toast-container"></div>
-            
-            <script src="/custom_web/static/src/js/tugas_mahasiswa.js?v=2" type="text/javascript"></script>
         </t>
     </template>
 </odoo>

@@ -1,21 +1,23 @@
-.app-container { 
-    display: flex; 
-    min-height: 100vh; 
+.app-container {
+    display: flex;
+    min-height: 100vh;
 }
 
 /* Sidebar (Desktop) */
 .sidebar {
     width: 260px;
     background: #ffffff;
-    box-shadow: 2px 0 15px rgba(0,0,0,0.03);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.03);
     display: flex;
     flex-direction: column;
     z-index: 100;
 }
+
 .sidebar-header {
     padding: 30px 24px;
     border-bottom: 1px solid #f8f9fa;
 }
+
 .sidebar-header h3 {
     font-size: 20px;
     font-weight: 700;
@@ -24,17 +26,20 @@
     align-items: center;
     gap: 10px;
 }
+
 .sidebar-header .user-name {
     font-size: 14px;
     color: #64748b;
     margin-top: 6px;
     font-weight: 500;
 }
+
 .sidebar-nav {
     list-style: none;
     padding: 20px 0;
     flex: 1;
 }
+
 .sidebar-nav li a {
     display: flex;
     align-items: center;
@@ -49,6 +54,7 @@
     overflow: hidden;
     transition: color 0.3s ease, border-left-color 0.3s ease, background-color 0.3s ease;
 }
+
 .sidebar-nav li a::before {
     content: '';
     position: absolute;
@@ -60,41 +66,51 @@
     z-index: -1;
     transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
 .sidebar-nav li a:hover {
     color: #3b82f6;
 }
+
 .sidebar-nav li a:hover::before {
     width: 100%;
 }
+
 .sidebar-nav li a:hover span.icon i {
     transform: scale(1.15) translateY(-1px);
     color: #3b82f6;
 }
+
 .sidebar-nav li a.active {
     color: #3b82f6;
     border-left-color: #3b82f6;
     background: rgba(59, 130, 246, 0.05);
 }
+
 .sidebar-nav li a.active::before {
     width: 100%;
 }
+
 .sidebar-nav li a.active span.icon i {
     transform: scale(1.1);
     color: #3b82f6;
 }
+
 .sidebar-nav li a span.icon {
     margin-right: 14px;
     font-size: 20px;
     display: inline-block;
 }
+
 .sidebar-nav li a span.icon i {
     display: inline-block;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
 }
+
 .sidebar-footer {
     padding: 20px 24px;
     border-top: 1px solid #f8f9fa;
 }
+
 .sidebar-footer a {
     color: #ef4444;
     text-decoration: none;
@@ -104,11 +120,15 @@
     align-items: center;
     transition: color 0.2s;
 }
+
 .sidebar-footer a span.icon {
     margin-right: 14px;
     font-size: 18px;
 }
-.sidebar-footer a:hover { color: #dc2626; }
+
+.sidebar-footer a:hover {
+    color: #dc2626;
+}
 
 /* Main Content */
 .main-content {
@@ -124,11 +144,14 @@
 @media (max-width: 768px) {
     .app-container {
         flex-direction: column;
-        padding-bottom: 80px; /* Space for bottom nav */
+        padding-bottom: 80px;
+        /* Space for bottom nav */
     }
+
     .main-content {
         padding: 20px 16px;
     }
+
     .sidebar {
         position: fixed;
         bottom: 0;
@@ -139,13 +162,16 @@
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
         border-top-left-radius: 24px;
         border-top-right-radius: 24px;
     }
-    .sidebar-header, .sidebar-footer {
+
+    .sidebar-header,
+    .sidebar-footer {
         display: none;
     }
+
     .sidebar-nav {
         padding: 0 10px;
         display: flex;
@@ -154,11 +180,13 @@
         align-items: center;
         width: 100%;
     }
+
     .sidebar-nav li {
         flex: 1;
         display: flex;
         justify-content: center;
     }
+
     .sidebar-nav li a {
         flex-direction: column;
         padding: 8px 16px;
@@ -169,23 +197,59 @@
         border-radius: 16px;
         transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
     }
+
     .sidebar-nav li a span.icon {
         margin-right: 0;
         margin-bottom: 4px;
         font-size: 22px;
         transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+
     .sidebar-nav li a:hover {
         color: #3b82f6;
     }
+
     .sidebar-nav li a:hover span.icon {
         transform: scale(1.1) translateY(-2px);
     }
+
     .sidebar-nav li a.active {
         background: rgba(59, 130, 246, 0.06);
         color: #3b82f6;
     }
+
     .sidebar-nav li a.active span.icon {
         transform: scale(1.15) translateY(-3px);
     }
+}
+
+/* --- STUDENT PORTAL CONTAINER STANDARD & HEADER --- */
+.mhs-tugas-container,
+.presensi-select-container,
+.shop-container,
+.profile-container,
+.dashboard-container {
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+}
+
+.back-btn-header {
+    text-decoration: none;
+    color: #475569;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.back-btn-header:hover {
+    transform: translateX(-3px);
+    color: #3b82f6;
+    background: rgba(0, 0, 0, 0.1);
 }

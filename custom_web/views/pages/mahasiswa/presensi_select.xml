@@ -5,8 +5,10 @@
             <link rel="stylesheet" href="/custom_web/static/src/css/presensi.css"/>
 
             <div class="presensi-select-container">
-                <div class="header-section-main">
-                    <h2>Pilih Kelas &amp; Mata Kuliah</h2>
+                <t t-call="custom_web.shared_student_header">
+                    <t t-set="title" t-value="'Presensi'"/>
+                </t>
+                <div class="header-section-main" style="margin-top: 10px; margin-bottom: 20px;">
                     <p>Silakan pilih kelas mata kuliah aktif untuk melakukan presensi kehadiran hari ini.</p>
                 </div>
 
