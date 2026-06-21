@@ -193,7 +193,7 @@ class DosenPortalController(http.Controller):
         return request.render('custom_web.leaderboard_dosen', {
             'dosen': dosen,
             'prodi_id': prodi,
-            'prodi_name': prodi or 'Semua Prodi',
+            'prodi_name': prodi or 'Nama Prodi',
             'angkatan_list': angkatan_set,
             'angkatan_selected': angkatan_selected,
             'students': students_for_template,
