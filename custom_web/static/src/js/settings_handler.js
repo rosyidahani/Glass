@@ -115,9 +115,10 @@ function createModal(titleId, defaultTitle, contentHTML) {
         closeBtn.style.transform = "scale(1)";
         closeBtn.style.background = "transparent";
     });
-    closeBtn.addEventListener("click", () => {
-        closeModal(overlay, modal);
-    });
+    closeBtn.onclick = function(e) {
+        e.stopPropagation();
+        window.closeModal(overlay, modal);
+    };
 
     modal.appendChild(header);
     modal.appendChild(body);
@@ -137,22 +138,23 @@ function createModal(titleId, defaultTitle, contentHTML) {
     }, 10);
 
     // Close on overlay click
-    overlay.addEventListener("click", (e) => {
+    overlay.onclick = function(e) {
         if (e.target === overlay) {
-            closeModal(overlay, modal);
+            window.closeModal(overlay, modal);
         }
-    });
+    };
 
     return { overlay, modal };
 }
 
-function closeModal(overlay, modal) {
+window.closeModal = function(overlay, modal) {
+    if (!overlay || !modal) return;
     overlay.style.opacity = "0";
     modal.style.transform = "translateY(20px)";
     setTimeout(() => {
         overlay.remove();
     }, 250);
-}
+};
 
 // Modal 1: Password & Security
 function openPasswordModal() {
@@ -215,7 +217,7 @@ function openPasswordModal() {
                 alertBox.style.background = "rgba(16, 185, 129, 0.1)";
                 alertBox.style.color = "#10b981";
                 alertBox.innerText = isEng ? "Password successfully changed!" : "Password berhasil diubah!";
-                setTimeout(() => closeModal(overlay, modal), 1500);
+                setTimeout(() => window.closeModal(overlay, modal), 1500);
             } else {
                 alertBox.style.background = "rgba(239, 68, 68, 0.1)";
                 alertBox.style.color = "#ef4444";
