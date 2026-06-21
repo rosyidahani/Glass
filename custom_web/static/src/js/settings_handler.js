@@ -151,8 +151,9 @@ function createModal(titleId, defaultTitle, contentHTML) {
 }
 
 window.closeModal = function(overlay, modal) {
-    if (overlay) {
-        overlay.remove();
+    const activeOverlay = document.getElementById("settings-modal-overlay");
+    if (activeOverlay) {
+        activeOverlay.remove();
     }
 };
 
