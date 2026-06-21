@@ -88,7 +88,7 @@ function createModal(titleId, defaultTitle, contentHTML) {
 
     // Close button
     const closeBtn = document.createElement("span");
-    closeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+    closeBtn.innerHTML = '<i class="bi bi-x-lg" style="pointer-events: none;"></i>';
     closeBtn.style.cssText = `
         position: absolute;
         top: 15px;
@@ -104,6 +104,7 @@ function createModal(titleId, defaultTitle, contentHTML) {
         width: 36px;
         height: 36px;
         border-radius: 50%;
+        pointer-events: auto !important;
     `;
     closeBtn.addEventListener("mouseenter", () => {
         closeBtn.style.color = "var(--text-color)";
@@ -116,6 +117,7 @@ function createModal(titleId, defaultTitle, contentHTML) {
         closeBtn.style.background = "transparent";
     });
     closeBtn.onclick = function(e) {
+        console.log("X button clicked!");
         e.stopPropagation();
         window.closeModal(overlay, modal);
     };
