@@ -51,9 +51,11 @@
                                 <li><a href="/leaderboard" t-att-class="'active' if request.httprequest.path == '/leaderboard' else ''"><span class="icon"><i class="bi bi-trophy-fill"></i></span> Leaderboard</a></li>
                             </ul>
                         </t>
-                        <div class="sidebar-footer">
-                            <a href="/logout"><span class="icon"><i class="bi bi-box-arrow-right"></i></span> Logout</a>
-                        </div>
+                        <t t-if="request.session.get('dosen_id')">
+                            <div class="sidebar-footer">
+                                <a href="/logout"><span class="icon"><i class="bi bi-box-arrow-right"></i></span> Logout</a>
+                            </div>
+                        </t>
                     </div>
                     <div class="main-content">
                         <t t-raw="0"/>
