@@ -470,3 +470,35 @@ class MahasiswaPortalController(http.Controller):
             'mahasiswa': mahasiswa,
             'course': course,
         })
+
+    @http.route('/api/settings/change_password', auth='public', type='http', website=True, methods=['POST'], csrf=False)
+    def api_change_password(self, **kwargs):
+        try:
+            body = json.loads(request.httprequest.data)
+        except Exception:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Invalid JSON body'}), headers=[('Content-Type', 'application/json')])
+        
+        old_password = body.get('old_password')
+        new_password = body.get('new_password')
+        
+        if not old_password or not new_password:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama dan baru harus diisi'}), headers=[('Content-Type', 'application/json')])
+
+        mahasiswa = get_active_mahasiswa()
+        dosen = get_active_dosen()
+        
+        if mahasiswa:
+            hashed_old = request.env['mahasiswa.mahasiswa']._hash_password(old_password)
+            if mahasiswa.password != hashed_old:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama salah'}), headers=[('Content-Type', 'application/json')])
+            mahasiswa.sudo().write({'password': new_password})
+            return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah'}), headers=[('Content-Type', 'application/json')])
+            
+        elif dosen:
+            if dosen.password != old_password:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama salah'}), headers=[('Content-Type', 'application/json')])
+            dosen.sudo().write({'password': new_password})
+            return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah'}), headers=[('Content-Type', 'application/json')])
+            
+        else:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Sesi tidak valid'}), headers=[('Content-Type', 'application/json')])

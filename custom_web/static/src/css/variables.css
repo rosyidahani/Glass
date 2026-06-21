@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 * {
     margin: 0;
@@ -6,8 +6,171 @@
     box-sizing: border-box;
 }
 
+/* Default / Ocean Breeze Theme */
+:root, .theme-ocean {
+    --bg-color: #f0f4f8;
+    --text-color: #1e293b;
+    --text-muted: #64748b;
+    --card-bg: rgba(255, 255, 255, 0.65);
+    --card-border: rgba(255, 255, 255, 0.8);
+    --card-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    --sidebar-bg: #ffffff;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-light: rgba(59, 130, 246, 0.08);
+}
+
+/* Midnight Slate Theme (Dark Mode) */
+.theme-midnight {
+    --bg-color: #0f172a;
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    --sidebar-bg: #1e293b;
+    --accent-color: #38bdf8;
+    --accent-hover: #0ea5e9;
+    --accent-light: rgba(56, 189, 248, 0.15);
+}
+
+/* Amethyst Dream Theme (Purple Mode) */
+.theme-amethyst {
+    --bg-color: #1e1b4b;
+    --text-color: #f5f3ff;
+    --text-muted: #c7d2fe;
+    --card-bg: rgba(49, 46, 129, 0.7);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    --sidebar-bg: #312e81;
+    --accent-color: #a78bfa;
+    --accent-hover: #8b5cf6;
+    --accent-light: rgba(167, 139, 250, 0.15);
+}
+
 body {
     font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f4f8;
-    color: #333;
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Global overrides for theme implementation */
+.glass-panel, .profile-pill, .settings-list, .stats-container {
+    background: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
+    color: var(--text-color) !important;
+}
+
+.sidebar {
+    background: var(--sidebar-bg) !important;
+    transition: background 0.3s ease;
+}
+
+.sidebar-header h3 {
+    color: var(--text-color) !important;
+}
+
+.sidebar-header .user-name {
+    color: var(--text-muted) !important;
+}
+
+.sidebar-nav li a {
+    color: var(--text-muted) !important;
+}
+
+.sidebar-nav li a:hover {
+    color: var(--accent-color) !important;
+}
+
+.sidebar-nav li a:hover::before {
+    background: var(--accent-light) !important;
+}
+
+.sidebar-nav li a.active {
+    color: var(--accent-color) !important;
+    border-left-color: var(--accent-color) !important;
+    background: var(--accent-light) !important;
+}
+
+.sidebar-nav li a.active span.icon i, .sidebar-nav li a:hover span.icon i {
+    color: var(--accent-color) !important;
+}
+
+.profile-details h2, .dosen-name {
+    color: var(--text-color) !important;
+}
+
+.profile-details p, .dosen-nip {
+    color: var(--text-muted) !important;
+}
+
+.stat-box h4 {
+    color: var(--text-color) !important;
+}
+
+.stat-box span {
+    color: var(--text-muted) !important;
+}
+
+.settings-item {
+    color: var(--text-color) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.settings-item:hover {
+    color: var(--accent-color) !important;
+}
+
+.settings-item .item-arrow {
+    color: var(--text-muted) !important;
+}
+
+.settings-item .item-icon {
+    background: var(--accent-light) !important;
+    color: var(--accent-color) !important;
+}
+
+.back-btn-header {
+    background: var(--accent-light) !important;
+    color: var(--accent-color) !important;
+}
+
+.back-btn-header:hover {
+    background: var(--accent-color) !important;
+    color: #ffffff !important;
+}
+
+.profile-info .profile-name {
+    color: var(--text-color) !important;
+}
+
+.profile-info .profile-level {
+    color: var(--text-muted) !important;
+}
+
+.stat-card .stat-info p {
+    color: var(--text-color) !important;
+}
+
+.stat-card .stat-info h4 {
+    color: var(--text-muted) !important;
+}
+
+.recent-activity h3 {
+    color: var(--text-color) !important;
+}
+
+.activity-item {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+}
+
+.activity-text h5 {
+    color: var(--text-color) !important;
+}
+
+.activity-text p {
+    color: var(--text-muted) !important;
 }
