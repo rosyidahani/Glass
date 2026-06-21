@@ -64,6 +64,20 @@
                             <a href="/dosen/tugas/pengumpulan" class="dosen-action-btn btn-amber">Periksa Tugas</a>
                         </div>
                     </div>
+
+                    <!-- CARD 4: Leaderboard Mahasiswa -->
+                    <div class="dosen-card glass-panel">
+                        <div class="dosen-card-icon icon-emerald">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                        <div class="dosen-card-body">
+                            <h3>Leaderboard</h3>
+                            <p>Pantau peringkat mahasiswa berdasarkan akumulasi XP dan pencapaian mereka.</p>
+                        </div>
+                        <div class="dosen-card-footer">
+                            <a href="/dosen/leaderboard" class="dosen-action-btn btn-emerald">Lihat Peringkat</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </t>
