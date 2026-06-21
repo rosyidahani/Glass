@@ -27,6 +27,16 @@ class DosenPortalController(http.Controller):
             'dosen': dosen,
         })
 
+    @http.route('/dashboard/dosen/settings', auth='public', website=True, type='http')
+    def settings_dosen(self, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        return request.render('custom_web.settings_dosen', {
+            'dosen': dosen,
+        })
+
     @http.route('/dosen/presensi', auth='public', website=True, type='http')
     def presensi_dosen_menu(self, **kwargs):
         dosen = get_active_dosen()

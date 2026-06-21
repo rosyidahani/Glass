@@ -49,17 +49,17 @@ class MahasiswaPortalController(http.Controller):
             'rank': rank,
         })
 
-    @http.route('/dashboard/mahasiswa/profile', auth='public', website=True, type='http')
-    def profile_mahasiswa(self, **kwargs):
+    @http.route('/dashboard/mahasiswa/settings', auth='public', website=True, type='http')
+    def settings_mahasiswa(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
 
-        return request.render('custom_web.profile', {
+        return request.render('custom_web.settings', {
             'mahasiswa': mahasiswa,
         })
 
-    @http.route('/dashboard/mahasiswa/profile/upload_photo', auth='public', website=True, type='http', methods=['POST'], csrf=True)
+    @http.route('/dashboard/mahasiswa/settings/upload_photo', auth='public', website=True, type='http', methods=['POST'], csrf=True)
     def upload_photo_mahasiswa(self, **post):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
@@ -72,7 +72,7 @@ class MahasiswaPortalController(http.Controller):
                 'foto_profil': base64.b64encode(file_content)
             })
 
-        return request.redirect('/dashboard/mahasiswa/profile')
+        return request.redirect('/dashboard/mahasiswa/settings')
 
     @http.route('/dashboard/mahasiswa/shop', auth='public', website=True, type='http')
     def shop_mahasiswa(self, **kwargs):
