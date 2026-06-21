@@ -151,12 +151,9 @@ function createModal(titleId, defaultTitle, contentHTML) {
 }
 
 window.closeModal = function(overlay, modal) {
-    if (!overlay || !modal) return;
-    overlay.style.opacity = "0";
-    modal.style.transform = "translateY(20px)";
-    setTimeout(() => {
+    if (overlay) {
         overlay.remove();
-    }, 250);
+    }
 };
 
 // Modal 1: Password & Security
