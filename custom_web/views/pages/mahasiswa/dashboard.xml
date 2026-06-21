@@ -8,7 +8,7 @@
                 <div class="top-hud">
                     <div class="hud-left">
                         <!-- Profile Card without EXP -->
-                        <a href="/dashboard/mahasiswa/profile" class="profile-pill glass-panel">
+                        <div class="profile-pill glass-panel">
                             <div class="avatar-large">
                                 <t t-if="mahasiswa.foto_profil">
                                     <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
@@ -25,7 +25,7 @@
                              <div class="profile-rank-badge" title="Rank Leaderboard">
                                  <span>#<t t-esc="rank"/></span>
                              </div>
-                        </a>
+                        </div>
                         
                         <!-- Action Buttons stacked below profile pill -->
                         <div class="hud-actions-vertical">
@@ -34,7 +34,7 @@
                                 <i class="bi bi-bag-fill"></i>
                             </a>
                             <!-- Setting Button -->
-                            <a href="/dashboard/mahasiswa/profile" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
+                            <a href="/dashboard/mahasiswa/settings" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
                                 <i class="bi bi-gear-fill"></i>
                             </a>
                         </div>

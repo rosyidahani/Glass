@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="profile" name="Mahasiswa Profile">
+    <template id="settings" name="Mahasiswa Settings">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/profile.css"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/settings.css"/>
 
             <div class="profile-container">
                 <t t-call="custom_web.shared_student_header">
-                    <t t-set="title" t-value="'Profil'"/>
+                    <t t-set="title" t-value="'Pengaturan'"/>
                     <t t-set="back_url" t-value="'/dashboard/mahasiswa'"/>
                 </t>
 
@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <form action="/dashboard/mahasiswa/profile/upload_photo" method="post" enctype="multipart/form-data" id="photoUploadForm" style="display: none;">
+                <form action="/dashboard/mahasiswa/settings/upload_photo" method="post" enctype="multipart/form-data" id="photoUploadForm" style="display: none;">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/png, image/jpeg, image/jpg" onchange="document.getElementById('photoUploadForm').submit();"/>
                 </form>

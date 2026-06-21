@@ -8,7 +8,7 @@
         'views/layout.xml',
         'views/pages/login.xml',
         'views/pages/mahasiswa/dashboard.xml',
-        'views/pages/mahasiswa/profile.xml',
+        'views/pages/mahasiswa/settings.xml',
         'views/pages/mahasiswa/presensi_select.xml',
         'views/pages/mahasiswa/presensi_scan.xml',
         'views/pages/mahasiswa/shop.xml',
