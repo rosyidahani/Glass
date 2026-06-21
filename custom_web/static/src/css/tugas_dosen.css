@@ -14,13 +14,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 30px;
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     border-radius: 24px;
     margin-bottom: 30px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    color: var(--text-color);
 }
 
 .dosen-profile-info {
@@ -47,14 +48,14 @@
 .dosen-meta .dosen-name {
     font-size: 20px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-color);
     margin: 0;
     letter-spacing: -0.5px;
 }
 
 .dosen-meta .dosen-role {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted);
     margin: 4px 0 0 0;
     font-weight: 600;
     display: flex;
@@ -100,9 +101,9 @@
 
 .glass-menu-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.03);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     border-radius: 24px;
     padding: 40px 20px;
     display: flex;
@@ -115,6 +116,7 @@
     overflow: hidden;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    color: var(--text-color);
 }
 
 .glass-menu-card .card-glow-bg {
@@ -173,7 +175,7 @@
 .glass-menu-card h3 {
     font-size: 19px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-color);
     margin: 0;
     letter-spacing: -0.5px;
 }
@@ -389,33 +391,33 @@
     padding: 14px 16px;
     font-size: 12.5px;
     font-weight: 700;
-    color: #475569;
-    border-bottom: 2px solid #e2e8f0;
-    background: #f8fafc;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--card-border);
+    background: var(--bg-color);
 }
 
 .modern-table td {
     padding: 14px 16px;
     font-size: 13.5px;
     font-weight: 600;
-    color: #334155;
-    border-bottom: 1px solid #e2e8f0;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--card-border);
 }
 
 .modern-table tr:hover td {
-    background: rgba(248, 250, 252, 0.4);
+    background: rgba(248, 250, 252, 0.08);
 }
 
 .student-meta-block .name {
     font-size: 14px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-color);
     margin: 0;
 }
 
 .student-meta-block .nim {
     font-size: 11.5px;
-    color: #64748b;
+    color: var(--text-muted);
     margin: 2px 0 0 0;
 }
 
