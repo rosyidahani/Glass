@@ -66,7 +66,14 @@ class Mahasiswa(models.Model):
         default='id'
     )
 
+    prodi = fields.Char(
+        string='Program Studi',
+        help='Program studi mahasiswa untuk kebutuhan leaderboard dosen dan filter angkatan.',
+    )
+
     _sql_constraints = [
+
+
         ('nim_unique', 'UNIQUE(nim)', 'NIM sudah terdaftar!'),
     ]
 
@@ -99,6 +106,7 @@ class Mahasiswa(models.Model):
     # ------------------------------------------------------------------
     # Authentication
     # ------------------------------------------------------------------
+
     @api.model
     def authenticate_nim(self, nim, password):
         """Autentikasi mahasiswa berdasarkan NIM dan password.

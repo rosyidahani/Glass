@@ -87,15 +87,18 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
 
-        # Ambil seluruh mahasiswa aktif diurutkan berdasarkan total XP terbanyak
-        students = request.env['mahasiswa.mahasiswa'].sudo().search([
-            ('active', '=', True)
-        ], order='total_xp desc')
+        # Leaderboard mahasiswa: ambil mahasiswa aktif dan urutkan total_xp desc
+        # (tanpa field angkatan)
+        students = request.env['mahasiswa.mahasiswa'].sudo().search(
+            [('active', '=', True)],
+            order='total_xp desc',
+        )
 
         return request.render('custom_web.leaderboard', {
             'mahasiswa': mahasiswa,
             'students': students,
         })
+
 
     @http.route('/api/shop/state', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_shop_state(self, **kwargs):

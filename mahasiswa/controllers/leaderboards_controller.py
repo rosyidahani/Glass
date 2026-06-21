@@ -1,42 +1,31 @@
 from odoo import http
 from odoo.http import request
-from odoo.exceptions import AccessError
 import json
 
+
 class LeaderboardController(http.Controller):
+    """Controller leaderboard versi lama (mock) sudah dihapus.
+
+    File ini dibiarkan ada hanya untuk endpoint yang masih dipakai.
+    """
 
     def _json_error(self, message, status=400):
-        """Helper: kembalikan response error dalam format JSON."""
         payload = {'status': 'error', 'message': message}
         return request.make_response(
             json.dumps(payload),
             headers=[('Content-Type', 'application/json')],
-            status=status
+            status=status,
         )
 
     def _get_current_mahasiswa(self):
+        # Catatan: endpoint ini mengasumsikan user_id Odoo terhubung ke mahasiswa.
         uid = request.env.user.id
         mahasiswa = request.env['mahasiswa.mahasiswa'].sudo().search(
             [('user_id', '=', uid)], limit=1
         )
         return mahasiswa or None
 
-    @http.route('/api/leaderboard', type='http',
-                auth='user', methods=['GET'], cors='*')
-    def get_leaderboard(self, **kw):
-        mock_data = [
-            {"rank": 1, "nama": "Andi",  "xp_total": 5000},
-            {"rank": 2, "nama": "Budi",  "xp_total": 4500},
-            {"rank": 3, "nama": "Citra", "xp_total": 3000},
-        ]
-        payload = {'status': 'success', 'data': mock_data}
-        return request.make_response(
-            json.dumps(payload),
-            headers=[('Content-Type', 'application/json')]
-        )
-
-    @http.route('/api/mahasiswa/<int:target_id>/data', type='http',
-                auth='user', methods=['GET'], cors='*')
+    @http.route('/api/mahasiswa/<int:target_id>/data', type='http', auth='user', methods=['GET'], cors='*')
     def get_mahasiswa_data(self, target_id, **kw):
         current = self._get_current_mahasiswa()
         if not current:
@@ -45,10 +34,17 @@ class LeaderboardController(http.Controller):
         if current.id != target_id:
             return self._json_error('Akses ditolak.', 403)
 
-        payload = {'status': 'success', 'data': {
-            'nama': current.nama,
-        }}
+        payload = {
+            'status': 'success',
+            'data': {
+                'nama': current.name,
+                'nim': current.nim,
+                'total_xp': current.total_xp,
+                'koin': current.koin,
+            },
+        }
         return request.make_response(
             json.dumps(payload),
-            headers=[('Content-Type', 'application/json')]
+            headers=[('Content-Type', 'application/json')],
         )
+
