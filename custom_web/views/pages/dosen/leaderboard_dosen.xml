@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="leaderboard_dosen" name="Leaderboard Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css"/>
+
+            <div class="leaderboard-container">
+                <div class="leaderboard-topbar glass-panel">
+                    <a href="/dashboard/dosen" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+                    <div class="topbar-title">Leaderboard Mahasiswa</div>
+                    <div class="topbar-right">
+                        <div class="xp-display" title="Prodi Dosen">
+                            <i class="bi bi-building"></i>
+                            <t t-esc="prodi_name"/>
+                        </div>
+                        <div class="topbar-profile">
+                            <t t-if="dosen and dosen.name">
+                                <t t-esc="dosen.name[0].upper()"/>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="'D'"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding: 16px 18px;">
+                    <div style="display:flex; gap: 12px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-weight:800; color:#0f172a;">Filter Angkatan</div>
+                            <div style="font-size:13px; color:#64748b;">Gunakan NIM (2 digit awal) untuk filter.</div>
+                        </div>
+
+                        <form method="get" action="/dosen/leaderboard" style="display:flex; gap:10px; align-items:center;">
+                            <input type="hidden" name="prodi" t-att-value="prodi_id"/>
+                            <select name="angkatan" style="padding:10px 12px; border-radius:12px; border:1px solid rgba(148,163,184,0.35); background:#fff; font-weight:700;">
+                                <option value="semua" t-att-selected="'selected' if str(angkatan_selected)=='semua' else None">Semua</option>
+                                <t t-foreach="angkatan_list" t-as="a">
+                                    <option t-att-value="a" t-att-selected="'selected' if (str(angkatan_selected)==str(a)) else None">
+                                        <t t-esc="a"/>
+                                    </option>
+                                </t>
+                            </select>
+
+                            <button type="submit" style="padding:10px 14px; border-radius:12px; border:none; background:#3b82f6; color:white; font-weight:800; cursor:pointer;">
+                                Terapkan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="podium-section glass-panel" style="margin-top:0; padding-top:30px;">
+                    <t t-set="rank_1" t-value="students[0] if len(students) &gt; 0 else False"/>
+                    <t t-set="rank_2" t-value="students[1] if len(students) &gt; 1 else False"/>
+                    <t t-set="rank_3" t-value="students[2] if len(students) &gt; 2 else False"/>
+
+                    <div class="podium-row-wrapper" style="max-width:560px;">
+                        <t t-if="rank_2">
+                            <div t-attf-class="podium-card rank-2 #{'highlight' if rank_2.id == dosen.id else ''}">
+                                <div class="podium-bar bar-silver">
+                                    <div class="comet-head-star head-1 head-silver"></div>
+                                    <div class="comet-head-star head-2 head-silver"></div>
+                                    <div class="comet-particle p1 part-silver"></div>
+                                    <div class="comet-particle p2 part-silver"></div>
+                                    <div class="comet-particle p3 part-silver"></div>
+                                    <div class="comet-particle p4 part-silver"></div>
+                                    <div class="comet-particle p5 part-silver"></div>
+                                    <div class="comet-particle p6 part-silver"></div>
+                                    <div class="comet-particle p7 part-silver"></div>
+                                    <div class="comet-particle p8 part-silver"></div>
+                                    <div class="comet-particle p9 part-silver"></div>
+                                    <div class="comet-particle p10 part-silver"></div>
+                                    <div class="comet-particle p11 part-silver"></div>
+                                    <div class="comet-particle p12 part-silver"></div>
+                                    <div class="podium-bar-content content-silver">
+                                        <div class="podium-avatar-container">
+                                            <img t-att-src="rank_2.equipped_avatar_id.avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 2 Avatar" class="podium-avatar"/>
+                                            <div class="podium-badge badge-silver">2</div>
+                                        </div>
+                                        <div class="podium-name"><t t-esc="rank_2.name"/></div>
+                                        <div class="podium-xp"><t t-esc="rank_2.total_xp"/> XP</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <t t-if="rank_1">
+                            <div t-attf-class="podium-card rank-1 #{'highlight' if rank_1.id == dosen.id else ''}">
+                                <div class="podium-bar bar-gold">
+                                    <div class="comet-head-star head-1 head-gold"></div>
+                                    <div class="comet-head-star head-2 head-gold"></div>
+                                    <div class="comet-particle p1 part-gold"></div>
+                                    <div class="comet-particle p2 part-gold"></div>
+                                    <div class="comet-particle p3 part-gold"></div>
+                                    <div class="comet-particle p4 part-gold"></div>
+                                    <div class="comet-particle p5 part-gold"></div>
+                                    <div class="comet-particle p6 part-gold"></div>
+                                    <div class="comet-particle p7 part-gold"></div>
+                                    <div class="comet-particle p8 part-gold"></div>
+                                    <div class="comet-particle p9 part-gold"></div>
+                                    <div class="comet-particle p10 part-gold"></div>
+                                    <div class="comet-particle p11 part-gold"></div>
+                                    <div class="comet-particle p12 part-gold"></div>
+
+                                    <div class="podium-bar-content content-gold">
+                                        <div class="crown-glow">
+                                            <i class="bi bi-crown-fill"></i>
+                                        </div>
+                                        <div class="podium-avatar-container">
+                                            <img t-att-src="rank_1.equipped_avatar_id.avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 1 Avatar" class="podium-avatar"/>
+                                            <div class="podium-badge badge-gold">1</div>
+                                        </div>
+                                        <div class="podium-name"><t t-esc="rank_1.name"/></div>
+                                        <div class="podium-xp"><t t-esc="rank_1.total_xp"/> XP</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <t t-if="rank_3">
+                            <div t-attf-class="podium-card rank-3 #{'highlight' if rank_3.id == dosen.id else ''}">
+                                <div class="podium-bar bar-bronze">
+                                    <div class="comet-head-star head-1 head-bronze"></div>
+                                    <div class="comet-head-star head-2 head-bronze"></div>
+                                    <div class="comet-particle p1 part-bronze"></div>
+                                    <div class="comet-particle p2 part-bronze"></div>
+                                    <div class="comet-particle p3 part-bronze"></div>
+                                    <div class="comet-particle p4 part-bronze"></div>
+                                    <div class="comet-particle p5 part-bronze"></div>
+                                    <div class="comet-particle p6 part-bronze"></div>
+                                    <div class="comet-particle p7 part-bronze"></div>
+                                    <div class="comet-particle p8 part-bronze"></div>
+                                    <div class="comet-particle p9 part-bronze"></div>
+                                    <div class="comet-particle p10 part-bronze"></div>
+                                    <div class="comet-particle p11 part-bronze"></div>
+                                    <div class="comet-particle p12 part-bronze"></div>
+
+                                    <div class="podium-bar-content content-bronze">
+                                        <div class="podium-avatar-container">
+                                            <img t-att-src="rank_3.equipped_avatar_id.avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 3 Avatar" class="podium-avatar"/>
+                                            <div class="podium-badge badge-bronze">3</div>
+                                        </div>
+                                        <div class="podium-name"><t t-esc="rank_3.name"/></div>
+                                        <div class="podium-xp"><t t-esc="rank_3.total_xp"/> XP</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="leaderboard-list-section">
+                    <div class="list-header">
+                        <div class="list-title">Peringkat Mahasiswa</div>
+                        <div style="font-size:13px; color:#64748b; margin-top:4px;">Angkatan: <t t-esc="angkatan_selected"/></div>
+                    </div>
+
+                    <div class="leaderboard-rows-container">
+                        <t t-set="rank_idx" t-value="4"/>
+                        <t t-foreach="students[3:]" t-as="student">
+                            <div t-attf-class="leaderboard-row glass-panel">
+                                <div class="row-rank-num-container">
+                                    <span class="row-rank-badge">#<t t-esc="rank_idx"/></span>
+                                </div>
+                                <div class="row-avatar-box">
+                                    <img t-att-src="student.equipped_avatar_id.avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Student Avatar" class="row-avatar-img"/>
+                                </div>
+                                <div class="row-student-info">
+                                    <div class="row-student-name"><t t-esc="student.name"/></div>
+                                    <div class="row-student-nim"><t t-esc="student.nim"/></div>
+                                </div>
+                                <div class="row-xp-score">
+                                    <i class="bi bi-star"></i> <t t-esc="student.total_xp"/> XP
+                                </div>
+                            </div>
+                            <t t-set="rank_idx" t-value="rank_idx + 1"/>
+                        </t>
+
+                        <t t-if="len(students) &lt;= 3">
+                            <div class="no-more-rank glass-panel">Belum ada data peringkat untuk angkatan ini.</div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

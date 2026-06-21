@@ -152,6 +152,114 @@ class DosenPortalController(http.Controller):
         })
 
     # =======================================================
+    # LEADERBOARD DOSEN (VIEW ONLY)
+    # =======================================================
+    @http.route('/dosen/leaderboard', auth='public', website=True, type='http')
+    def dosen_leaderboard(self, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        prodi = getattr(dosen, 'prodi', False) if hasattr(dosen, 'prodi') else False
+        if not prodi:
+            # fallback: tampilkan leaderboard tanpa filter prodi
+            prodi = ''
+
+        # ambil semua angkatan berdasarkan NIM (2 digit awal)
+        # lalu urutkan angka kecil->besar
+        students = request.env['mahasiswa.mahasiswa'].sudo().search([
+            ('active', '=', True),
+            ('prodi', '=', prodi) if prodi else ('id', '!=', 0),
+        ])
+        angkatan_set = sorted({(s.nim or '')[:2] for s in students if (s.nim or '').startswith(tuple([str(i) for i in range(10)])) and (s.nim or '').strip()})
+        if not angkatan_set:
+            angkatan_set = ['']
+
+        angkatan_selected = kwargs.get('angkatan') or angkatan_set[0]
+
+        domain = [('active', '=', True)]
+        if prodi:
+            domain.append(('prodi', '=', prodi))
+        if angkatan_selected and str(angkatan_selected) != 'semua':
+            domain.append(('nim', 'like', str(angkatan_selected) + '%'))
+
+        # =======================================================
+        # DOSEN VIEW
+        # - Default: leaderboard GABUNGAN (semua angkatan untuk prodi terpilih) 
+        # - Setelah filter angkatan diterapkan: tampilkan JUARA PER ANGKATAN 
+        # =======================================================
+
+        # 'semua' diperlakukan sebagai tidak ada filter angkatan
+        is_angkatan_filtered = bool(kwargs.get('angkatan')) and str(kwargs.get('angkatan')) != 'semua'
+
+        # Jika mode gabungan ('semua'), tampilkan label yang sesuai
+        if not is_angkatan_filtered:
+            angkatan_selected = 'semua'
+
+
+        class _RowProxy:
+            def __init__(self, mahasiswa, total_xp_agg=None, rank_xp=None, angkatan=None):
+                self._m = mahasiswa
+                self.id = mahasiswa.id if mahasiswa else 0
+                self.name = getattr(mahasiswa, 'name', '') if mahasiswa else ''
+                self.nim = getattr(mahasiswa, 'nim', '') if mahasiswa else ''
+                self.equipped_avatar_id = getattr(mahasiswa, 'equipped_avatar_id', False) if mahasiswa else False
+                self.total_xp = total_xp_agg if total_xp_agg is not None else (mahasiswa.total_xp if mahasiswa else 0)
+                self.angkatan = angkatan
+
+        students_for_template = []
+
+        if is_angkatan_filtered:
+            # hitung top mahasiswa dan total_xp agregat per angkatan untuk prodi yang sama
+            base_domain = [('active', '=', True)]
+            if prodi:
+                base_domain.append(('prodi', '=', prodi))
+
+            base_students = request.env['mahasiswa.mahasiswa'].sudo().search(base_domain)
+
+            agg = {}
+            for s in base_students:
+                ang = (s.nim or '')[:2]
+                if ang not in agg:
+                    agg[ang] = {'angkatan': ang, 'total_xp': 0, 'top_student': False}
+                agg[ang]['total_xp'] += (s.total_xp or 0)
+                if not agg[ang]['top_student'] or (s.total_xp or 0) > (agg[ang]['top_student'].total_xp or 0):
+                    agg[ang]['top_student'] = s
+
+            aggregated_rows = list(agg.values())
+            # urutkan juara angkatan berdasarkan total_xp agregat angkatan
+            aggregated_rows.sort(key=lambda r: r['total_xp'], reverse=True)
+
+            # tampilkan hanya angkatan yang dipilih (agar “1 prodi dari beberapa angkatan” tapi yang ditampilkan setelah filter jadi juara sendiri-sendiri di angkatannya)
+            # berarti daftar berisi juara untuk angkatan_selected.
+            aggregated_rows = [r for r in aggregated_rows if str(r['angkatan']) == str(angkatan_selected)]
+
+            for r in aggregated_rows[:10]:
+                top = r['top_student']
+                if top:
+                    students_for_template.append(_RowProxy(top, total_xp_agg=r['total_xp'], angkatan=r['angkatan']))
+
+        else:
+            # gabungan semua angkatan: urutkan total_xp per mahasiswa
+            # gunakan domain prodi saja (tanpa membatasi angkatan)
+            base_domain = [('active', '=', True)]
+            if prodi:
+                base_domain.append(('prodi', '=', prodi))
+
+            all_students = request.env['mahasiswa.mahasiswa'].sudo().search(base_domain, order='total_xp desc')
+            students_for_template = all_students[:10]
+
+        return request.render('custom_web.leaderboard_dosen', {
+            'dosen': dosen,
+            'prodi_id': prodi,
+            'prodi_name': prodi or 'Nama Prodi',
+            'angkatan_list': angkatan_set,
+            'angkatan_selected': angkatan_selected,
+            'students': students_for_template,
+        })
+
+
+    # =======================================================
     # API BACKEND TUGAS
     # =======================================================
     @http.route('/api/tugas/buat', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
