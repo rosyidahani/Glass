@@ -654,9 +654,9 @@
 .stat-capsule {
     flex: 1;
     min-width: 140px;
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(31, 38, 135, 0.02);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     border-radius: 16px;
     padding: 12px 18px;
     display: flex;
@@ -665,6 +665,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     transition: all 0.3s ease;
+    color: var(--text-color);
 }
 
 .stat-capsule:hover {
@@ -705,14 +706,14 @@
 .stat-info .num {
     font-size: 16px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-color);
     line-height: 1.2;
 }
 
 .stat-info .lbl {
     font-size: 10.5px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     margin-top: 1px;
@@ -836,7 +837,7 @@
     display: block;
     font-size: 12px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
@@ -844,11 +845,10 @@
 
 .course-dropdown-trigger,
 .sort-dropdown-trigger {
-    background: rgba(255, 255, 255, 0.7);
-    /* Premium glassmorphism */
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(31, 38, 135, 0.03);
-    color: #0f172a;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    color: var(--text-color);
     border-radius: 14px;
     padding: 14px 20px;
     font-size: 14px;
@@ -864,8 +864,8 @@
 
 .course-dropdown-trigger:hover,
 .sort-dropdown-trigger:hover {
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 6px 20px rgba(31, 38, 135, 0.05);
+    background: var(--accent-light);
+    box-shadow: var(--card-shadow);
 }
 
 .course-dropdown-trigger i,
@@ -886,10 +886,10 @@
     top: calc(100% + 6px);
     left: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--card-shadow);
     z-index: 100;
     max-height: 280px;
     overflow-y: auto;
@@ -905,7 +905,7 @@
     border-radius: 10px;
     font-size: 13.5px;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-color);
     cursor: pointer;
     transition: all 0.15s;
     display: flex;
@@ -924,11 +924,11 @@
 .dropdown-section-divider {
     font-size: 10.5px;
     font-weight: 800;
-    color: #94a3b8;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 12px 16px 6px 16px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--card-border);
     margin-top: 6px;
 }
 
