@@ -24,7 +24,6 @@
                         </group>
                         <group>
                             <field name="gambar_url"/>
-                            <field name="is_video" readonly="1"/>
                             <field name="active"/>
                         </group>
                     </group>
@@ -45,7 +44,6 @@
                 <field name="nama_avatar"/>
                 <field name="harga_koin"/>
                 <field name="gambar_url"/>
-                <field name="is_video"/>
                 <field name="active"/>
             </tree>
         </field>

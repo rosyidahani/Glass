@@ -30,10 +30,13 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
 
-        # Hitung ranking mahasiswa berdasarkan total_xp
-        all_students = request.env['mahasiswa.mahasiswa'].sudo().search([
-            ('active', '=', True)
-        ], order='total_xp desc')
+        # Hitung ranking mahasiswa berdasarkan total_xp dalam kelompok 7 digit NIM yang sama
+        nim_prefix = (mahasiswa.nim or '').strip()[:7]
+        domain = [('active', '=', True)]
+        if len(nim_prefix) == 7:
+            domain.append(('nim', '=like', f"{nim_prefix}%"))
+
+        all_students = request.env['mahasiswa.mahasiswa'].sudo().search(domain, order='total_xp desc')
         
         rank = 1
         for idx, student in enumerate(all_students, start=1):
@@ -87,10 +90,14 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
 
-        # Leaderboard mahasiswa: ambil mahasiswa aktif dan urutkan total_xp desc
-        # (tanpa field angkatan)
+        # Leaderboard mahasiswa: hanya tampilkan mahasiswa dengan 7 digit NIM yang sama
+        nim_prefix = (mahasiswa.nim or '').strip()[:7]
+        domain = [('active', '=', True)]
+        if len(nim_prefix) == 7:
+            domain.append(('nim', '=like', f"{nim_prefix}%"))
+
         students = request.env['mahasiswa.mahasiswa'].sudo().search(
-            [('active', '=', True)],
+            domain,
             order='total_xp desc',
         )
 

@@ -46,7 +46,6 @@ class ShopAvatar(models.Model):
     # Pendukung Upload File Gambar
     foto_avatar = fields.Image(string='Upload Gambar Avatar', max_width=512, max_height=512)
     image_src = fields.Char(string='Sumber Gambar', compute='_compute_image_src')
-    is_video = fields.Boolean(string='Apakah Video?', compute='_compute_is_video', store=True)
     active = fields.Boolean(string='Aktif', default=True)
 
     _sql_constraints = [
@@ -88,13 +87,6 @@ class ShopAvatar(models.Model):
             else:
                 rec.image_src = f"/custom_web/static/src/img/{rec.avatar_id or 'char_default'}.png"
 
-    @api.depends('gambar_url', 'foto_avatar')
-    def _compute_is_video(self):
-        for rec in self:
-            if not rec.foto_avatar and rec.gambar_url and any(rec.gambar_url.lower().endswith(ext) for ext in ['.mp4', '.webm', '.ogg', '.mov']):
-                rec.is_video = True
-            else:
-                rec.is_video = False
 
 
 class ShopVoucher(models.Model):

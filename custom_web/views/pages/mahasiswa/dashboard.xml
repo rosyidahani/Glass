@@ -60,12 +60,7 @@
                     <!-- LEFT: 2D Character Area -->
                     <div class="avatar-section glass-panel">
                         <div class="avatar-glow"/>
-                        <t t-if="mahasiswa.equipped_avatar_id.is_video">
-                            <video t-att-src="mahasiswa.equipped_avatar_id.image_src" class="user-image" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"></video>
-                        </t>
-                        <t t-else="">
-                            <img t-att-src="mahasiswa.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" class="user-image" alt="Character Glass"/>
-                        </t>
+                        <img t-att-src="mahasiswa.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" class="user-image" alt="Character Glass"/>
                     </div>
 
                 </div>
