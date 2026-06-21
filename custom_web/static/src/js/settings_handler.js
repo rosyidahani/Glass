@@ -88,6 +88,7 @@ function createModal(titleId, defaultTitle, contentHTML) {
 
     // Close button
     const closeBtn = document.createElement("span");
+    closeBtn.id = "modal-close-btn";
     closeBtn.innerHTML = '<i class="bi bi-x-lg" style="pointer-events: none;"></i>';
     closeBtn.style.cssText = `
         position: absolute;
@@ -381,3 +382,34 @@ window.toggleFaq = function(index) {
         icon.style.transform = "rotate(0deg)";
     }
 };
+
+// Global fallback click listener to ensure modal closes under any circumstances
+document.addEventListener("click", function(e) {
+    const target = e.target;
+    
+    // Check close button click (either the span wrapper or the icon itself)
+    if (target.closest("#modal-close-btn") || target.closest(".bi-x-lg")) {
+        console.log("Global close click intercepted.");
+        const overlay = document.getElementById("settings-modal-overlay");
+        if (overlay) {
+            const modal = overlay.querySelector("div");
+            if (window.closeModal) {
+                window.closeModal(overlay, modal);
+            } else {
+                overlay.remove();
+            }
+        }
+        return;
+    }
+    
+    // Check backdrop click
+    if (target.id === "settings-modal-overlay") {
+        console.log("Global backdrop click intercepted.");
+        const modal = target.querySelector("div");
+        if (window.closeModal) {
+            window.closeModal(target, modal);
+        } else {
+            target.remove();
+        }
+    }
+});
