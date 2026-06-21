@@ -13,17 +13,17 @@
     align-items: center;
     padding: 18px 24px;
     border-radius: 28px;
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--card-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     transition: all 0.3s ease;
 }
 
 .dosen-header-hud:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(31, 38, 135, 0.08);
+    box-shadow: var(--card-shadow);
 }
 
 .dosen-profile-info {
@@ -45,7 +45,7 @@
     font-size: 22px;
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(79, 70, 229, 0.15);
     overflow: hidden;
-    border: 3px solid #ffffff;
+    border: 3px solid var(--card-border);
     flex-shrink: 0;
 }
 
@@ -64,14 +64,14 @@
 .dosen-name {
     font-size: 18px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-color);
     letter-spacing: -0.4px;
     margin: 0;
 }
 
 .dosen-nip {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 600;
     margin: 0;
 }
@@ -81,13 +81,13 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
+    color: var(--text-color);
     font-size: 18px;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,9 +95,9 @@
 
 .dosen-settings-btn:hover {
     color: #4f46e5;
-    background: #ffffff;
+    background: var(--accent-light);
     transform: scale(1.1) rotate(45deg);
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+    box-shadow: var(--card-shadow);
 }
 
 /* --- MAIN ACTIONS GRID --- */
@@ -116,18 +116,18 @@
     align-items: center;
     text-align: center;
     gap: 20px;
-    background: rgba(255, 255, 255, 0.65);
+    background: var(--card-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .dosen-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(31, 38, 135, 0.08);
-    background: rgba(255, 255, 255, 0.85);
+    box-shadow: var(--card-shadow);
+    background: var(--accent-light);
 }
 
 .dosen-card-icon {
@@ -172,13 +172,13 @@
 .dosen-card-body h3 {
     font-size: 20px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-color);
     margin-bottom: 8px;
 }
 
 .dosen-card-body p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 500;
     line-height: 1.5;
     margin: 0;

@@ -9,11 +9,11 @@
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
-                            <t t-esc="dosen.name[0].upper()"/>
+                            <t t-esc="dosen.name[0].upper() if dosen and dosen.name else 'D'"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name"><t t-esc="dosen.name"/></h2>
-                            <p class="dosen-role"><i class="bi bi-person-workspace"></i> Portal Presensi Dosen</p>
+                            <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Presensi Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
                     <a href="/dashboard" class="btn-back-dashboard">
