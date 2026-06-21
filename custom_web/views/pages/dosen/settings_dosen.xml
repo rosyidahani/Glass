@@ -38,28 +38,28 @@
 
                 <!-- Settings List -->
                 <div class="settings-list">
-                    <a href="#" class="settings-item">
+                    <a href="/dashboard/dosen/settings/1" class="settings-item">
                         <div class="item-left">
                             <div class="item-icon"><i class="bi bi-shield-lock-fill"></i></div>
                             <span data-translate-id="set_security">Sandi &amp; Keamanan</span>
                         </div>
                         <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
                     </a>
-                    <a href="#" class="settings-item">
+                    <a href="/dashboard/dosen/settings/2" class="settings-item">
                         <div class="item-left">
                             <div class="item-icon"><i class="bi bi-palette-fill"></i></div>
                             <span data-translate-id="set_theme">Tema</span>
                         </div>
                         <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
                     </a>
-                    <a href="#" class="settings-item">
+                    <a href="/dashboard/dosen/settings/3" class="settings-item">
                         <div class="item-left">
                             <div class="item-icon"><i class="bi bi-translate"></i></div>
                             <span data-translate-id="set_lang">Bahasa</span>
                         </div>
                         <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
                     </a>
-                    <a href="#" class="settings-item">
+                    <a href="/dashboard/dosen/settings/4" class="settings-item">
                         <div class="item-left">
                             <div class="item-icon"><i class="bi bi-question-circle-fill"></i></div>
                             <span data-translate-id="set_faq">Bantuan (faq)</span>

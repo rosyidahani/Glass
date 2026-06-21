@@ -142,7 +142,7 @@ function createModal(titleId, defaultTitle, contentHTML) {
     closeBtn.onclick = function(e) {
         console.log("X button clicked!");
         e.stopPropagation();
-        window.closeModal(overlay, modal);
+        window.closeSettingsPortalModal(overlay, modal);
     };
 
     modal.appendChild(header);
@@ -165,14 +165,14 @@ function createModal(titleId, defaultTitle, contentHTML) {
     // Close on overlay click
     overlay.onclick = function(e) {
         if (e.target === overlay) {
-            window.closeModal(overlay, modal);
+            window.closeSettingsPortalModal(overlay, modal);
         }
     };
 
     return { overlay, modal };
 }
 
-window.closeModal = function(overlay, modal) {
+window.closeSettingsPortalModal = function(overlay, modal) {
     // Determine the parent path (remove the /1, /2, etc.)
     const path = window.location.pathname;
     const parentPath = path.replace(/\/\d+$/, '');
@@ -247,7 +247,7 @@ function openPasswordModal() {
                 alertBox.style.background = "rgba(16, 185, 129, 0.1)";
                 alertBox.style.color = "#10b981";
                 alertBox.innerText = isEng ? "Password successfully changed!" : "Password berhasil diubah!";
-                setTimeout(() => window.closeModal(overlay, modal), 1500);
+                setTimeout(() => window.closeSettingsPortalModal(overlay, modal), 1500);
             } else {
                 alertBox.style.background = "rgba(239, 68, 68, 0.1)";
                 alertBox.style.color = "#ef4444";
@@ -420,10 +420,13 @@ document.addEventListener("click", function(e) {
         const overlay = document.getElementById("settings-modal-overlay");
         if (overlay) {
             const modal = overlay.querySelector("div");
-            if (window.closeModal) {
-                window.closeModal(overlay, modal);
+            if (window.closeSettingsPortalModal) {
+                window.closeSettingsPortalModal(overlay, modal);
             } else {
                 overlay.remove();
+                const path = window.location.pathname;
+                const parentPath = path.replace(/\/\d+$/, '');
+                history.pushState(null, '', parentPath);
             }
         }
         return;
@@ -433,10 +436,13 @@ document.addEventListener("click", function(e) {
     if (target.id === "settings-modal-overlay") {
         console.log("Global backdrop click intercepted.");
         const modal = target.querySelector("div");
-        if (window.closeModal) {
-            window.closeModal(target, modal);
+        if (window.closeSettingsPortalModal) {
+            window.closeSettingsPortalModal(target, modal);
         } else {
             target.remove();
+            const path = window.location.pathname;
+            const parentPath = path.replace(/\/\d+$/, '');
+            history.pushState(null, '', parentPath);
         }
     }
 });

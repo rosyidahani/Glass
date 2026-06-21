@@ -49,8 +49,11 @@ class MahasiswaPortalController(http.Controller):
             'rank': rank,
         })
 
-    @http.route('/dashboard/mahasiswa/settings', auth='public', website=True, type='http')
-    def settings_mahasiswa(self, **kwargs):
+    @http.route([
+        '/dashboard/mahasiswa/settings',
+        '/dashboard/mahasiswa/settings/<int:submenu_id>'
+    ], auth='public', website=True, type='http')
+    def settings_mahasiswa(self, submenu_id=None, **kwargs):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
