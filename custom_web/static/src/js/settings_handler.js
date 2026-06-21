@@ -77,6 +77,7 @@ function createModal(titleId, defaultTitle, contentHTML) {
         font-size: 20px;
         font-weight: 800;
         color: var(--text-color);
+        padding-right: 40px;
     `;
     header.setAttribute("data-translate-id", titleId);
     header.innerText = defaultTitle;
@@ -118,9 +119,9 @@ function createModal(titleId, defaultTitle, contentHTML) {
         closeModal(overlay, modal);
     });
 
-    modal.appendChild(closeBtn);
     modal.appendChild(header);
     modal.appendChild(body);
+    modal.appendChild(closeBtn);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
