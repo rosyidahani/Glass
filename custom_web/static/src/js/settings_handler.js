@@ -90,13 +90,30 @@ function createModal(titleId, defaultTitle, contentHTML) {
     closeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
     closeBtn.style.cssText = `
         position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 18px;
+        top: 15px;
+        right: 15px;
+        font-size: 20px;
         cursor: pointer;
         color: var(--text-muted);
-        transition: color 0.2s;
+        transition: color 0.2s, transform 0.2s;
+        z-index: 1000;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
     `;
+    closeBtn.addEventListener("mouseenter", () => {
+        closeBtn.style.color = "var(--text-color)";
+        closeBtn.style.transform = "scale(1.1)";
+        closeBtn.style.background = "var(--accent-light)";
+    });
+    closeBtn.addEventListener("mouseleave", () => {
+        closeBtn.style.color = "var(--text-muted)";
+        closeBtn.style.transform = "scale(1)";
+        closeBtn.style.background = "transparent";
+    });
     closeBtn.addEventListener("click", () => {
         closeModal(overlay, modal);
     });
