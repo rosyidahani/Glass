@@ -17,6 +17,7 @@
         'views/pages/dosen/presensi_dosen.xml',
         'views/pages/dosen/tugas_dosen.xml',
         'views/pages/dosen/leaderboard_dosen.xml',
+        'views/pages/dosen/settings_dosen.xml',
         'views/pages/menu.xml',
         'views/pages/submenu.xml',
     ],
