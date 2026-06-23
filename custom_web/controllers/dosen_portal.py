@@ -2,6 +2,7 @@ import json
 import pytz
 from datetime import datetime
 from odoo import http
+import base64
 from odoo.http import request
 from .utils import get_active_mahasiswa, get_active_dosen
 
@@ -287,8 +288,8 @@ class DosenPortalController(http.Controller):
                 'name': sub.mahasiswa_id.name,
                 'nim': sub.mahasiswa_id.nim,
                 'date': sub_wib,
-                'file': sub.link_jawaban or 'Berkas ZIP',
-                'type': sub.tipe_file or 'zip',
+                'file': f'/api/tugas/pengumpulan/download/{sub.id}' if sub.file_jawaban else sub.link_jawaban,
+                'type': 'zip' if sub.file_jawaban else 'link',
                 'note': sub.catatan or '-',
                 'grade': sub.nilai,
                 'status': sub.status_penilaian
@@ -322,6 +323,28 @@ class DosenPortalController(http.Controller):
             return request.make_response(json.dumps({'status': 'success'}), headers=[('Content-Type', 'application/json')])
         except Exception as e:
             return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
+
+    @http.route('/api/tugas/pengumpulan/download/<int:pengumpulan_id>', type='http', auth='public', methods=['GET'])
+    def api_tugas_download_jawaban(self, pengumpulan_id, **kw):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.make_response("Unauthorized", status=401)
+
+        submission = request.env['tugas.pengumpulan'].sudo().browse(pengumpulan_id)
+        if not submission.exists() or not submission.file_jawaban:
+            return request.not_found("File tidak ditemukan atau pengumpulan tidak valid.")
+
+        file_data = base64.b64decode(submission.file_jawaban)
+        
+        # Sanitize filename
+        tugas_judul = ''.join(c for c in submission.tugas_id.judul if c.isalnum() or c in (' ', '_')).rstrip()
+        mhs_nim = submission.mahasiswa_id.nim or "000"
+        filename = f"jawaban_{mhs_nim}_{tugas_judul}.zip"
+
+        return request.make_response(file_data, headers=[
+            ('Content-Type', 'application/zip'),
+            ('Content-Disposition', f'attachment; filename="{filename}"')
+        ])
 
     @http.route('/dosen/tugas/materi/<int:tugas_id>', auth='public', website=True, type='http')
     def download_tugas_materi(self, tugas_id, **kwargs):
