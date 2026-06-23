@@ -108,6 +108,18 @@ function initStudentTugas() {
         });
     }
 
+    // Detail overlay close handler
+    var detailOverlay = document.getElementById("detail-overlay");
+    if (detailOverlay) {
+        detailOverlay.addEventListener("click", function(e) {
+            // Close if the overlay backdrop or the close button is clicked
+            if (e.target === detailOverlay || e.target.closest(".detail-close-btn")) {
+                e.preventDefault();
+                closeTaskDetails();
+            }
+        });
+    }
+
     // Drag & Drop mock handlers
     var dropZone = document.getElementById("drop-zone");
     if (dropZone) {
@@ -344,8 +356,15 @@ function openSubmissionDrawer(taskId, taskTitle, taskSubject) {
 
 function closeSubmissionDrawer() {
     var overlay = document.getElementById("submission-overlay");
-    overlay.classList.remove("open");
+    if (overlay) overlay.classList.remove("open");
 }
+
+// Close task detail overlay (modal) if present
+function closeTaskDetails() {
+    var overlay = document.getElementById("detail-overlay");
+    if (overlay) overlay.classList.remove("open");
+}
+
 
 // 5. Task Detail Modal Controls
 function showTaskDetailsNew(btn) {
@@ -396,6 +415,12 @@ function handleFileSelect(input) {
 
 // 7. Submit Real Submission to Odoo Backend (Multipart/FormData to HTTP route)
 async function submitRealSubmission() {
+    const btnSubmit = document.querySelector(".btn-submit-drawer");
+    if (!btnSubmit) {
+        showToast("Error", "Tombol submit tidak ditemukan (btn-submit-drawer).", "bi-exclamation-triangle-fill text-danger");
+        return;
+    }
+
     var fileInput = document.getElementById("file-upload");
     var linkInput = document.getElementById("link-submission").value.trim();
     var taskId = document.getElementById("submit-task-id").value;

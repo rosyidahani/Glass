@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="settings_dosen_detail" name="Dosen Settings - Detail">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/settings.css"/>
+
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-picture-wrapper">
+                        <div class="profile-picture" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <h2><t t-esc="dosen.name"/></h2>
+                        <p>NIP: <t t-esc="dosen.nip"/></p>
+                    </div>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-box" style="flex: 1;">
+                        <h4 style="font-size: 16px;"><t t-esc="dosen.prodi or '-'"/></h4>
+                        <span>Program Studi</span>
+                    </div>
+                    <div class="stat-box" style="flex: 1;">
+                        <h4 style="font-size: 16px;"><t t-esc="dosen.spesialisasi or '-'"/></h4>
+                        <span>Spesialisasi</span>
+                    </div>
+                </div>
+
+                <!-- Detail masing-masing menu akan ada di template terpisah -->
+            </div>
+        </t>
+    </template>
+</odoo>
+

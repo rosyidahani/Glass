@@ -336,25 +336,32 @@ class MahasiswaPortalController(http.Controller):
             'stats_history_count': len(tugas_riwayat),
         })
 
-    @http.route('/api/tugas/kumpul', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
+    @http.route('/api/tugas/kumpul', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_tugas_kumpul(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
+        import json
         if not mahasiswa:
             return {'status': 'error', 'message': 'Session expired or not logged in'}
 
         from odoo import fields
         tugas_id = kwargs.get('tugas_id')
-        tipe_file = kwargs.get('tipe_file')
+        tipe_file = kwargs.get('tipe_file', 'link')
         file_jawaban = kwargs.get('file_jawaban')
         link_jawaban = kwargs.get('link_jawaban')
         catatan = kwargs.get('catatan')
 
         if not tugas_id:
-            return {'status': 'error', 'message': 'ID Tugas wajib diisi.'}
+            return request.make_response(json.dumps({'status': 'error', 'message': 'ID Tugas wajib diisi.'}), headers=[('Content-Type', 'application/json')], status=400)
 
         tugas = request.env['tugas.tugas'].sudo().browse(int(tugas_id))
         if not tugas.exists():
-            return {'status': 'error', 'message': 'Tugas tidak ditemukan.'}
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Tugas tidak ditemukan.'}), headers=[('Content-Type', 'application/json')], status=404)
+
+        # Handle file upload when route type is 'http'
+        if tipe_file == 'zip' and 'file_jawaban' in request.httprequest.files:
+            import base64
+            uploaded_file = request.httprequest.files.get('file_jawaban')
+            file_jawaban = base64.b64encode(uploaded_file.read())
 
         existing = request.env['tugas.pengumpulan'].sudo().search([
             ('tugas_id', '=', tugas.id),
@@ -365,7 +372,7 @@ class MahasiswaPortalController(http.Controller):
             'tugas_id': tugas.id,
             'mahasiswa_id': mahasiswa.id,
             'tipe_file': tipe_file,
-            'file_jawaban': file_jawaban or False,
+            'file_jawaban': file_jawaban if tipe_file == 'zip' else False,
             'link_jawaban': link_jawaban or '',
             'catatan': catatan or '',
             'waktu_kumpul': fields.Datetime.now()
@@ -376,9 +383,7 @@ class MahasiswaPortalController(http.Controller):
         else:
             request.env['tugas.pengumpulan'].sudo().create(vals)
 
-        return {
-            'status': 'success'
-        }
+        return request.make_response(json.dumps({'status': 'success', 'message': 'Tugas berhasil dikumpulkan!'}), headers=[('Content-Type', 'application/json')])
 
     @http.route('/menu/submenu', auth='public', website=True, type='http')
     def submenu(self, **kwargs):
@@ -476,6 +481,7 @@ class MahasiswaPortalController(http.Controller):
 
     @http.route('/api/settings/change_password', auth='public', type='http', website=True, methods=['POST'], csrf=False)
     def api_change_password(self, **kwargs):
+        import json
         try:
             body = json.loads(request.httprequest.data)
         except Exception:
@@ -488,6 +494,7 @@ class MahasiswaPortalController(http.Controller):
             return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama dan baru harus diisi'}), headers=[('Content-Type', 'application/json')])
 
         mahasiswa = get_active_mahasiswa()
+        from .utils import get_active_dosen
         dosen = get_active_dosen()
         
         if mahasiswa:
@@ -498,7 +505,10 @@ class MahasiswaPortalController(http.Controller):
             return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah'}), headers=[('Content-Type', 'application/json')])
             
         elif dosen:
-            if dosen.password != old_password:
+            # Asumsikan model feature.dosen punya method _hash_password atau sejenisnya
+            # Jika tidak, ini adalah celah keamanan (plain text password comparison)
+            # Perbaikan: Gunakan metode autentikasi yang aman
+            if not request.env['feature.dosen'].sudo().authenticate_nip(dosen.nip, old_password):
                 return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama salah'}), headers=[('Content-Type', 'application/json')])
             dosen.sudo().write({'password': new_password})
             return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah'}), headers=[('Content-Type', 'application/json')])

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="settings_dosen_security" name="Dosen Settings - Sandi & Keamanan">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/settings.css"/>
+
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-picture-wrapper">
+                        <div class="profile-picture" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <h2>Sandi &amp; Keamanan</h2>
+                        <p>NIP: <t t-esc="dosen.nip"/></p>
+                    </div>
+                </div>
+
+                <div class="settings-list" style="margin-top: 12px;">
+                    <form id="form_ganti_sandi" class="settings-item" style="margin:0;padding:0;" enctype="multipart/form-data">
+                        <div class="settings-item" style="border:none;cursor:default;">
+                            <div class="item-left">
+                                <div class="item-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                                <span>Ganti sandi</span>
+                            </div>
+
+                            <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;align-items:flex-start;">
+                                <input id="old_password" name="old_password" type="password" placeholder="Password lama"/>
+                                <input id="new_password" name="new_password" type="password" placeholder="Password baru"/>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <a href="/dashboard/dosen/settings" class="settings-item">
+                        <div class="item-left">
+                            <div class="item-icon"><i class="bi bi-arrow-left"></i></div>
+                            <span>Kembali</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
+
