@@ -445,7 +445,6 @@ async function submitRealSubmission() {
         return;
     }
 
-    var btnSubmit = document.querySelector(".btn-submit-drawer");
     var originalBtnHTML = btnSubmit.innerHTML;
     btnSubmit.disabled = true;
     btnSubmit.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Mengirim...';

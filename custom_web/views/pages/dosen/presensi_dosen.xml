@@ -229,6 +229,7 @@
     <template id="presensi_dosen_histori" name="Riwayat Presensi Dosen">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
+            <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
 
             <div class="dosen-presensi-container">
                 <!-- Top Header HUD -->
@@ -275,7 +276,7 @@
                                 </t>
                                 <t t-else="">
                                     <t t-foreach="closed_sessions" t-as="sesi">
-                                        <tr>
+                                        <tr t-att-data-id="sesi.id">
                                             <td class="bold"><t t-esc="sesi.name"/></td>
                                             <td><t t-esc="sesi.mata_kuliah_id.nama"/></td>
                                             <td>
@@ -290,6 +291,115 @@
                                             <td class="time-format"><span t-field="sesi.waktu_tutup" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></td>
                                             <td class="center bold text-primary"><t t-esc="sesi.total_hadir"/> Mhs</td>
                                             <td><span class="status-badge closed">Selesai</span></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- 4. TEMPLATE DETAIL SESI PRESENSI -->
+    <template id="presensi_dosen_histori_detail" name="Detail Sesi Presensi Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
+            <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
+
+            <div class="dosen-presensi-container">
+                <!-- Top Header HUD -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name">Detail Sesi: <t t-esc="sesi.name"/></h2>
+                            <p class="dosen-role"><i class="bi bi-info-circle"></i> <t t-esc="sesi.mata_kuliah_id.nama"/> (<t t-esc="'Online' if sesi.tipe_kelas == 'online' else 'Offline'"/>)</p>
+                        </div>
+                    </div>
+                    <a href="/dosen/presensi/histori" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Riwayat</span>
+                    </a>
+                </div>
+
+                <!-- Session Metadata Summary Cards -->
+                <div class="detail-summary-grid">
+                    <div class="summary-card glass-panel">
+                        <div class="card-icon blue"><i class="bi bi-calendar-event"></i></div>
+                        <div class="card-info">
+                            <span class="value time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></span>
+                            <span class="label">Waktu Buka</span>
+                        </div>
+                    </div>
+                    <div class="summary-card glass-panel">
+                        <div class="card-icon red"><i class="bi bi-calendar-check-fill"></i></div>
+                        <div class="card-info">
+                            <span class="value time-format"><span t-field="sesi.waktu_tutup" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></span>
+                            <span class="label">Waktu Tutup</span>
+                        </div>
+                    </div>
+                    <div class="summary-card glass-panel">
+                        <div class="card-icon green"><i class="bi bi-people-fill"></i></div>
+                        <div class="card-info">
+                            <span class="value"><t t-esc="sesi.total_hadir"/> Mhs</span>
+                            <span class="label">Total Kehadiran</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student List Table Section -->
+                <div class="riwayat-section glass-panel">
+                    <div class="card-header">
+                        <span class="header-icon"><i class="bi bi-person-check-fill"></i></span>
+                        <h3>Daftar Hadir Mahasiswa</h3>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>NIM</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>Waktu Presensi</th>
+                                    <th>Status Kehadiran</th>
+                                    <th>Metode</th>
+                                    <th>Koin Didapat</th>
+                                    <th>XP Didapat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-table-body">
+                                <t t-if="not records">
+                                    <tr class="row-empty">
+                                        <td colspan="7">Tidak ada mahasiswa yang hadir pada sesi ini.</td>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                    <t t-foreach="records" t-as="r">
+                                        <tr>
+                                            <td class="bold"><t t-esc="r.mahasiswa_id.nim"/></td>
+                                            <td><t t-esc="r.mahasiswa_id.name"/></td>
+                                            <td class="time-format"><span t-field="r.waktu_presensi" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></td>
+                                            <td>
+                                                <t t-if="r.status_kehadiran == 'tepat_waktu'">
+                                                    <span class="badge online">Tepat Waktu</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge offline">Terlambat</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="r.is_manual">
+                                                    <span class="badge-text manual"><i class="bi bi-pencil-square"></i> Manual</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge-text auto"><i class="bi bi-phone"></i> Mandiri (App/Web)</span>
+                                                </t>
+                                            </td>
+                                            <td class="bold text-accent">+<t t-esc="r.koin_didapat"/> Koin</td>
+                                            <td class="bold text-primary">+<t t-esc="r.xp_didapat"/> XP</td>
                                         </tr>
                                     </t>
                                 </t>

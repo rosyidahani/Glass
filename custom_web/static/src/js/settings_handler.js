@@ -29,6 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
 function openModalByUrlPath() {
     const path = window.location.pathname;
     
+    // Only execute on settings pages to prevent route conflicts with other pages ending in numbers
+    if (!path.includes("/settings")) {
+        return;
+    }
+    
     // First close any existing modal
     const existing = document.getElementById("settings-modal-overlay");
     if (existing) {

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initAutocompleteSelect();
     initFormSubmit();
     initTutupSesi();
+    initRiwayatTable();
 });
 
 // 1. Inisialisasi default form (Batas Waktu = Jam Sekarang + 1 Jam)
@@ -304,6 +305,89 @@ function initAutocompleteSelect() {
         if (!triggerBtn.contains(e.target) && !dropdownPane.contains(e.target)) {
             dropdownPane.classList.add('hidden');
             triggerBtn.classList.remove('active');
+        }
+    });
+}
+
+// 7. Logika Sorting Tabel & Interaktivitas Baris Riwayat
+function initRiwayatTable() {
+    var table = document.querySelector('.modern-table');
+    if (!table) return;
+
+    var headers = table.querySelectorAll('thead th');
+    var tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    // Tambahkan class & pointer cursor ke header agar terkesan bisa diklik
+    headers.forEach(function(header, colIndex) {
+        header.style.cursor = 'pointer';
+        header.classList.add('sortable-header');
+        
+        // Simpan konten teks asli untuk menghindari penggandaan icon
+        var originalText = header.childNodes[0].textContent.trim();
+        header.innerHTML = originalText + ' <i class="bi bi-arrow-down-up sort-indicator" style="font-size: 0.8rem; opacity: 0.5; margin-left: 5px;"></i>';
+
+        var asc = true;
+        header.addEventListener('click', function() {
+            // Reset icon headers lain
+            headers.forEach(function(h) {
+                if (h !== header) {
+                    var indicator = h.querySelector('.sort-indicator');
+                    if (indicator) {
+                        indicator.className = 'bi bi-arrow-down-up sort-indicator';
+                        indicator.style.opacity = '0.5';
+                    }
+                }
+            });
+
+            // Update icon header ini
+            var indicator = header.querySelector('.sort-indicator');
+            if (indicator) {
+                indicator.className = asc ? 'bi bi-arrow-up sort-indicator' : 'bi bi-arrow-down sort-indicator';
+                indicator.style.opacity = '1';
+            }
+
+            var rows = Array.from(tbody.querySelectorAll('tr'));
+            if (rows.length === 1 && rows[0].classList.contains('row-empty')) return;
+
+            rows.sort(function(rowA, rowB) {
+                var cellA = rowA.cells[colIndex].textContent.trim();
+                var cellB = rowB.cells[colIndex].textContent.trim();
+
+                // Cek jika numeric (misal total hadir "12 Mhs" atau "+5 Koin")
+                var numA = parseFloat(cellA.replace(/[^0-9.-]/g, ''));
+                var numB = parseFloat(cellB.replace(/[^0-9.-]/g, ''));
+
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return asc ? numA - numB : numB - numA;
+                }
+
+                return asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+            });
+
+            // Re-append sorted rows
+            rows.forEach(function(row) {
+                tbody.appendChild(row);
+            });
+
+            asc = !asc; // toggle sort direction
+        });
+    });
+
+    // Klik pada baris tabel pergi ke detail
+    var rows = tbody.querySelectorAll('tr');
+    rows.forEach(function(row) {
+        if (row.classList.contains('row-empty')) return;
+        
+        // Hanya baris di tabel riwayat utama yang punya data-id yang bisa diklik pergi ke detail
+        var sesiId = row.getAttribute('data-id');
+        if (sesiId) {
+            row.style.cursor = 'pointer';
+            row.classList.add('clickable-row');
+
+            row.addEventListener('click', function(e) {
+                window.location.href = '/dosen/presensi/histori/detail/' + sesiId;
+            });
         }
     });
 }

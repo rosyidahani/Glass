@@ -30,6 +30,10 @@ class PresensiController(http.Controller):
     def _get_mahasiswa(self):
         auth_header = request.httprequest.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
+            # Fallback to session for Web Portal
+            mahasiswa_id = request.session.get('mahasiswa_id')
+            if mahasiswa_id:
+                return request.env['mahasiswa.mahasiswa'].sudo().browse(mahasiswa_id)
             return None
         token = auth_header.split(' ')[1]
         try:
@@ -195,23 +199,26 @@ class PresensiController(http.Controller):
         if not face_verified:
             return self._error('Verifikasi wajah gagal. Presensi ditolak.', 403)
 
-        # Pastikan client kirim descriptor face vektor untuk dibandingkan di server.
-        if not client_face_descriptor:
-            return self._error('face_descriptor wajib dikirim untuk verifikasi server-side.', 403)
+        # Cek apakah ini sesi Web Portal (tidak menggunakan token Bearer Authorization)
+        auth_header = request.httprequest.headers.get('Authorization')
+        is_web_session = not (auth_header and auth_header.startswith('Bearer '))
 
+        if not is_web_session:
+            # Pastikan client kirim descriptor face vektor untuk dibandingkan di server (wajib untuk mobile)
+            if not client_face_descriptor:
+                return self._error('face_descriptor wajib dikirim untuk verifikasi server-side.', 403)
 
-
-        # FaceID similarity check
-        from presensi.models.faceid_service import verify_face_server_side
-        res = verify_face_server_side(
-            request.env,
-            stored_encrypted_descriptor_b64=mhs.face_descriptor,
-            client_descriptor=client_face_descriptor,
-            method=face_method,
-            threshold=face_threshold,
-        )
-        if not res.get('ok'):
-            return self._error('FaceID server-side verification gagal. Presensi ditolak.', 403)
+            # FaceID similarity check
+            from presensi.models.faceid_service import verify_face_server_side
+            res = verify_face_server_side(
+                request.env,
+                stored_encrypted_descriptor_b64=mhs.face_descriptor,
+                client_descriptor=client_face_descriptor,
+                method=face_method,
+                threshold=face_threshold,
+            )
+            if not res.get('ok'):
+                return self._error('FaceID server-side verification gagal. Presensi ditolak.', 403)
 
 
         # Ambil sesi

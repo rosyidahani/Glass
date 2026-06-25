@@ -70,7 +70,7 @@
                                     <div class="row-student-nim"><t t-esc="student.nim"/></div>
                                 </div>
                                 <div class="row-xp-score">
-                                    <i class="bi bi-star"></i> <t t-esc="student.total_xp"/> XP
+                                    <t t-esc="student.total_xp"/> XP
                                 </div>
                             </div>
                             <t t-set="rank_idx" t-value="rank_idx + 1"/>
