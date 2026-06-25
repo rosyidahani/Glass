@@ -85,6 +85,25 @@ class DosenPortalController(http.Controller):
             'closed_sessions': closed_sessions,
         })
 
+    @http.route('/dosen/presensi/histori/detail/<int:sesi_id>', auth='public', website=True, type='http')
+    def presensi_dosen_histori_detail(self, sesi_id, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        sesi = request.env['presensi.sesi'].sudo().browse(sesi_id)
+        if not sesi.exists() or sesi.feature_dosen_id.id != dosen.id:
+            return request.redirect('/dosen/presensi/histori')
+
+        # Get all records for this session, sorted by check-in time
+        records = sesi.record_ids.sorted(key=lambda r: r.waktu_presensi)
+
+        return request.render('custom_web.presensi_dosen_histori_detail', {
+            'dosen': dosen,
+            'sesi': sesi,
+            'records': records,
+        })
+
     @http.route('/dosen/tugas', auth='public', website=True, type='http')
     def tugas_dosen_menu(self, **kwargs):
         dosen = get_active_dosen()

@@ -244,6 +244,14 @@ function syncDashboardAvatar() {
     const dashboardAvatarImg = document.querySelector('.user-image');
     if (dashboardAvatarImg) {
         const equipped = localStorage.getItem('equipped_avatar') || 'char_default';
+        
+        // Jika avatar berasal dari database (berawalan 'avatar_'), biarkan server-side rendering
+        // dari Odoo (dashboard.xml) yang menentukan URL gambarnya (/avatar/image/<id>).
+        // Jangan timpa dengan path lokal /custom_web/static/src/img/ yang tidak ada di disk.
+        if (equipped.startsWith('avatar_')) {
+            return;
+        }
+        
         const imgItem = getAvatarData()[equipped];
         if (imgItem && imgItem.img) {
             dashboardAvatarImg.src = imgItem.img;
