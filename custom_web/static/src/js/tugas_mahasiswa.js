@@ -461,35 +461,27 @@ async function submitRealSubmission() {
     }
 
     try {
-        var res = await fetch("/api/tugas/kumpul", {
+        const res = await fetch("/tugas/submit", {
             method: "POST",
             body: formData
         });
-        
-        var rawText = await res.text();
-        var resultData = {};
-        try {
-            var parsed = JSON.parse(rawText);
-            resultData = parsed.result || parsed.data || parsed;
-        } catch (jsonErr) {
-            resultData = { status: "error", message: "Gagal memproses response server." };
+
+        const resultData = await res.json();
+
+        if (!res.ok || resultData.status !== 'success') {
+            throw new Error(resultData.message || 'Gagal mengumpulkan tugas. Silakan coba lagi.');
         }
-        
-        if (resultData.status === "success" || resultData.message === "Tugas berhasil dikumpulkan!") {
-            closeSubmissionDrawer();
-            
-            // Open gamified celebration modal
-            setTimeout(function() {
-                var celebration = document.getElementById("celebration-panel");
-                celebration.classList.remove("hidden");
-            }, 400);
-        } else {
-            showToast("Error", resultData.message || "Gagal mengumpulkan tugas.", "bi-exclamation-triangle-fill text-danger");
-            btnSubmit.disabled = false;
-            btnSubmit.innerHTML = originalBtnHTML;
-        }
+
+        // Success
+        closeSubmissionDrawer();
+        setTimeout(() => {
+            const celebration = document.getElementById("celebration-panel");
+            if (celebration) celebration.classList.remove("hidden");
+        }, 400);
+
     } catch (e) {
-        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+        // Catches network errors, JSON parsing errors, and thrown errors from the 'if' block
+        showToast("Error", e.message || "Koneksi ke server gagal.", "bi-wifi-off text-danger");
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = originalBtnHTML;
     }
