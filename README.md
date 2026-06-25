@@ -101,10 +101,6 @@ pip install Pillow pycryptodome
 5. Cari modul **`custom_web`** dan klik **Activate** atau **Upgrade**.
 
 ---
-
-## 🔒 Catatan Keamanan & Kredensial Pengembang
-* Konfigurasi hak akses Windows filestore diatasi menggunakan opsi penyimpanan database (`ir_attachment.location = 'db'`) selama proses impor massal untuk mencegah error *Permission Denied*.
-* Kredensial default PostgreSQL lokal pengembang menggunakan user `openpg` dengan password `koentji`.
 * Seluruh perubahan dan perbaikan fitur terbaru dikembangkan di bawah Git Branch kustom bernama **`Perubahan`**.
 
 ---
