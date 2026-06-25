@@ -1,9 +1,11 @@
 import json
 import pytz
 from datetime import datetime
+import io
+import zipfile
 from odoo import http
 import base64
-from odoo.http import request
+from odoo.http import request, content_disposition
 from .utils import get_active_mahasiswa, get_active_dosen
 
 
@@ -152,16 +154,18 @@ class DosenPortalController(http.Controller):
         for t in tugas_list:
             count = len(t.pengumpulan_ids)
             color = 'purple'
-            if 'web' in t.mata_kuliah_id.nama.lower():
-                color = 'blue'
-            elif 'rekayasa' in t.mata_kuliah_id.nama.lower():
-                color = 'teal'
-            
+            mk_nama = t.mata_kuliah_id.nama if t.mata_kuliah_id else ''
+            if mk_nama:
+                if 'web' in mk_nama.lower():
+                    color = 'blue'
+                elif 'rekayasa' in mk_nama.lower():
+                    color = 'teal'
+
             tugas_data.append({
                 'id': t.id,
                 'judul': t.judul,
-                'mk_id': t.mata_kuliah_id.id,
-                'mk_nama': t.mata_kuliah_id.nama,
+                'mk_id': t.mata_kuliah_id.id if t.mata_kuliah_id else False,
+                'mk_nama': mk_nama,
                 'jenis_tugas': t.jenis_tugas,
                 'submission_count': count,
                 'color': color,
@@ -343,7 +347,7 @@ class DosenPortalController(http.Controller):
         except Exception as e:
             return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
 
-    @http.route('/api/tugas/pengumpulan/download/<int:pengumpulan_id>', type='http', auth='public', methods=['GET'])
+    @http.route('/api/tugas/pengumpulan/download/<int:pengumpulan_id>', type='http', auth='public', methods=['GET'], website=True)
     def api_tugas_download_jawaban(self, pengumpulan_id, **kw):
         dosen = get_active_dosen()
         if not dosen:
@@ -353,16 +357,19 @@ class DosenPortalController(http.Controller):
         if not submission.exists() or not submission.file_jawaban:
             return request.not_found("File tidak ditemukan atau pengumpulan tidak valid.")
 
-        file_data = base64.b64decode(submission.file_jawaban)
-        
-        # Sanitize filename
-        tugas_judul = ''.join(c for c in submission.tugas_id.judul if c.isalnum() or c in (' ', '_')).rstrip()
-        mhs_nim = submission.mahasiswa_id.nim or "000"
-        filename = f"jawaban_{mhs_nim}_{tugas_judul}.zip"
+        # Membuat file ZIP yang valid di memori
+        in_memory_zip = io.BytesIO()
+        with zipfile.ZipFile(in_memory_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+            file_name = submission.file_jawaban_name or f"jawaban_{submission.mahasiswa_id.nim}.bin"
+            file_content = base64.b64decode(submission.file_jawaban)
+            zf.writestr(file_name, file_content)
 
-        return request.make_response(file_data, headers=[
+        zip_content = in_memory_zip.getvalue()
+        zip_filename = f"Jawaban_{submission.mahasiswa_id.name.replace(' ', '_')}_{submission.tugas_id.judul.replace(' ', '_')}.zip"
+
+        return request.make_response(zip_content, headers=[
             ('Content-Type', 'application/zip'),
-            ('Content-Disposition', f'attachment; filename="{filename}"')
+            ('Content-Disposition', content_disposition(zip_filename))
         ])
 
     @http.route('/dosen/tugas/materi/<int:tugas_id>', auth='public', website=True, type='http')

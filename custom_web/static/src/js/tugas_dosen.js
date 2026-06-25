@@ -192,7 +192,7 @@ async function loadTugasDetailAndSubmissions(taskId) {
         task.submissions.forEach(function(sub) {
             var fileBtn = "";
             if (sub.type === "zip") {
-                fileBtn = `<a href="#" class="btn-zip-download" onclick="event.preventDefault(); showToast('Mengunduh', 'Mengunduh berkas ${sub.file}...', 'bi-cloud-download text-primary');"><i class="bi bi-file-earmark-zip-fill"></i> Unduh ZIP</a>`;
+                fileBtn = `<a href="${sub.file}" class="btn-zip-download" download onclick="showToast('Mengunduh', 'Unduhan untuk jawaban ${sub.name} akan dimulai...', 'bi-cloud-download text-primary');"><i class="bi bi-file-earmark-zip-fill"></i> Unduh ZIP</a>`;
             } else {
                 fileBtn = `<a href="${sub.file}" target="_blank" class="btn-link-view"><i class="bi bi-link-45deg"></i> Buka Tautan</a>`;
             }
@@ -223,7 +223,7 @@ async function loadTugasDetailAndSubmissions(taskId) {
                     <td>
                         <div class="grading-input-wrapper">
                             ${gradeInput}
-                            <button class="btn-save-grade" onclick="saveMockGrade('${sub.id}', '${sub.name}', this)">
+                            <button class="btn-save-grade" onclick="saveGrade('${sub.id}', '${sub.name}', this)">
                                 <i class="bi bi-check-lg"></i>
                             </button>
                         </div>
@@ -240,8 +240,8 @@ async function loadTugasDetailAndSubmissions(taskId) {
     }
 }
 
-// Interactive Grade Submission Simulator
-async function saveMockGrade(subId, studentName, btn) {
+// Interactive Grade Submission
+async function saveGrade(subId, studentName, btn) {
     var wrapper = btn.closest(".grading-input-wrapper");
     var input = wrapper.querySelector(".input-grade");
     var scoreValue = input.value.trim();

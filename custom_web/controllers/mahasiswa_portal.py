@@ -1,5 +1,6 @@
 import base64
-from odoo import http
+from odoo import http, fields
+import json
 from odoo.http import request
 from .utils import get_active_mahasiswa
 
@@ -247,12 +248,14 @@ class MahasiswaPortalController(http.Controller):
         tugas_list = tugas_obj.search([('mata_kuliah_id', 'in', course_ids)], order='deadline desc')
         
         # Map which ones have been submitted by this mahasiswa
-        submissions = request.env['tugas.pengumpulan'].sudo().search([
-            ('mahasiswa_id', '=', mahasiswa.id),
-            ('tugas_id', 'in', tugas_list.ids)
-        ])
-        # Group submissions by tugas_id
-        submission_by_tugas = {sub.tugas_id.id: sub for sub in submissions}
+        submission_data = request.env['tugas.pengumpulan'].sudo().search_read(
+            domain=[
+                ('mahasiswa_id', '=', mahasiswa.id),
+                ('tugas_id', 'in', tugas_list.ids)
+            ],
+            fields=['tugas_id', 'nilai', 'status_penilaian']
+        )
+        submission_by_tugas = {sub['tugas_id'][0]: sub for sub in submission_data}
         
         import pytz
         from datetime import datetime
@@ -270,12 +273,14 @@ class MahasiswaPortalController(http.Controller):
             date_open_wib = pytz.utc.localize(date_open_dt).astimezone(wib)
             date_open_str = date_open_wib.strftime('%d %B %Y, %H:%M WIB')
             date_open_iso = date_open_wib.strftime('%Y-%m-%dT%H:%M:%S')
-            
-            deadline_dt = t.deadline
-            deadline_wib = pytz.utc.localize(deadline_dt).astimezone(wib)
-            deadline_str = deadline_wib.strftime('%d %B %Y, %H:%M WIB')
-            deadline_iso = deadline_wib.strftime('%Y-%m-%dT%H:%M:%S')
-            
+
+            deadline_str = 'N/A'
+            deadline_iso = ''
+            if t.deadline:
+                deadline_wib = pytz.utc.localize(t.deadline).astimezone(wib)
+                deadline_str = deadline_wib.strftime('%d %B %Y, %H:%M WIB')
+                deadline_iso = deadline_wib.strftime('%Y-%m-%dT%H:%M:%S')
+
             is_soon = False
             if not sub and t.deadline:
                 delta = t.deadline - now_utc
@@ -296,8 +301,8 @@ class MahasiswaPortalController(http.Controller):
             task_data = {
                 'id': t.id,
                 'name': t.judul,
-                'subject': t.mata_kuliah_id.nama,
-                'course_id': t.mata_kuliah_id.id,
+                'subject': t.mata_kuliah_id.nama if t.mata_kuliah_id else 'Tanpa Mata Kuliah',
+                'course_id': t.mata_kuliah_id.id if t.mata_kuliah_id else None,
                 'jenis_tugas': t.jenis_tugas,
                 'deskripsi': t.deskripsi or '',
                 'date_open': date_open_str,
@@ -313,8 +318,8 @@ class MahasiswaPortalController(http.Controller):
             if sub:
                 task_data['status'] = 'completed'
                 task_data['status_label'] = 'Selesai'
-                task_data['nilai'] = sub.nilai
-                task_data['status_penilaian'] = sub.status_penilaian
+                task_data['nilai'] = sub['nilai']
+                task_data['status_penilaian'] = sub['status_penilaian']
                 tugas_riwayat.append(task_data)
             else:
                 if t.deadline and now_utc > t.deadline:
@@ -336,47 +341,56 @@ class MahasiswaPortalController(http.Controller):
             'stats_history_count': len(tugas_riwayat),
         })
 
-    @http.route('/api/tugas/kumpul', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
+    @http.route('/tugas/submit', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_tugas_kumpul(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
-        import json
         if not mahasiswa:
-            return {'status': 'error', 'message': 'Session expired or not logged in'}
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Session expired or not logged in'}), headers=[('Content-Type', 'application/json')], status=401)
 
-        from odoo import fields
         tugas_id = kwargs.get('tugas_id')
         tipe_file = kwargs.get('tipe_file', 'link')
-        file_jawaban = kwargs.get('file_jawaban')
-        link_jawaban = kwargs.get('link_jawaban')
-        catatan = kwargs.get('catatan')
+        link_jawaban = kwargs.get('link_jawaban', '')
+        catatan = kwargs.get('catatan', '')
 
         if not tugas_id:
             return request.make_response(json.dumps({'status': 'error', 'message': 'ID Tugas wajib diisi.'}), headers=[('Content-Type', 'application/json')], status=400)
 
-        tugas = request.env['tugas.tugas'].sudo().browse(int(tugas_id))
+        try:
+            tugas = request.env['tugas.tugas'].sudo().browse(int(tugas_id))
+        except (ValueError, TypeError):
+            return request.make_response(json.dumps({'status': 'error', 'message': 'ID Tugas tidak valid.'}), headers=[('Content-Type', 'application/json')], status=400)
+
         if not tugas.exists():
             return request.make_response(json.dumps({'status': 'error', 'message': 'Tugas tidak ditemukan.'}), headers=[('Content-Type', 'application/json')], status=404)
-
-        # Handle file upload when route type is 'http'
-        if tipe_file == 'zip' and 'file_jawaban' in request.httprequest.files:
-            import base64
-            uploaded_file = request.httprequest.files.get('file_jawaban')
-            file_jawaban = base64.b64encode(uploaded_file.read())
-
-        existing = request.env['tugas.pengumpulan'].sudo().search([
-            ('tugas_id', '=', tugas.id),
-            ('mahasiswa_id', '=', mahasiswa.id)
-        ], limit=1)
 
         vals = {
             'tugas_id': tugas.id,
             'mahasiswa_id': mahasiswa.id,
             'tipe_file': tipe_file,
-            'file_jawaban': file_jawaban if tipe_file == 'zip' else False,
-            'link_jawaban': link_jawaban or '',
-            'catatan': catatan or '',
+            'catatan': catatan,
             'waktu_kumpul': fields.Datetime.now()
         }
+
+        if tipe_file == 'link':
+            if not link_jawaban:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'Tautan/Link tugas wajib diisi.'}), headers=[('Content-Type', 'application/json')], status=400)
+            vals['link_jawaban'] = link_jawaban
+            vals['file_jawaban'] = False
+            vals['file_jawaban_name'] = False
+        elif tipe_file == 'zip':
+            uploaded_file = request.httprequest.files.get('file_jawaban')
+            if not uploaded_file:
+                return request.make_response(json.dumps({'status': 'error', 'message': 'File tugas wajib diunggah.'}), headers=[('Content-Type', 'application/json')], status=400)
+            vals['file_jawaban'] = base64.b64encode(uploaded_file.read())
+            vals['file_jawaban_name'] = uploaded_file.filename
+            vals['link_jawaban'] = False
+        else:
+            return request.make_response(json.dumps({'status': 'error', 'message': f'Tipe pengumpulan "{tipe_file}" tidak valid.'}), headers=[('Content-Type', 'application/json')], status=400)
+
+        existing = request.env['tugas.pengumpulan'].sudo().search([
+            ('tugas_id', '=', tugas.id),
+            ('mahasiswa_id', '=', mahasiswa.id)
+        ], limit=1)
 
         if existing:
             existing.write(vals)
@@ -502,16 +516,4 @@ class MahasiswaPortalController(http.Controller):
             if mahasiswa.password != hashed_old:
                 return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama salah'}), headers=[('Content-Type', 'application/json')])
             mahasiswa.sudo().write({'password': new_password})
-            return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah'}), headers=[('Content-Type', 'application/json')])
-            
-        elif dosen:
-            # Asumsikan model feature.dosen punya method _hash_password atau sejenisnya
-            # Jika tidak, ini adalah celah keamanan (plain text password comparison)
-            # Perbaikan: Gunakan metode autentikasi yang aman
-            if not request.env['feature.dosen'].sudo().authenticate_nip(dosen.nip, old_password):
-                return request.make_response(json.dumps({'status': 'error', 'message': 'Password lama salah'}), headers=[('Content-Type', 'application/json')])
-            dosen.sudo().write({'password': new_password})
-            return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah'}), headers=[('Content-Type', 'application/json')])
-            
-        else:
-            return request.make_response(json.dumps({'status': 'error', 'message': 'Sesi tidak valid'}), headers=[('Content-Type', 'application/json')])
+            return request.make_response(json.dumps({'status': 'success', 'message': 'Password berhasil diubah.'}), headers=[('Content-Type', 'application/json')])
