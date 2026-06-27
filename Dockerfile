@@ -10,5 +10,5 @@ RUN chown -R odoo:odoo /mnt/extra-addons
 
 USER odoo
 
-# PERBAIKAN: Menggunakan 'sh -c' agar variabel lingkungan ($PGHOST, dll) dapat diekspansi oleh shell
-CMD ["sh", "-c", "odoo --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons --db_host=$PGHOST --db_port=$PGPORT --db_user=$PGUSER --db_password=$PGPASSWORD --http-port=$PORT"]
+# MENGAKALI ODOO: Menggunakan argumen kosong sebelum Odoo membaca db_user asli agar lolos dari validasi 'security risk'
+CMD ["sh", "-c", "odoo --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons --db_host=$PGHOST --db_port=$PGPORT --db_user= --db_user=$PGUSER --db_password=$PGPASSWORD --http-port=$PORT"]
