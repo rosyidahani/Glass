@@ -25,7 +25,7 @@
             <field name="nama"/>
             <field name="sks"/>
             <field name="semester"/>
-            <field name="dosen_pengampu"/>
+            <field name="dosen_ids" widget="many2many_tags" options="{'no_create': True}"/>
           </group>
           <notebook>
             <page string="Daftar Mahasiswa">

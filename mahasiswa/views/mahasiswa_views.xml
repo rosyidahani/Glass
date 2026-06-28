@@ -44,6 +44,12 @@
                         <group string="Biometrik &amp; Perangkat">
                             <field name="device_id" readonly="1"/>
                             <field name="face_descriptor" readonly="1"/>
+                            <button name="action_reset_face_data" 
+                                    type="object" 
+                                    string="Hapus Data Wajah" 
+                                    class="btn-danger" 
+                                    confirm="Apakah Anda yakin ingin menghapus data wajah mahasiswa ini? Setelah dihapus, mahasiswa harus melakukan registrasi wajah kembali." 
+                                    invisible="not face_descriptor"/>
                         </group>
                     </group>
                 </sheet>

@@ -62,7 +62,7 @@ class DosenPortalController(http.Controller):
         open_sessions = sesi_obj.search([('status', '=', 'open'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
 
         # Load courses specifically taught by this Dosen
-        courses_list = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        courses_list = request.env['mata.kuliah'].sudo().search([('dosen_ids', 'in', [dosen.id])], order='nama asc')
         if not courses_list:
             # Fallback to all active courses if no relationship is defined yet
             courses_list = request.env['mata.kuliah'].sudo().search([], order='nama asc')
@@ -122,7 +122,7 @@ class DosenPortalController(http.Controller):
             return request.redirect('/login')
 
         # Get actual courses taught by this Dosen from database (removes mockup dummy data)
-        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_ids', 'in', [dosen.id])], order='nama asc')
         if not real_mk:
             real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
         
@@ -140,7 +140,7 @@ class DosenPortalController(http.Controller):
             return request.redirect('/login')
 
         # Get actual courses taught by this Dosen from database (removes mockup dummy data)
-        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_ids', 'in', [dosen.id])], order='nama asc')
         if not real_mk:
             real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
         

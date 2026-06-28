@@ -173,9 +173,9 @@ class PresensiController(http.Controller):
         # FaceID server-side verification (Backend 1)
         # Ambil descriptor dari client untuk dihitung kesamaannya di server.
         client_face_descriptor = kw.get('face_descriptor')
-        face_method = kw.get('face_method', 'euclidean')
-        face_threshold = kw.get('face_threshold', 0.6)
-
+        face_method = kw.get('face_method', 'cosine')
+        face_threshold = kw.get('face_threshold', 0.80)
+    
         # Backend 1 - FaceID server-side only (device binding ditiadakan)
         device_id = kw.get('device_id')
 

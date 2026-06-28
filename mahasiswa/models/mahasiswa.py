@@ -164,6 +164,14 @@ class Mahasiswa(models.Model):
         if self.koin < jumlah:
             raise UserError('Koin tidak cukup untuk melakukan transaksi ini.')
         self.koin -= jumlah
+
+    def action_reset_face_data(self):
+        """Reset data biometrik wajah dan device binding mahasiswa."""
+        for rec in self:
+            rec.write({
+                'face_descriptor': False,
+                'device_id': False
+            })
     # Di dalam class model Mahasiswa pada models/mahasiswa.py
 
     @classmethod
