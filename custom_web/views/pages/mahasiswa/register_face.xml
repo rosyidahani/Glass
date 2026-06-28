@@ -40,7 +40,27 @@
                         <!-- Scan Overlay Frame -->
                         <div class="scan-overlay">
                             <div class="laser-scanner" id="laserScanner"></div>
-                            <div class="face-oval-frame"></div>
+                            <div class="face-oval-frame" id="faceOvalFrame"></div>
+                            
+                            <!-- Real-time Tracking Box (moving around the face) -->
+                            <div class="face-tracking-box hidden" id="faceTrackingBox" style="position: absolute; border: 2px dashed #3b82f6; border-radius: 12px; width: 120px; height: 120px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.2s ease; z-index: 4;">
+                                <div style="position: absolute; top: -5px; left: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
+                                <div style="position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-right: 3px solid #3b82f6;"></div>
+                                <div style="position: absolute; bottom: -5px; left: -5px; width: 12px; height: 12px; border-bottom: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
+                                <div style="position: absolute; bottom: -5px; right: -5px; width: 12px; height: 12px; border-bottom: 3px solid #3b82f6; border-right: 3px solid #3b82f6;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Interactive Indicators -->
+                        <div class="interactive-indicators hidden" id="interactiveIndicators" style="position: absolute; bottom: 15px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 6; pointer-events: none;">
+                            <!-- Distance Indicator -->
+                            <div id="distanceIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
+                                <i class="bi bi-arrows-expand" id="distanceIcon"></i> <span id="distanceText">Jarak Wajah: Mendeteksi...</span>
+                            </div>
+                            <!-- Pose/Liveness Guide -->
+                            <div id="poseIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
+                                <i class="bi bi-person-badge" id="poseIcon"></i> <span id="poseText">Petunjuk: Posisikan Wajah Anda</span>
+                            </div>
                         </div>
 
                         <!-- Vector Success Checklist SVG -->

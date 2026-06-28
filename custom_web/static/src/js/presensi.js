@@ -20,7 +20,6 @@ function filterCourses() {
 
 // --- Fungsi Filter Status ---
 function filterStatus(status) {
-    // Kelola kelas aktif pada tombol filter
     var buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(function(btn) {
         btn.classList.remove('active');
@@ -31,7 +30,6 @@ function filterStatus(status) {
         activeBtn.classList.add('active');
     }
     
-    // Saring kartu
     var cards = document.querySelectorAll('.course-card');
     cards.forEach(function(card) {
         if (status === 'all') {
@@ -54,7 +52,7 @@ function initWebcam() {
     var video = document.getElementById('webcam');
     var fallback = document.getElementById('cameraFallback');
     
-    if (!video) return; // Hanya jalankan di halaman scan
+    if (!video) return;
     
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ 
@@ -75,7 +73,6 @@ function initWebcam() {
         })
         .catch(function(err) {
             console.warn("Akses kamera ditolak atau tidak tersedia: ", err);
-            // Tetap gunakan fallback visual wireframe SVG
             updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> Kamera diblokir. Mode Simulasi Aktif.');
         });
     } else {
@@ -83,14 +80,14 @@ function initWebcam() {
     }
 }
 
-// --- Memperbarui Box Status di Atas Kamera ---
+// --- Memperbarui Box Status ---
 function updateStatusBox(stateClass, htmlContent) {
     var statusBox = document.getElementById('scannerStatusBox');
     var statusMsg = document.getElementById('statusMessage');
     
     if (!statusBox || !statusMsg) return;
     
-    statusBox.className = 'scanner-status-box'; // reset
+    statusBox.className = 'scanner-status-box';
     if (stateClass) {
         statusBox.classList.add(stateClass);
     }
@@ -113,6 +110,104 @@ function generateDeterministicFaceVector(nim) {
     return vector.join(',');
 }
 
+// --- Simulasi Pemindaian Interaktif (Liveness, Jarak, Tracking, Warna) ---
+function runFaceScanSequence(onComplete) {
+    var indicators = document.getElementById('interactiveIndicators');
+    var trackingBox = document.getElementById('faceTrackingBox');
+    var ovalFrame = document.getElementById('faceOvalFrame');
+    
+    var distanceIndicator = document.getElementById('distanceIndicator');
+    var distanceText = document.getElementById('distanceText');
+    
+    var poseIndicator = document.getElementById('poseIndicator');
+    var poseText = document.getElementById('poseText');
+    
+    if (indicators) indicators.classList.remove('hidden');
+    if (trackingBox) trackingBox.classList.remove('hidden');
+    
+    // Helper untuk mengubah status secara real-time
+    function updateState(distance, distanceColor, pose, poseColor, boxWidth, boxHeight, boxLeft, boxTop, ovalColor, statusMsg) {
+        if (distanceText) distanceText.innerHTML = "Jarak Wajah: " + distance;
+        if (distanceIndicator) {
+            distanceIndicator.style.borderColor = distanceColor;
+            distanceIndicator.style.color = distanceColor;
+        }
+        
+        if (poseText) poseText.innerHTML = "Petunjuk: " + pose;
+        if (poseIndicator) {
+            poseIndicator.style.borderColor = poseColor;
+            poseIndicator.style.color = poseColor;
+        }
+        
+        if (trackingBox) {
+            trackingBox.style.width = boxWidth + "px";
+            trackingBox.style.height = boxHeight + "px";
+            trackingBox.style.left = boxLeft;
+            trackingBox.style.top = boxTop;
+            trackingBox.style.borderColor = ovalColor;
+            var corners = trackingBox.querySelectorAll('div');
+            corners.forEach(function(c) {
+                c.style.borderColor = ovalColor;
+            });
+        }
+        
+        if (ovalFrame) {
+            ovalFrame.style.borderColor = ovalColor;
+            ovalFrame.style.boxShadow = "0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 20px " + ovalColor;
+        }
+        
+        if (statusMsg) {
+            updateStatusBox('active', statusMsg);
+        }
+    }
+    
+    // Alur Simulasi
+    // 1. Deteksi Awal - Terlalu Jauh (Merah)
+    updateState("Terlalu Jauh", "#ef4444", "Dekatkan wajah Anda ke kamera", "#ef4444", 80, 80, "50%", "50%", "#ef4444", "Memulai Pemindaian...");
+    
+    // 2. Terlalu Dekat (Kuning/Oranye) - setelah 1.2 detik
+    setTimeout(function() {
+        updateState("Terlalu Dekat", "#f59e0b", "Jauhkan wajah Anda sedikit", "#f59e0b", 160, 160, "50%", "50%", "#f59e0b", "Mendeteksi Jarak...");
+    }, 1200);
+    
+    // 3. Jarak Ideal (Hijau) - setelah 2.4 detik
+    setTimeout(function() {
+        updateState("Ideal (Pas) ✓", "#10b981", "Jarak sesuai. Bersiap deteksi keaktifan.", "#10b981", 120, 120, "50%", "50%", "#10b981", "Jarak Wajah Ideal");
+    }, 2400);
+    
+    // 4. Liveness - Putar Kanan (Oranye) - setelah 3.6 detik
+    setTimeout(function() {
+        updateState("Ideal (Pas) ✓", "#10b981", "👉 Putar wajah ke kanan", "#f59e0b", 120, 120, "55%", "50%", "#f59e0b", "Deteksi Keaktifan (Liveness)");
+    }, 3600);
+    
+    // 5. Liveness - Putar Kiri (Oranye) - setelah 5.0 detik
+    setTimeout(function() {
+        updateState("Ideal (Pas) ✓", "#10b981", "👈 Putar wajah ke kiri", "#f59e0b", 120, 120, "45%", "50%", "#f59e0b", "Deteksi Keaktifan (Liveness)");
+    }, 5000);
+    
+    // 6. Liveness - Angkat Dagu (Oranye) - setelah 6.4 detik
+    setTimeout(function() {
+        updateState("Ideal (Pas) ✓", "#10b981", "▲ Angkat dagu Anda", "#f59e0b", 120, 120, "50%", "45%", "#f59e0b", "Deteksi Keaktifan (Liveness)");
+    }, 6400);
+    
+    // 7. Liveness - Turunkan Dagu (Oranye) - setelah 7.8 detik
+    setTimeout(function() {
+        updateState("Ideal (Pas) ✓", "#10b981", "▼ Turunkan dagu Anda", "#f59e0b", 120, 120, "50%", "55%", "#f59e0b", "Deteksi Keaktifan (Liveness)");
+    }, 7800);
+    
+    // 8. Finalizing - Jangan Bergerak (Cyan) - setelah 9.2 detik
+    setTimeout(function() {
+        updateState("Ideal (Pas) ✓", "#10b981", "🔒 Jangan bergerak, memproses...", "#10b981", 120, 120, "50%", "50%", "#06b6d4", "Memproses Biometrik Akhir");
+    }, 9200);
+    
+    // 9. Selesai - setelah 10.5 detik
+    setTimeout(function() {
+        if (indicators) indicators.classList.add('hidden');
+        if (trackingBox) trackingBox.classList.add('hidden');
+        onComplete();
+    }, 10500);
+}
+
 // --- Proses Validasi Face ID & GPS Riil ---
 function startPresenceSimulation() {
     var metadataEl = document.getElementById('presenceMetadata');
@@ -128,7 +223,6 @@ function startPresenceSimulation() {
     
     if (!btn || !scannerCard) return;
     
-    // Nonaktifkan tombol selama proses pemindaian berlangsung
     btn.disabled = true;
     var btnText = btn.querySelector('.btn-text');
     var btnLoader = btn.querySelector('.btn-loader');
@@ -136,11 +230,9 @@ function startPresenceSimulation() {
     if (btnText) btnText.classList.add('hidden');
     if (btnLoader) btnLoader.classList.remove('hidden');
     
-    // Tambahkan kelas pemindaian ke container utama untuk memicu animasi laser
     scannerCard.classList.add('scanning');
     
     if (courseType === 'offline') {
-        // Alur Offline: Wajib Validasi GPS Browser Asli
         updateStatusBox('location-active', '<i class="bi bi-geo-alt-fill spin"></i> Mendeteksi GPS Handphone/Browser Anda...');
         
         if (!navigator.geolocation) {
@@ -153,14 +245,13 @@ function startPresenceSimulation() {
                 var lat = position.coords.latitude;
                 var lon = position.coords.longitude;
                 var accuracy = position.coords.accuracy;
-                var isMock = position.coords.mocked || false; // standard Android HTML5 mock detection
+                var isMock = position.coords.mocked || false;
                 
                 updateStatusBox('active', '<i class="bi bi-person-bounding-box"></i> GPS Valid! Memproses Pemindaian Wajah...');
                 
-                // Lakukan scan wajah selama 2 detik kemudian tembak API
-                setTimeout(function() {
+                runFaceScanSequence(function() {
                     submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, studentNim);
-                }, 2000);
+                });
             },
             function(error) {
                 console.error("GPS error:", error);
@@ -179,12 +270,9 @@ function startPresenceSimulation() {
             }
         );
     } else {
-        // Alur Online: Langsung Pemindaian Wajah, GPS diset 0.0 (Bypassed)
-        updateStatusBox('active', '<i class="bi bi-person-bounding-box"></i> Memindai Face ID Anda...');
-        
-        setTimeout(function() {
+        runFaceScanSequence(function() {
             submitCheckInAPI(courseId, courseName, 0.0, 0.0, false, 10, studentNim);
-        }, 2200);
+        });
     }
 }
 
@@ -218,7 +306,6 @@ function submitCheckInAPI(sesiId, courseName, lat, lon, isMock, accuracy, studen
         });
     })
     .then(function(data) {
-        // Presensi berhasil! Trigger layar sukses dengan data reward dinamis
         triggerScanSuccess(courseName, data);
     })
     .catch(function(err) {
@@ -243,7 +330,6 @@ function triggerScanFailure(errorMessage) {
         if (btnText) btnText.classList.remove('hidden');
         if (btnLoader) btnLoader.classList.add('hidden');
         
-        // Buat getaran visual/merah di tombol
         btn.style.background = '#fde8e8';
         btn.style.borderColor = '#f56565';
         btn.style.color = '#e53e3e';
@@ -263,7 +349,6 @@ function triggerScanSuccess(courseName, data) {
     if (scannerCard) scannerCard.classList.remove('scanning');
     if (statusBox) statusBox.classList.add('hidden');
     
-    // Format pesan sukses gamifikasi sesuai data yang didapatkan
     var successMsgText = `Presensi Sukses! Anda mendapatkan +${data.xp_didapat} XP dan +${data.koin_didapat} Koin.`;
     if (data.is_pertama) {
         successMsgText = `🎉 LUAR BIASA! Anda yang Pertama Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
@@ -271,7 +356,6 @@ function triggerScanSuccess(courseName, data) {
         successMsgText = `Presensi Sukses! Namun Anda terlambat (mendapatkan +0 XP / +0 Koin). Tetap semangat!`;
     }
     
-    // Tampilkan overlay checklist vector sukses
     if (successCheckmark) {
         successCheckmark.classList.remove('hidden');
         var successMsg = document.getElementById('successMessage');
@@ -280,7 +364,6 @@ function triggerScanSuccess(courseName, data) {
         }
     }
     
-    // Perbarui teks tombol
     if (btn) {
         btn.innerHTML = '<span class="text-green"><i class="bi bi-check-circle-fill"></i> Presensi Berhasil!</span>';
         btn.disabled = true;
@@ -289,14 +372,12 @@ function triggerScanSuccess(courseName, data) {
         btn.style.color = '#137333';
     }
     
-    // Hentikan webcam
     if (webcamStream) {
         webcamStream.getTracks().forEach(function(track) {
             track.stop();
         });
     }
     
-    // Alihkan kembali ke daftar kelas setelah 4 detik
     setTimeout(function() {
         window.location.href = '/presensi';
     }, 4000);
