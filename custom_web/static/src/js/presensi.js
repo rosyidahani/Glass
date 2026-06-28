@@ -179,80 +179,6 @@ function updateStatusBox(stateClass, htmlContent) {
     statusMsg.innerHTML = htmlContent;
 }
 
-// --- Simulasi Pemindaian Interaktif (Panduan Liveness) ---
-function runFaceScanSequence(onComplete) {
-    var indicators = document.getElementById('interactiveIndicators');
-    var ovalFrame = document.getElementById('faceOvalFrame');
-    
-    var distanceIndicator = document.getElementById('distanceIndicator');
-    var distanceText = document.getElementById('distanceText');
-    
-    var poseIndicator = document.getElementById('poseIndicator');
-    var poseText = document.getElementById('poseText');
-    
-    if (indicators) indicators.classList.remove('hidden');
-    
-    // Helper untuk mengubah status secara real-time
-    function updateState(distance, distanceColor, pose, poseColor, ovalColor, statusMsg) {
-        if (distanceText) distanceText.innerHTML = "Jarak Wajah: " + distance;
-        if (distanceIndicator) {
-            distanceIndicator.style.borderColor = distanceColor;
-            distanceIndicator.style.color = distanceColor;
-        }
-        
-        if (poseText) poseText.innerHTML = "Petunjuk: " + pose;
-        if (poseIndicator) {
-            poseIndicator.style.borderColor = poseColor;
-            poseIndicator.style.color = poseColor;
-        }
-        
-        if (ovalFrame) {
-            ovalFrame.style.borderColor = ovalColor;
-            ovalFrame.style.boxShadow = "0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 20px " + ovalColor;
-        }
-        
-        if (statusMsg) {
-            updateStatusBox('active', statusMsg);
-        }
-    }
-    
-    // Alur Panduan Liveness
-    updateState("Terlalu Jauh", "#ef4444", "Dekatkan wajah Anda ke kamera", "#ef4444", "#ef4444", "Memulai Pemindaian...");
-    
-    setTimeout(function() {
-        updateState("Terlalu Dekat", "#f59e0b", "Jauhkan wajah Anda sedikit", "#f59e0b", "#f59e0b", "Mendeteksi Jarak...");
-    }, 1200);
-    
-    setTimeout(function() {
-        updateState("Ideal (Pas) ✓", "#10b981", "Jarak sesuai. Bersiap deteksi keaktifan.", "#10b981", "#10b981", "Jarak Wajah Ideal");
-    }, 2400);
-    
-    setTimeout(function() {
-        updateState("Ideal (Pas) ✓", "#10b981", "👉 Putar wajah ke kanan", "#f59e0b", "#f59e0b", "Deteksi Keaktifan (Liveness)");
-    }, 3600);
-    
-    setTimeout(function() {
-        updateState("Ideal (Pas) ✓", "#10b981", "👈 Putar wajah ke kiri", "#f59e0b", "#f59e0b", "Deteksi Keaktifan (Liveness)");
-    }, 5000);
-    
-    setTimeout(function() {
-        updateState("Ideal (Pas) ✓", "#10b981", "▲ Angkat dagu Anda", "#f59e0b", "#f59e0b", "Deteksi Keaktifan (Liveness)");
-    }, 6400);
-    
-    setTimeout(function() {
-        updateState("Ideal (Pas) ✓", "#10b981", "▼ Turunkan dagu Anda", "#f59e0b", "#f59e0b", "Deteksi Keaktifan (Liveness)");
-    }, 7800);
-    
-    setTimeout(function() {
-        updateState("Ideal (Pas) ✓", "#10b981", "🔒 Jangan bergerak, memproses...", "#10b981", "#06b6d4", "Memproses Biometrik Akhir");
-    }, 9200);
-    
-    setTimeout(function() {
-        if (indicators) indicators.classList.add('hidden');
-        onComplete();
-    }, 10500);
-}
-
 // --- Proses Validasi Face ID & GPS Riil ---
 function startPresenceSimulation() {
     var metadataEl = document.getElementById('presenceMetadata');
@@ -277,6 +203,37 @@ function startPresenceSimulation() {
     
     scannerCard.classList.add('scanning');
     
+    async function proceedWithFaceCheck(lat, lon, isMock, accuracy) {
+        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Memverifikasi wajah...');
+        
+        var video = document.getElementById('webcam');
+        if (video && !latestFaceDescriptor) {
+            try {
+                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                    
+                if (detection) {
+                    latestFaceDescriptor = detection.descriptor;
+                }
+            } catch (e) {
+                console.error("Gagal melakukan deteksi wajah:", e);
+            }
+        }
+        
+        if (latestFaceDescriptor) {
+            stopFaceTracking();
+            var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
+            submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVector);
+        } else {
+            scannerCard.classList.remove('scanning');
+            if (btnText) btnText.classList.remove('hidden');
+            if (btnLoader) btnLoader.classList.add('hidden');
+            btn.disabled = false;
+            updateStatusBox('camera-denied', '<i class="bi bi-x-circle-fill"></i> Wajah tidak terdeteksi. Silakan arahkan wajah Anda dengan jelas ke kamera.');
+        }
+    }
+    
     if (courseType === 'offline') {
         updateStatusBox('location-active', '<i class="bi bi-geo-alt-fill spin"></i> Mendeteksi GPS Handphone/Browser Anda...');
         
@@ -292,36 +249,7 @@ function startPresenceSimulation() {
                 var accuracy = position.coords.accuracy;
                 var isMock = position.coords.mocked || false;
                 
-                updateStatusBox('active', '<i class="bi bi-person-bounding-box"></i> GPS Valid! Memproses Pemindaian Wajah...');
-                
-                runFaceScanSequence(async function() {
-                    // Hentikan tracking sementara untuk memfokuskan ekstraksi final
-                    stopFaceTracking();
-                    
-                    var video = document.getElementById('webcam');
-                    if (video) {
-                        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Memverifikasi biometrik wajah Anda...');
-                        try {
-                            const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
-                                .withFaceLandmarks()
-                                .withFaceDescriptor();
-                                
-                            if (detection) {
-                                latestFaceDescriptor = detection.descriptor;
-                            }
-                        } catch (e) {
-                            console.error("Gagal melakukan deteksi akhir:", e);
-                        }
-                    }
-                    
-                    if (latestFaceDescriptor) {
-                        var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
-                        submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVector);
-                    } else {
-                        startFaceTracking();
-                        triggerScanFailure("Wajah tidak terdeteksi. Posisikan wajah tepat di depan kamera.");
-                    }
-                });
+                proceedWithFaceCheck(lat, lon, isMock, accuracy);
             },
             function(error) {
                 console.error("GPS error:", error);
@@ -340,33 +268,7 @@ function startPresenceSimulation() {
             }
         );
     } else {
-        runFaceScanSequence(async function() {
-            stopFaceTracking();
-            
-            var video = document.getElementById('webcam');
-            if (video) {
-                updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Memverifikasi biometrik wajah Anda...');
-                try {
-                    const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                        
-                    if (detection) {
-                        latestFaceDescriptor = detection.descriptor;
-                    }
-                } catch (e) {
-                    console.error("Gagal melakukan deteksi akhir:", e);
-                }
-            }
-            
-            if (latestFaceDescriptor) {
-                var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
-                submitCheckInAPI(courseId, courseName, 0.0, 0.0, false, 10, faceVector);
-            } else {
-                startFaceTracking();
-                triggerScanFailure("Wajah tidak terdeteksi. Posisikan wajah tepat di depan kamera.");
-            }
-        });
+        proceedWithFaceCheck(0.0, 0.0, false, 10);
     }
 }
 
