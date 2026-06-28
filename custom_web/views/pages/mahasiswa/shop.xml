@@ -59,12 +59,7 @@
                             <t t-foreach="avatar_items" t-as="item">
                                 <div t-attf-class="avatar-card glass-panel #{'equipped-active' if mahasiswa.equipped_avatar_id.id == item.id else ''}" t-att-data-id="item.avatar_id">
                                     <div class="avatar-card-image-box">
-                                        <t t-if="item.is_video">
-                                            <video t-att-src="item.image_src" class="shop-avatar-video" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline" style="width: 100%; height: 100%; object-fit: contain;"></video>
-                                        </t>
-                                        <t t-else="">
-                                            <img t-att-src="item.image_src" t-att-alt="item.nama_avatar"/>
-                                        </t>
+                                        <img t-att-src="item.image_src" t-att-alt="item.nama_avatar"/>
                                     </div>
                                     <div class="avatar-info-box">
                                         <h4 class="avatar-name"><t t-esc="item.nama_avatar"/></h4>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="register_face" name="Registrasi Face ID">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/presensi.css"/>
+            <script src="/custom_web/static/src/js/register_face.js?v=12" type="text/javascript"></script>
+
+            <!-- Metadata for JS -->
+            <div id="registerMetadata" 
+                 t-att-data-student-name="mahasiswa.name"
+                 t-att-data-student-nim="mahasiswa.nim"
+                 style="display: none;"></div>
+
+            <div class="presensi-scan-container">
+                <!-- Top Mock Header Bar -->
+                <div class="presensi-top-bar glass-panel">
+                    <span class="bar-title" style="margin-left: 15px;">Registrasi Face ID</span>
+                </div>
+
+                <!-- Main Camera/Scanner Card -->
+                <div class="scanner-card glass-panel" id="scannerCard">
+                    <div class="camera-wrapper">
+                        <!-- Real Camera Video Element -->
+                        <video id="webcam" autoplay="true" playsinline="true" class="webcam-feed hidden"></video>
+
+                        <!-- Fallback Wireframe Scanner Illustration (SVG) -->
+                        <div id="cameraFallback" class="camera-fallback">
+                            <div class="wireframe-glow"></div>
+                            <svg viewBox="0 0 200 200" class="wireframe-face">
+                                <ellipse cx="100" cy="95" rx="55" ry="70" fill="none" stroke="rgba(59, 130, 246, 0.4)" stroke-width="2" stroke-dasharray="5,5" />
+                                <path d="M70,140 C80,165 120,165 130,140" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2.5" />
+                                <path d="M80,90 C90,100 110,100 120,90" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2" />
+                                <circle cx="85" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
+                                <circle cx="115" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
+                                <path d="M100,75 L100,100 L95,102" fill="none" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" />
+                            </svg>
+                            <span class="fallback-text"><i class="bi bi-camera-video-off-fill"></i> Kamera tidak aktif / diblokir</span>
+                        </div>
+
+                        <!-- Scan Overlay Frame -->
+                        <div class="scan-overlay">
+                            <div class="laser-scanner" id="laserScanner"></div>
+                            <div class="face-oval-frame" id="faceOvalFrame"></div>
+                            
+                            <!-- Real-time Tracking Box (moving around the face) -->
+                            <div class="face-tracking-box hidden" id="faceTrackingBox" style="position: absolute; border: 2px dashed #3b82f6; border-radius: 12px; width: 120px; height: 120px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.2s ease; z-index: 4;">
+                                <div style="position: absolute; top: -5px; left: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
+                                <div style="position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-right: 3px solid #3b82f6;"></div>
+                                <div style="position: absolute; bottom: -5px; left: -5px; width: 12px; height: 12px; border-bottom: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
+                                <div style="position: absolute; bottom: -5px; right: -5px; width: 12px; height: 12px; border-bottom: 3px solid #3b82f6; border-right: 3px solid #3b82f6;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Interactive Indicators -->
+                        <div class="interactive-indicators hidden" id="interactiveIndicators" style="position: absolute; bottom: 15px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 6; pointer-events: none;">
+                            <!-- Distance Indicator -->
+                            <div id="distanceIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
+                                <i class="bi bi-arrows-expand" id="distanceIcon"></i> <span id="distanceText">Jarak Wajah: Mendeteksi...</span>
+                            </div>
+                            <!-- Pose/Liveness Guide -->
+                            <div id="poseIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
+                                <i class="bi bi-person-badge" id="poseIcon"></i> <span id="poseText">Petunjuk: Posisikan Wajah Anda</span>
+                            </div>
+                        </div>
+
+                        <!-- Vector Success Checklist SVG -->
+                        <div class="success-checkmark-overlay hidden" id="successCheckmark">
+                            <div class="checkmark-circle-glow">
+                                <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                </svg>
+                            </div>
+                            <h3>Registrasi Berhasil!</h3>
+                            <p id="successMessage">Data wajah Anda telah terdaftar dalam sistem.</p>
+                        </div>
+
+                        <!-- Micro Info Box on Scanner Top -->
+                        <div class="scanner-status-box" id="scannerStatusBox">
+                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> Posisikan wajah Anda pada area lingkaran</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="scanner-action">
+                        <button type="button" class="btn-scan-oval" id="btnMulaiRegistrasi" onclick="startFaceRegistration()">
+                            <span class="btn-text">Daftarkan Wajah</span>
+                            <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> memproses...</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bottom Instructions Card -->
+                <div class="student-info-card glass-panel" style="padding: 18px;">
+                    <h4 style="margin-top: 0; color: var(--accent-color); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-info-circle-fill"></i> Petunjuk Registrasi Wajah
+                    </h4>
+                    <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 13px; color: var(--text-color); opacity: 0.85; line-height: 1.6;">
+                        <li>Pastikan wajah Anda terlihat jelas dengan pencahayaan yang cukup.</li>
+                        <li>Jangan menggunakan kacamata hitam, masker, atau topi.</li>
+                        <li>Posisikan wajah tepat di dalam bingkai oval di atas.</li>
+                        <li>Sistem akan mendeteksi dan mengamankan data biometrik wajah Anda untuk kebutuhan absensi otomatis.</li>
+                    </ul>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

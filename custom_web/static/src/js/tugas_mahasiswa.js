@@ -108,6 +108,18 @@ function initStudentTugas() {
         });
     }
 
+    // Detail overlay close handler
+    var detailOverlay = document.getElementById("detail-overlay");
+    if (detailOverlay) {
+        detailOverlay.addEventListener("click", function(e) {
+            // Close if the overlay backdrop or the close button is clicked
+            if (e.target === detailOverlay || e.target.closest(".detail-close-btn")) {
+                e.preventDefault();
+                closeTaskDetails();
+            }
+        });
+    }
+
     // Drag & Drop mock handlers
     var dropZone = document.getElementById("drop-zone");
     if (dropZone) {
@@ -344,8 +356,15 @@ function openSubmissionDrawer(taskId, taskTitle, taskSubject) {
 
 function closeSubmissionDrawer() {
     var overlay = document.getElementById("submission-overlay");
-    overlay.classList.remove("open");
+    if (overlay) overlay.classList.remove("open");
 }
+
+// Close task detail overlay (modal) if present
+function closeTaskDetails() {
+    var overlay = document.getElementById("detail-overlay");
+    if (overlay) overlay.classList.remove("open");
+}
+
 
 // 5. Task Detail Modal Controls
 function showTaskDetailsNew(btn) {
@@ -396,6 +415,12 @@ function handleFileSelect(input) {
 
 // 7. Submit Real Submission to Odoo Backend (Multipart/FormData to HTTP route)
 async function submitRealSubmission() {
+    const btnSubmit = document.querySelector(".btn-submit-drawer");
+    if (!btnSubmit) {
+        showToast("Error", "Tombol submit tidak ditemukan (btn-submit-drawer).", "bi-exclamation-triangle-fill text-danger");
+        return;
+    }
+
     var fileInput = document.getElementById("file-upload");
     var linkInput = document.getElementById("link-submission").value.trim();
     var taskId = document.getElementById("submit-task-id").value;
@@ -420,7 +445,6 @@ async function submitRealSubmission() {
         return;
     }
 
-    var btnSubmit = document.querySelector(".btn-submit-drawer");
     var originalBtnHTML = btnSubmit.innerHTML;
     btnSubmit.disabled = true;
     btnSubmit.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Mengirim...';
@@ -437,35 +461,27 @@ async function submitRealSubmission() {
     }
 
     try {
-        var res = await fetch("/api/tugas/kumpul", {
+        const res = await fetch("/tugas/submit", {
             method: "POST",
             body: formData
         });
-        
-        var rawText = await res.text();
-        var resultData = {};
-        try {
-            var parsed = JSON.parse(rawText);
-            resultData = parsed.result || parsed.data || parsed;
-        } catch (jsonErr) {
-            resultData = { status: "error", message: "Gagal memproses response server." };
+
+        const resultData = await res.json();
+
+        if (!res.ok || resultData.status !== 'success') {
+            throw new Error(resultData.message || 'Gagal mengumpulkan tugas. Silakan coba lagi.');
         }
-        
-        if (resultData.status === "success" || resultData.message === "Tugas berhasil dikumpulkan!") {
-            closeSubmissionDrawer();
-            
-            // Open gamified celebration modal
-            setTimeout(function() {
-                var celebration = document.getElementById("celebration-panel");
-                celebration.classList.remove("hidden");
-            }, 400);
-        } else {
-            showToast("Error", resultData.message || "Gagal mengumpulkan tugas.", "bi-exclamation-triangle-fill text-danger");
-            btnSubmit.disabled = false;
-            btnSubmit.innerHTML = originalBtnHTML;
-        }
+
+        // Success
+        closeSubmissionDrawer();
+        setTimeout(() => {
+            const celebration = document.getElementById("celebration-panel");
+            if (celebration) celebration.classList.remove("hidden");
+        }, 400);
+
     } catch (e) {
-        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+        // Catches network errors, JSON parsing errors, and thrown errors from the 'if' block
+        showToast("Error", e.message || "Koneksi ke server gagal.", "bi-wifi-off text-danger");
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = originalBtnHTML;
     }

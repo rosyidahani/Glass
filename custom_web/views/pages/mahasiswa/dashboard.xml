@@ -1,20 +1,20 @@
 <odoo>
     <template id="dashboard" name="Dashboard Page">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/dashboard.css"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/dashboard.css?v=11"/>
 
             <div class="dashboard-container">
                 <!-- TOP HUD -->
                 <div class="top-hud">
                     <div class="hud-left">
                         <!-- Profile Card without EXP -->
-                        <a href="/dashboard/mahasiswa/profile" class="profile-pill glass-panel">
+                        <div class="profile-pill glass-panel">
                             <div class="avatar-large">
                                 <t t-if="mahasiswa.foto_profil">
                                     <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
                                 </t>
                                 <t t-else="">
-                                    <t t-esc="mahasiswa.name[0].upper()"/>
+                                    <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile"/>
                                 </t>
                             </div>
                             <div class="profile-info">
@@ -25,7 +25,7 @@
                              <div class="profile-rank-badge" title="Rank Leaderboard">
                                  <span>#<t t-esc="rank"/></span>
                              </div>
-                        </a>
+                        </div>
                         
                         <!-- Action Buttons stacked below profile pill -->
                         <div class="hud-actions-vertical">
@@ -34,7 +34,7 @@
                                 <i class="bi bi-bag-fill"></i>
                             </a>
                             <!-- Setting Button -->
-                            <a href="/dashboard/mahasiswa/profile" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
+                            <a href="/dashboard/mahasiswa/settings" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
                                 <i class="bi bi-gear-fill"></i>
                             </a>
                         </div>
@@ -60,12 +60,7 @@
                     <!-- LEFT: 2D Character Area -->
                     <div class="avatar-section glass-panel">
                         <div class="avatar-glow"/>
-                        <t t-if="mahasiswa.equipped_avatar_id.is_video">
-                            <video t-att-src="mahasiswa.equipped_avatar_id.image_src" class="user-image" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"></video>
-                        </t>
-                        <t t-else="">
-                            <img t-att-src="mahasiswa.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" class="user-image" alt="Character Glass"/>
-                        </t>
+                        <img t-att-src="mahasiswa.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" class="user-image" alt="Character Glass"/>
                     </div>
 
                 </div>

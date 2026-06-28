@@ -14,7 +14,12 @@ class Dosen(models.Model):
     email = fields.Char(string='Email')
     telepon = fields.Char(string='Nomor Telepon')
     alamat = fields.Text(string='Alamat')
-    spesialisasi = fields.Char(string='Bidang Keahlian')
+    spesialisasi = fields.Char(string='Kepakaran / Keilmuan')
+    foto_profil = fields.Binary(string='Foto Profil')
+    prodi = fields.Char(
+        string='Program Studi',
+        help='Program studi dosen.',
+    )
     description = fields.Text(string='Catatan Internal')
 
     @api.model

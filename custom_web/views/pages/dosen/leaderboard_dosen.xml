@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="leaderboard_dosen" name="Leaderboard Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css"/>
+
+            <div class="leaderboard-container">
+                <div class="leaderboard-topbar glass-panel">
+                    <a href="/dashboard/dosen" class="back-btn"><i class="bi bi-arrow-left"></i></a>
+                    <div class="topbar-title">Leaderboard Mahasiswa</div>
+                    <div class="topbar-right">
+                        <div class="xp-display" title="Prodi Dosen">
+                            <i class="bi bi-building"></i>
+                            <t t-esc="prodi_name"/>
+                        </div>
+                        <div class="topbar-profile">
+                            <t t-if="dosen and dosen.name">
+                                <t t-esc="dosen.name[0].upper()"/>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="'D'"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding: 16px 18px;">
+                    <div style="display:flex; gap: 12px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-weight:800; color:#0f172a;">Filter Angkatan</div>
+                            <div style="font-size:13px; color:#64748b;">Gunakan NIM (2 digit awal) untuk filter.</div>
+                        </div>
+
+                        <form method="get" action="/dosen/leaderboard" style="display:flex; gap:10px; align-items:center;">
+                            <input type="hidden" name="prodi" t-att-value="prodi_id"/>
+                            <select name="angkatan" style="padding:10px 12px; border-radius:12px; border:1px solid rgba(148,163,184,0.35); background:#fff; font-weight:700;">
+                                <option value="semua" t-att-selected="'selected' if str(angkatan_selected)=='semua' else None">Semua</option>
+                                <t t-foreach="angkatan_list" t-as="a">
+                                    <option t-att-value="a" t-att-selected="'selected' if (str(angkatan_selected)==str(a)) else None">
+                                        <t t-esc="a"/>
+                                    </option>
+                                </t>
+                            </select>
+
+                            <button type="submit" style="padding:10px 14px; border-radius:12px; border:none; background:#3b82f6; color:white; font-weight:800; cursor:pointer;">
+                                Terapkan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="leaderboard-list-section" style="margin-top: 15px;">
+                    <div class="list-header">
+                        <div class="list-title">Peringkat Mahasiswa</div>
+                        <div style="font-size:13px; color:#64748b; margin-top:4px;">Angkatan: <t t-esc="angkatan_selected"/></div>
+                    </div>
+
+                    <div class="leaderboard-rows-container">
+                        <t t-set="rank_idx" t-value="1"/>
+                        <t t-foreach="students" t-as="student">
+                            <div t-attf-class="leaderboard-row glass-panel">
+                                <div class="row-rank-num-container">
+                                    <span class="row-rank-badge">#<t t-esc="rank_idx"/></span>
+                                </div>
+                                <div class="row-avatar-box">
+                                    <img t-att-src="(student.equipped_avatar_id and student.equipped_avatar_id.image_src) or '/custom_web/static/src/img/char_default.png'" alt="Student Avatar" class="row-avatar-img"/>
+                                </div>
+                                <div class="row-student-info">
+                                    <div class="row-student-name"><t t-esc="student.name"/></div>
+                                    <div class="row-student-nim"><t t-esc="student.nim"/></div>
+                                </div>
+                                <div class="row-xp-score">
+                                    <t t-esc="student.total_xp"/> XP
+                                </div>
+                            </div>
+                            <t t-set="rank_idx" t-value="rank_idx + 1"/>
+                        </t>
+
+                        <t t-if="not students">
+                            <div class="no-more-rank glass-panel">Belum ada data peringkat untuk angkatan ini.</div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

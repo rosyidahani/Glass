@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <form string="Form Dosen">
                 <sheet>
+                    <field name="foto_profil" widget="image" class="oe_avatar" options="{'preview_image': 'foto_profil'}"/>
                     <!-- Judul Utama (Modern Style) -->
                     <div class="oe_title">
                         <label for="name" string="Nama Dosen"/>
@@ -19,6 +20,7 @@
                             <field name="password" password="True" placeholder="Masukkan Password..."/>
                             <field name="gender" widget="radio" options="{'horizontal': true}"/>
                             <field name="spesialisasi" placeholder="Misal: Backend Engineer"/>
+                            <field name="prodi" placeholder="Misal: Teknik Informatika..."/>
                         </group>
                         
                         <group name="kontak" string="Kontak &amp; Komunikasi">
@@ -52,6 +54,7 @@
                 <field name="nip"/>
                 <field name="gender"/>
                 <field name="spesialisasi"/>
+                <field name="prodi"/>
                 <field name="email"/>
             </tree>
         </field>

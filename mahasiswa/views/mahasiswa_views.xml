@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- ============================================================ -->
-    <!-- Form View                                                     -->
-    <!-- ============================================================ -->
+    <record id="view_mahasiswa_tree" model="ir.ui.view">
+        <field name="name">mahasiswa.mahasiswa.tree</field>
+        <field name="model">mahasiswa.mahasiswa</field>
+        <field name="arch" type="xml">
+            <tree string="Data Mahasiswa">
+                <field name="name" string="Nama"/>
+                <field name="nim" string="NIM"/>
+                <field name="semester" string="Semester"/>
+                <field name="prodi" string="Program Studi"/>
+                <field name="total_xp" string="Total XP"/>
+                <field name="koin" string="Koin"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="view_mahasiswa_form" model="ir.ui.view">
         <field name="name">mahasiswa.mahasiswa.form</field>
         <field name="model">mahasiswa.mahasiswa</field>
@@ -23,10 +35,21 @@
                             <field name="nim"/>
                             <field name="password" password="True"/>
                             <field name="semester"/>
+                            <field name="prodi"/>
                         </group>
                         <group string="Statistik">
                             <field name="total_xp"/>
                             <field name="koin"/>
+                        </group>
+                        <group string="Biometrik &amp; Perangkat">
+                            <field name="device_id" readonly="1"/>
+                            <field name="face_descriptor" readonly="1"/>
+                            <button name="action_reset_face_data" 
+                                    type="object" 
+                                    string="Hapus Data Wajah" 
+                                    class="btn-danger" 
+                                    confirm="Apakah Anda yakin ingin menghapus data wajah mahasiswa ini? Setelah dihapus, mahasiswa harus melakukan registrasi wajah kembali." 
+                                    invisible="not face_descriptor"/>
                         </group>
                     </group>
                 </sheet>
@@ -34,9 +57,6 @@
         </field>
     </record>
 
-    <!-- ============================================================ -->
-    <!-- Search View                                                   -->
-    <!-- ============================================================ -->
     <record id="view_mahasiswa_search" model="ir.ui.view">
         <field name="name">mahasiswa.mahasiswa.search</field>
         <field name="model">mahasiswa.mahasiswa</field>
@@ -56,9 +76,6 @@
         </field>
     </record>
 
-    <!-- ============================================================ -->
-    <!-- Action                                                        -->
-    <!-- ============================================================ -->
     <record id="action_mahasiswa" model="ir.actions.act_window">
         <field name="name">Data Mahasiswa</field>
         <field name="res_model">mahasiswa.mahasiswa</field>
@@ -72,9 +89,6 @@
         </field>
     </record>
 
-    <!-- ============================================================ -->
-    <!-- Menu Items                                                    -->
-    <!-- ============================================================ -->
     <menuitem id="menu_mahasiswa_root"
               name="Mahasiswa"
               sequence="20"/>

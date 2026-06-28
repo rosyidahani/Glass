@@ -5,7 +5,7 @@ import io
 import base64
 from PIL import Image
 
-def _compress_avatar_image(base64_data, max_size=(512, 512), quality=85):
+def _compress_avatar_image(base64_data, max_size=(512, 512)):
     if not base64_data:
         return base64_data
     try:
@@ -15,19 +15,44 @@ def _compress_avatar_image(base64_data, max_size=(512, 512), quality=85):
             base64_bytes = base64_data
             
         img_bytes = base64.b64decode(base64_bytes)
-        img = Image.open(io.BytesIO(img_bytes))
+        img = Image.open(io.BytesIO(img_bytes)).convert('RGBA')
         
-        fmt = img.format if img.format else 'PNG'
-        
-        if img.width > max_size[0] or img.height > max_size[1]:
-            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+        # 1. Dapatkan bounding box dari piksel yang tidak transparan (area karakter saja)
+        bbox = img.getbbox()
+        if bbox:
+            left, upper, right, lower = bbox
+            char_w = right - left
+            char_h = lower - upper
+            
+            # 2. Tambahkan padding aman agar tidak memotong aset gambar (misal 5% dari dimensi terbesar)
+            padding = int(max(char_w, char_h) * 0.05)
+            padding = max(padding, 8)  # Minimal 8 piksel untuk margin aman
+            
+            left = max(0, left - padding)
+            upper = max(0, upper - padding)
+            right = min(img.width, right + padding)
+            lower = min(img.height, lower + padding)
+            
+            # 3. Potong (crop) gambar sesuai bounding box yang sudah diperlebar secara aman
+            cropped_img = img.crop((left, upper, right, lower))
+            
+            # 4. Buat canvas bujursangkar baru (1:1) transparan agar rasio semua avatar seragam
+            square_size = max(cropped_img.width, cropped_img.height)
+            square_img = Image.new('RGBA', (square_size, square_size), (0, 0, 0, 0))
+            
+            # 5. Letakkan gambar di tengah-tengah canvas bujursangkar
+            offset_x = (square_size - cropped_img.width) // 2
+            offset_y = (square_size - cropped_img.height) // 2
+            square_img.paste(cropped_img, (offset_x, offset_y))
+            
+            # 6. Ubah ukuran ke dimensi standard seragam (512x512)
+            img = square_img.resize(max_size, Image.Resampling.LANCZOS)
+        else:
+            # Jika gambar kosong/fully transparan, cukup resize langsung ke 512x512
+            img = img.resize(max_size, Image.Resampling.LANCZOS)
             
         output = io.BytesIO()
-        if fmt == 'JPEG' or fmt == 'JPG':
-            img.save(output, format='JPEG', quality=quality, optimize=True)
-        else:
-            img.save(output, format='PNG', optimize=True)
-            
+        img.save(output, format='PNG', optimize=True)
         return base64.b64encode(output.getvalue()).decode('utf-8')
     except Exception:
         return base64_data
@@ -46,7 +71,6 @@ class ShopAvatar(models.Model):
     # Pendukung Upload File Gambar
     foto_avatar = fields.Image(string='Upload Gambar Avatar', max_width=512, max_height=512)
     image_src = fields.Char(string='Sumber Gambar', compute='_compute_image_src')
-    is_video = fields.Boolean(string='Apakah Video?', compute='_compute_is_video', store=True)
     active = fields.Boolean(string='Aktif', default=True)
 
     _sql_constraints = [
@@ -88,13 +112,6 @@ class ShopAvatar(models.Model):
             else:
                 rec.image_src = f"/custom_web/static/src/img/{rec.avatar_id or 'char_default'}.png"
 
-    @api.depends('gambar_url', 'foto_avatar')
-    def _compute_is_video(self):
-        for rec in self:
-            if not rec.foto_avatar and rec.gambar_url and any(rec.gambar_url.lower().endswith(ext) for ext in ['.mp4', '.webm', '.ogg', '.mov']):
-                rec.is_video = True
-            else:
-                rec.is_video = False
 
 
 class ShopVoucher(models.Model):

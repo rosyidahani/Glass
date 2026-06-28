@@ -1,22 +1,22 @@
 <odoo>
     <template id="dashboard_dosen" name="Dashboard Dosen">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_dashboard.css"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_dashboard.css?v=11"/>
             
             <div class="dosen-dashboard-container">
                 <!-- Lecturer Profile HUD Header -->
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
-                            <t t-esc="dosen.name[0].upper()"/>
+                            <t t-esc="dosen.name[0].upper() if dosen and dosen.name else 'D'"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name"><t t-esc="dosen.name"/></h2>
-                            <p class="dosen-nip"><t t-esc="dosen.nip"/></p>
+                            <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
                     <!-- Settings Button -->
-                    <a href="#" class="dosen-settings-btn" title="Pengaturan Akun">
+                    <a href="/dashboard/dosen/settings" class="dosen-settings-btn" title="Pengaturan Akun">
                         <i class="bi bi-gear-fill"></i>
                     </a>
                 </div>
@@ -62,6 +62,20 @@
                         </div>
                         <div class="dosen-card-footer">
                             <a href="/dosen/tugas/pengumpulan" class="dosen-action-btn btn-amber">Periksa Tugas</a>
+                        </div>
+                    </div>
+
+                    <!-- CARD 4: Leaderboard Mahasiswa -->
+                    <div class="dosen-card glass-panel">
+                        <div class="dosen-card-icon icon-emerald">
+                            <i class="bi bi-trophy-fill"></i>
+                        </div>
+                        <div class="dosen-card-body">
+                            <h3>Leaderboard</h3>
+                            <p>Pantau peringkat mahasiswa berdasarkan akumulasi XP dan pencapaian mereka.</p>
+                        </div>
+                        <div class="dosen-card-footer">
+                            <a href="/dosen/leaderboard" class="dosen-action-btn btn-emerald">Lihat Peringkat</a>
                         </div>
                     </div>
                 </div>

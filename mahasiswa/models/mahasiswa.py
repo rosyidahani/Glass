@@ -70,6 +70,10 @@ class Mahasiswa(models.Model):
         string='Program Studi',
         help='Program studi mahasiswa untuk kebutuhan leaderboard dosen dan filter angkatan.',
     )
+    mata_kuliah_ids = fields.Many2many(
+        'mata.kuliah',
+        string='Mata Kuliah yang Diambil'
+    )
 
     _sql_constraints = [
 
@@ -124,7 +128,22 @@ class Mahasiswa(models.Model):
     def name_get(self):
         result = []
         for rec in self:
-            display = f"[{rec.nim}] {rec.name}" if rec.nim else rec.name
+            parts = []
+            if rec.nim:
+                parts.append(f"[{rec.nim}]")
+            
+            parts.append(rec.name)
+            
+            meta_info = []
+            if rec.prodi:
+                meta_info.append(rec.prodi)
+            if rec.semester:
+                meta_info.append(f"Semester {rec.semester}")
+            
+            if meta_info:
+                parts.append(f"({' - '.join(meta_info)})")
+                
+            display = " ".join(parts)
             result.append((rec.id, display))
         return result
 
@@ -145,6 +164,14 @@ class Mahasiswa(models.Model):
         if self.koin < jumlah:
             raise UserError('Koin tidak cukup untuk melakukan transaksi ini.')
         self.koin -= jumlah
+
+    def action_reset_face_data(self):
+        """Reset data biometrik wajah dan device binding mahasiswa."""
+        for rec in self:
+            rec.write({
+                'face_descriptor': False,
+                'device_id': False
+            })
     # Di dalam class model Mahasiswa pada models/mahasiswa.py
 
     @classmethod

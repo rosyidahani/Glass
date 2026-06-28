@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="settings" name="Mahasiswa Settings">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/settings.css"/>
+
+            <div class="profile-container">
+                <t t-call="custom_web.shared_student_header">
+                    <t t-set="title" t-value="'Pengaturan'"/>
+                    <t t-set="back_url" t-value="'/dashboard/mahasiswa'"/>
+                </t>
+
+                <!-- Header Section -->
+                <div class="profile-header">
+                    <div class="profile-picture-wrapper">
+                        <div class="profile-picture" onclick="document.getElementById('fotoProfilInput').click();" style="cursor: pointer;" title="Ubah Foto">
+                            <t t-if="mahasiswa.foto_profil">
+                                <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
+                            </t>
+                            <t t-else="">
+                                <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile"/>
+                            </t>
+                        </div>
+                        <div class="edit-icon" title="Ubah Foto" onclick="document.getElementById('fotoProfilInput').click();"><i class="bi bi-pencil-fill"></i></div>
+                    </div>
+                    <div class="profile-details">
+                        <h2><t t-esc="mahasiswa.name"/></h2>
+                        <p>NIM: <t t-esc="mahasiswa.nim"/></p>
+                        <a href="#" class="edit-btn" onclick="document.getElementById('fotoProfilInput').click(); return false;" data-translate-id="set_edit_photo">Edit Photo</a>
+                    </div>
+                </div>
+
+                <form action="/dashboard/mahasiswa/settings/upload_photo" method="post" enctype="multipart/form-data" id="photoUploadForm" style="display: none;">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/png, image/jpeg, image/jpg" onchange="document.getElementById('photoUploadForm').submit();"/>
+                </form>
+
+                <!-- Stats Tabs -->
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <h4><t t-esc="mahasiswa.semester"/></h4>
+                        <span data-translate-id="set_semester">Semester</span>
+                    </div>
+                    <div class="stat-box">
+                        <h4><t t-esc="mahasiswa.koin"/></h4>
+                        <span data-translate-id="set_coins">Koin</span>
+                    </div>
+                    <div class="stat-box">
+                        <h4><t t-esc="mahasiswa.total_xp"/></h4>
+                        <span data-translate-id="set_total_xp">Total XP</span>
+                    </div>
+                </div>
+
+                <!-- Settings List -->
+                <div class="settings-list">
+                    <a href="/dashboard/mahasiswa/settings/1" class="settings-item">
+                        <div class="item-left">
+                            <div class="item-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                            <span data-translate-id="set_security">Sandi &amp; Keamanan</span>
+                        </div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
+                    </a>
+                    <a href="/dashboard/mahasiswa/settings/2" class="settings-item">
+                        <div class="item-left">
+                            <div class="item-icon"><i class="bi bi-palette-fill"></i></div>
+                            <span data-translate-id="set_theme">Tema</span>
+                        </div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
+                    </a>
+                    <a href="/dashboard/mahasiswa/settings/3" class="settings-item">
+                        <div class="item-left">
+                            <div class="item-icon"><i class="bi bi-translate"></i></div>
+                            <span data-translate-id="set_lang">Bahasa</span>
+                        </div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
+                    </a>
+                    <a href="/dashboard/mahasiswa/settings/4" class="settings-item">
+                        <div class="item-left">
+                            <div class="item-icon"><i class="bi bi-question-circle-fill"></i></div>
+                            <span data-translate-id="set_faq">Bantuan (faq)</span>
+                        </div>
+                        <div class="item-arrow"><i class="bi bi-chevron-right"></i></div>
+                    </a>
+                    <a href="/logout" class="settings-item logout-item" style="color: #ef4444;">
+                        <div class="item-left">
+                            <div class="item-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="bi bi-box-arrow-right"></i></div>
+                            <span data-translate-id="set_logout">Log out</span>
+                        </div>
+                        <div class="item-arrow" style="color: #ef4444;"><i class="bi bi-chevron-right"></i></div>
+                    </a>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

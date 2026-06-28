@@ -44,12 +44,7 @@
                                     <!-- Inner Bar Content -->
                                     <div class="podium-bar-content content-silver">
                                         <div class="podium-avatar-container">
-                                            <t t-if="rank_2.equipped_avatar_id.is_video">
-                                                <video t-att-src="rank_2.equipped_avatar_id.image_src" class="podium-avatar" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"></video>
-                                            </t>
-                                            <t t-else="">
-                                                <img t-att-src="rank_2.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 2 Avatar" class="podium-avatar"/>
-                                            </t>
+                                            <img t-att-src="rank_2.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 2 Avatar" class="podium-avatar"/>
                                             <div class="podium-badge badge-silver">2</div>
                                         </div>
                                         <div class="podium-name"><t t-esc="rank_2.name"/></div>
@@ -87,12 +82,7 @@
                                             <i class="bi bi-crown-fill"></i>
                                         </div>
                                         <div class="podium-avatar-container">
-                                            <t t-if="rank_1.equipped_avatar_id.is_video">
-                                                <video t-att-src="rank_1.equipped_avatar_id.image_src" class="podium-avatar" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"></video>
-                                            </t>
-                                            <t t-else="">
-                                                <img t-att-src="rank_1.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 1 Avatar" class="podium-avatar"/>
-                                            </t>
+                                            <img t-att-src="rank_1.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 1 Avatar" class="podium-avatar"/>
                                             <div class="podium-badge badge-gold">1</div>
                                         </div>
                                         <div class="podium-name"><t t-esc="rank_1.name"/></div>
@@ -127,12 +117,7 @@
                                     <!-- Inner Bar Content -->
                                     <div class="podium-bar-content content-bronze">
                                         <div class="podium-avatar-container">
-                                            <t t-if="rank_3.equipped_avatar_id.is_video">
-                                                <video t-att-src="rank_3.equipped_avatar_id.image_src" class="podium-avatar" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"></video>
-                                            </t>
-                                            <t t-else="">
-                                                <img t-att-src="rank_3.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 3 Avatar" class="podium-avatar"/>
-                                            </t>
+                                            <img t-att-src="rank_3.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Rank 3 Avatar" class="podium-avatar"/>
                                             <div class="podium-badge badge-bronze">3</div>
                                         </div>
                                         <div class="podium-name"><t t-esc="rank_3.name"/></div>
@@ -159,19 +144,14 @@
                                     <span class="row-rank-badge">#<t t-esc="rank_idx"/></span>
                                 </div>
                                 <div class="row-avatar-box">
-                                    <t t-if="student.equipped_avatar_id.is_video">
-                                        <video t-att-src="student.equipped_avatar_id.image_src" class="row-avatar-img" autoplay="autoplay" loop="loop" muted="muted" playsinline="playsinline"></video>
-                                    </t>
-                                    <t t-else="">
-                                        <img t-att-src="student.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Student Avatar" class="row-avatar-img"/>
-                                    </t>
+                                    <img t-att-src="student.equipped_avatar_id.image_src or '/custom_web/static/src/img/char_default.png'" alt="Student Avatar" class="row-avatar-img"/>
                                 </div>
                                 <div class="row-student-info">
                                     <div class="row-student-name"><t t-esc="student.name"/></div>
                                     <div class="row-student-nim"><t t-esc="student.nim"/></div>
                                 </div>
                                 <div class="row-xp-score">
-                                    <i class="bi bi-star"></i> <t t-esc="student.total_xp"/> XP
+                                    <t t-esc="student.total_xp"/> XP
                                 </div>
                             </div>
                             <t t-set="rank_idx" t-value="rank_idx + 1"/>

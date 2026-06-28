@@ -39,6 +39,7 @@ class PengumpulanTugas(models.Model):
     waktu_kumpul = fields.Datetime('Waktu Kumpul', default=fields.Datetime.now)
     tipe_file = fields.Selection([('zip', 'File ZIP/PDF'), ('link', 'Tautan/Link')], string='Tipe Pengumpulan')
     file_jawaban = fields.Binary('File Jawaban')
+    file_jawaban_name = fields.Char('Nama File Jawaban')
     link_jawaban = fields.Char('Tautan Jawaban')
     catatan = fields.Text('Catatan Mahasiswa')
     

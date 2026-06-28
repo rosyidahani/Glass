@@ -1,8 +1,11 @@
 import json
 import pytz
 from datetime import datetime
+import io
+import zipfile
 from odoo import http
-from odoo.http import request
+import base64
+from odoo.http import request, content_disposition
 from .utils import get_active_mahasiswa, get_active_dosen
 
 
@@ -27,6 +30,19 @@ class DosenPortalController(http.Controller):
             'dosen': dosen,
         })
 
+    @http.route([
+        '/dashboard/dosen/settings',
+        '/dashboard/dosen/settings/<int:submenu_id>'
+    ], auth='public', website=True, type='http')
+    def settings_dosen(self, submenu_id=None, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        return request.render('custom_web.settings_dosen', {
+            'dosen': dosen,
+        })
+
     @http.route('/dosen/presensi', auth='public', website=True, type='http')
     def presensi_dosen_menu(self, **kwargs):
         dosen = get_active_dosen()
@@ -46,7 +62,7 @@ class DosenPortalController(http.Controller):
         open_sessions = sesi_obj.search([('status', '=', 'open'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
 
         # Load courses specifically taught by this Dosen
-        courses_list = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        courses_list = request.env['mata.kuliah'].sudo().search([('dosen_ids', 'in', [dosen.id])], order='nama asc')
         if not courses_list:
             # Fallback to all active courses if no relationship is defined yet
             courses_list = request.env['mata.kuliah'].sudo().search([], order='nama asc')
@@ -71,6 +87,25 @@ class DosenPortalController(http.Controller):
             'closed_sessions': closed_sessions,
         })
 
+    @http.route('/dosen/presensi/histori/detail/<int:sesi_id>', auth='public', website=True, type='http')
+    def presensi_dosen_histori_detail(self, sesi_id, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        sesi = request.env['presensi.sesi'].sudo().browse(sesi_id)
+        if not sesi.exists() or sesi.feature_dosen_id.id != dosen.id:
+            return request.redirect('/dosen/presensi/histori')
+
+        # Get all records for this session, sorted by check-in time
+        records = sesi.record_ids.sorted(key=lambda r: r.waktu_presensi)
+
+        return request.render('custom_web.presensi_dosen_histori_detail', {
+            'dosen': dosen,
+            'sesi': sesi,
+            'records': records,
+        })
+
     @http.route('/dosen/tugas', auth='public', website=True, type='http')
     def tugas_dosen_menu(self, **kwargs):
         dosen = get_active_dosen()
@@ -87,7 +122,7 @@ class DosenPortalController(http.Controller):
             return request.redirect('/login')
 
         # Get actual courses taught by this Dosen from database (removes mockup dummy data)
-        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_ids', 'in', [dosen.id])], order='nama asc')
         if not real_mk:
             real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
         
@@ -105,7 +140,7 @@ class DosenPortalController(http.Controller):
             return request.redirect('/login')
 
         # Get actual courses taught by this Dosen from database (removes mockup dummy data)
-        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_id', '=', dosen.id)], order='nama asc')
+        real_mk = request.env['mata.kuliah'].sudo().search([('dosen_ids', 'in', [dosen.id])], order='nama asc')
         if not real_mk:
             real_mk = request.env['mata.kuliah'].sudo().search([], order='nama asc')
         
@@ -119,16 +154,18 @@ class DosenPortalController(http.Controller):
         for t in tugas_list:
             count = len(t.pengumpulan_ids)
             color = 'purple'
-            if 'web' in t.mata_kuliah_id.nama.lower():
-                color = 'blue'
-            elif 'rekayasa' in t.mata_kuliah_id.nama.lower():
-                color = 'teal'
-            
+            mk_nama = t.mata_kuliah_id.nama if t.mata_kuliah_id else ''
+            if mk_nama:
+                if 'web' in mk_nama.lower():
+                    color = 'blue'
+                elif 'rekayasa' in mk_nama.lower():
+                    color = 'teal'
+
             tugas_data.append({
                 'id': t.id,
                 'judul': t.judul,
-                'mk_id': t.mata_kuliah_id.id,
-                'mk_nama': t.mata_kuliah_id.nama,
+                'mk_id': t.mata_kuliah_id.id if t.mata_kuliah_id else False,
+                'mk_nama': mk_nama,
                 'jenis_tugas': t.jenis_tugas,
                 'submission_count': count,
                 'color': color,
@@ -150,6 +187,55 @@ class DosenPortalController(http.Controller):
             'dosen': dosen,
             'tugas_id': tugas_id,
         })
+
+    # =======================================================
+    # LEADERBOARD DOSEN (VIEW ONLY)
+    # =======================================================
+    @http.route('/dosen/leaderboard', auth='public', website=True, type='http')
+    def dosen_leaderboard(self, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        prodi = getattr(dosen, 'prodi', False) if hasattr(dosen, 'prodi') else False
+        if not prodi:
+            prodi = ''
+
+        # Ambil list angkatan dari semua mahasiswa di prodi ini
+        base_domain = [('active', '=', True)]
+        if prodi:
+            base_domain.append(('prodi', '=', prodi))
+
+        all_prodi_students = request.env['mahasiswa.mahasiswa'].sudo().search(base_domain)
+
+        # Ambil NIM 2 digit awal yang valid (berupa angka)
+        angkatan_set = sorted({
+            (s.nim or '')[:2] 
+            for s in all_prodi_students 
+            if (s.nim or '').strip() and len((s.nim or '').strip()) >= 2 and (s.nim or '')[:2].isdigit()
+        })
+
+        angkatan_selected = kwargs.get('angkatan') or 'semua'
+
+        # Query mahasiswa untuk leaderboard berdasarkan prodi dan angkatan terpilih
+        students_domain = [('active', '=', True)]
+        if prodi:
+            students_domain.append(('prodi', '=', prodi))
+
+        if angkatan_selected and angkatan_selected != 'semua':
+            students_domain.append(('nim', '=like', f"{angkatan_selected}%"))
+
+        students_for_template = request.env['mahasiswa.mahasiswa'].sudo().search(students_domain, order='total_xp desc')
+
+        return request.render('custom_web.leaderboard_dosen', {
+            'dosen': dosen,
+            'prodi_id': prodi,
+            'prodi_name': prodi or 'Nama Prodi',
+            'angkatan_list': angkatan_set,
+            'angkatan_selected': angkatan_selected,
+            'students': students_for_template,
+        })
+
 
     # =======================================================
     # API BACKEND TUGAS
@@ -225,8 +311,8 @@ class DosenPortalController(http.Controller):
                 'name': sub.mahasiswa_id.name,
                 'nim': sub.mahasiswa_id.nim,
                 'date': sub_wib,
-                'file': sub.link_jawaban or 'Berkas ZIP',
-                'type': sub.tipe_file or 'zip',
+                'file': f'/api/tugas/pengumpulan/download/{sub.id}' if sub.file_jawaban else sub.link_jawaban,
+                'type': 'zip' if sub.file_jawaban else 'link',
                 'note': sub.catatan or '-',
                 'grade': sub.nilai,
                 'status': sub.status_penilaian
@@ -260,6 +346,31 @@ class DosenPortalController(http.Controller):
             return request.make_response(json.dumps({'status': 'success'}), headers=[('Content-Type', 'application/json')])
         except Exception as e:
             return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
+
+    @http.route('/api/tugas/pengumpulan/download/<int:pengumpulan_id>', type='http', auth='public', methods=['GET'], website=True)
+    def api_tugas_download_jawaban(self, pengumpulan_id, **kw):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.make_response("Unauthorized", status=401)
+
+        submission = request.env['tugas.pengumpulan'].sudo().browse(pengumpulan_id)
+        if not submission.exists() or not submission.file_jawaban:
+            return request.not_found("File tidak ditemukan atau pengumpulan tidak valid.")
+
+        # Membuat file ZIP yang valid di memori
+        in_memory_zip = io.BytesIO()
+        with zipfile.ZipFile(in_memory_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+            file_name = submission.file_jawaban_name or f"jawaban_{submission.mahasiswa_id.nim}.bin"
+            file_content = base64.b64decode(submission.file_jawaban)
+            zf.writestr(file_name, file_content)
+
+        zip_content = in_memory_zip.getvalue()
+        zip_filename = f"Jawaban_{submission.mahasiswa_id.name.replace(' ', '_')}_{submission.tugas_id.judul.replace(' ', '_')}.zip"
+
+        return request.make_response(zip_content, headers=[
+            ('Content-Type', 'application/zip'),
+            ('Content-Disposition', content_disposition(zip_filename))
+        ])
 
     @http.route('/dosen/tugas/materi/<int:tugas_id>', auth='public', website=True, type='http')
     def download_tugas_materi(self, tugas_id, **kwargs):
