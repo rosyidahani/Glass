@@ -4,6 +4,14 @@ from odoo.exceptions import UserError
 import json
 import base64
 from odoo import fields
+import os
+import sys
+
+# Dapatkan path root proyek (2 tingkat di atas controllers)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 import jwt
 import datetime
 

@@ -1,4 +1,13 @@
 import json
+import os
+import sys
+
+# Dapatkan path root proyek (2 tingkat di atas controllers)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+import jwt
 
 from odoo import http
 from odoo.http import request
@@ -34,8 +43,6 @@ class PrefsController(http.Controller):
         )
 
     def _get_mahasiswa_from_token(self):
-        import jwt
-
         auth_header = request.httprequest.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
             return None

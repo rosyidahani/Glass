@@ -1,6 +1,14 @@
 from odoo import http
 from odoo.http import request
 import json
+import os
+import sys
+
+# Dapatkan path root proyek (2 tingkat di atas controllers)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 import jwt
 
 JWT_SECRET = 'GlassSuperSecretKey2024'
