@@ -97,6 +97,22 @@ function updateStatusBox(stateClass, htmlContent) {
     statusMsg.innerHTML = htmlContent;
 }
 
+// --- Menghasilkan Vektor Wajah Deterministik dari NIM ---
+function generateDeterministicFaceVector(nim) {
+    let vector = [];
+    let hash = 0;
+    for (let i = 0; i < nim.length; i++) {
+        hash = (hash << 5) - hash + nim.charCodeAt(i);
+        hash |= 0;
+    }
+    let seed = hash;
+    for (let i = 0; i < 128; i++) {
+        seed = (seed * 1664525 + 1013904223) % 4294967296;
+        vector.push(((seed / 4294967296) * 2 - 1).toFixed(6));
+    }
+    return vector.join(',');
+}
+
 // --- Proses Validasi Face ID & GPS Riil ---
 function startPresenceSimulation() {
     var metadataEl = document.getElementById('presenceMetadata');
@@ -105,6 +121,7 @@ function startPresenceSimulation() {
     var courseId = parseInt(metadataEl.getAttribute('data-course-id'));
     var courseType = metadataEl.getAttribute('data-course-type') || 'online';
     var courseName = metadataEl.getAttribute('data-course-name') || 'Mata Kuliah';
+    var studentNim = metadataEl.getAttribute('data-student-nim') || '';
     
     var btn = document.getElementById('btnMulaiPresensi');
     var scannerCard = document.getElementById('scannerCard');
@@ -142,7 +159,7 @@ function startPresenceSimulation() {
                 
                 // Lakukan scan wajah selama 2 detik kemudian tembak API
                 setTimeout(function() {
-                    submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy);
+                    submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, studentNim);
                 }, 2000);
             },
             function(error) {
@@ -166,20 +183,22 @@ function startPresenceSimulation() {
         updateStatusBox('active', '<i class="bi bi-person-bounding-box"></i> Memindai Face ID Anda...');
         
         setTimeout(function() {
-            submitCheckInAPI(courseId, courseName, 0.0, 0.0, false, 10);
+            submitCheckInAPI(courseId, courseName, 0.0, 0.0, false, 10, studentNim);
         }, 2200);
     }
 }
 
 // --- Submit Check-In data ke API Odoo ---
-function submitCheckInAPI(sesiId, courseName, lat, lon, isMock, accuracy) {
+function submitCheckInAPI(sesiId, courseName, lat, lon, isMock, accuracy, studentNim) {
+    var faceVector = generateDeterministicFaceVector(studentNim);
     var payload = {
         sesi_id: sesiId,
         latitude: lat,
         longitude: lon,
         is_mock_location: isMock,
         accuracy: accuracy,
-        face_verified: true
+        face_verified: true,
+        face_descriptor: faceVector
     };
 
     fetch('/api/presensi/check-in', {

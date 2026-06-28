@@ -11,6 +11,7 @@
         'views/pages/mahasiswa/settings.xml',
         'views/pages/mahasiswa/presensi_select.xml',
         'views/pages/mahasiswa/presensi_scan.xml',
+        'views/pages/mahasiswa/register_face.xml',
         'views/pages/mahasiswa/shop.xml',
         'views/pages/mahasiswa/leaderboard.xml',
         'views/pages/dosen/dashboard.xml',

@@ -31,6 +31,9 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
 
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
+
         # Hitung ranking mahasiswa berdasarkan total_xp dalam kelompok 7 digit NIM yang sama
         nim_prefix = (mahasiswa.nim or '').strip()[:7]
         domain = [('active', '=', True)]
@@ -50,6 +53,45 @@ class MahasiswaPortalController(http.Controller):
             'rank': rank,
         })
 
+    @http.route('/mahasiswa/register-face', auth='public', website=True, type='http')
+    def register_face_page(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return request.redirect('/login')
+        
+        # If already has face data, redirect to dashboard
+        if mahasiswa.face_descriptor:
+            return request.redirect('/dashboard/mahasiswa')
+            
+        return request.render('custom_web.register_face', {
+            'mahasiswa': mahasiswa,
+        })
+
+    @http.route('/api/mahasiswa/register-face', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
+    def api_register_face(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return {'status': 'error', 'message': 'Session expired or not logged in'}
+            
+        face_vector = kwargs.get('face_vector')
+        if not face_vector:
+            return {'status': 'error', 'message': 'Data wajah tidak boleh kosong.'}
+            
+        # Encrypt the face descriptor using aes256_encrypt_b64 from faceid_utils
+        from presensi.models.faceid_utils import aes256_encrypt_b64
+        from presensi.models.faceid_service import _get_faceid_secret
+        
+        secret = _get_faceid_secret(request.env)
+        encrypted_descriptor = aes256_encrypt_b64(face_vector, secret)
+        
+        try:
+            mahasiswa.sudo().write({
+                'face_descriptor': encrypted_descriptor
+            })
+            return {'status': 'success', 'message': 'Pendaftaran wajah berhasil.'}
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
     @http.route([
         '/dashboard/mahasiswa/settings',
         '/dashboard/mahasiswa/settings/<int:submenu_id>'
@@ -58,6 +100,8 @@ class MahasiswaPortalController(http.Controller):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
 
         return request.render('custom_web.settings', {
             'mahasiswa': mahasiswa,
@@ -83,6 +127,8 @@ class MahasiswaPortalController(http.Controller):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
 
         return request.render('custom_web.shop', {
             'mahasiswa': mahasiswa,
@@ -93,6 +139,8 @@ class MahasiswaPortalController(http.Controller):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
 
         # Leaderboard mahasiswa: hanya tampilkan mahasiswa dengan 7 digit NIM yang sama
         nim_prefix = (mahasiswa.nim or '').strip()[:7]
@@ -241,6 +289,8 @@ class MahasiswaPortalController(http.Controller):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
 
         # Get all tasks for the student's courses
         course_ids = mahasiswa.mata_kuliah_ids.ids
@@ -414,6 +464,8 @@ class MahasiswaPortalController(http.Controller):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
 
         # Ambil seluruh mata kuliah yang diambil mahasiswa
         courses_taken = mahasiswa.mata_kuliah_ids
@@ -467,6 +519,8 @@ class MahasiswaPortalController(http.Controller):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
             return request.redirect('/login')
+        if not mahasiswa.face_descriptor:
+            return request.redirect('/mahasiswa/register-face')
 
         sesi = request.env['presensi.sesi'].sudo().browse(course_id)
         if not sesi.exists():
