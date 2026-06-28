@@ -59,44 +59,24 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
         
-        # If already has face data, redirect to dashboard
-        if mahasiswa.face_descriptor:
-            return request.redirect('/dashboard/mahasiswa')
-            
+        # Allow visiting the registration page to register or re-register face data.
         return request.render('custom_web.register_face', {
             'mahasiswa': mahasiswa,
         })
 
-    @http.route('/api/mahasiswa/register-face', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
+    @http.route('/api/mahasiswa/register-face', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_register_face(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
-            return request.make_response(
-                json.dumps({'status': 'error', 'message': 'Session expired or not logged in'}),
-                headers=[('Content-Type', 'application/json')],
-                status=401
-            )
+            return {'status': 'error', 'message': 'Session expired or not logged in'}
             
-        try:
-            body = json.loads(request.httprequest.data)
-        except Exception:
-            return request.make_response(
-                json.dumps({'status': 'error', 'message': 'Format JSON tidak valid.'}),
-                headers=[('Content-Type', 'application/json')],
-                status=400
-            )
-            
-        face_vector = body.get('face_vector')
+        face_vector = kwargs.get('face_vector')
         if not face_vector:
-            return request.make_response(
-                json.dumps({'status': 'error', 'message': 'Data wajah tidak boleh kosong.'}),
-                headers=[('Content-Type', 'application/json')],
-                status=400
-            )
+            return {'status': 'error', 'message': 'Data wajah tidak boleh kosong.'}
             
         # Encrypt the face descriptor using aes256_encrypt_b64 from faceid_utils
-        from presensi.models.faceid_utils import aes256_encrypt_b64
-        from presensi.models.faceid_service import _get_faceid_secret
+        from odoo.addons.presensi.models.faceid_utils import aes256_encrypt_b64
+        from odoo.addons.presensi.models.faceid_service import _get_faceid_secret
         
         secret = _get_faceid_secret(request.env)
         encrypted_descriptor = aes256_encrypt_b64(face_vector, secret)
@@ -105,16 +85,9 @@ class MahasiswaPortalController(http.Controller):
             mahasiswa.sudo().write({
                 'face_descriptor': encrypted_descriptor
             })
-            return request.make_response(
-                json.dumps({'status': 'success', 'message': 'Pendaftaran wajah berhasil.'}),
-                headers=[('Content-Type', 'application/json')]
-            )
+            return {'status': 'success', 'message': 'Pendaftaran wajah berhasil.'}
         except Exception as e:
-            return request.make_response(
-                json.dumps({'status': 'error', 'message': str(e)}),
-                headers=[('Content-Type', 'application/json')],
-                status=500
-            )
+            return {'status': 'error', 'message': str(e)}
 
     @http.route([
         '/dashboard/mahasiswa/settings',
