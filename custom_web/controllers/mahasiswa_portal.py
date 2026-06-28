@@ -59,7 +59,11 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return request.redirect('/login')
         
-        # Allow visiting the registration page to register or re-register face data.
+        # Keamanan: Jika wajah sudah terdaftar, blokir akses pendaftaran ulang langsung
+        # untuk mencegah orang lain mendaftarkan wajah baru secara ilegal.
+        if mahasiswa.face_descriptor:
+            return request.redirect('/dashboard/mahasiswa')
+        
         return request.render('custom_web.register_face', {
             'mahasiswa': mahasiswa,
         })

@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class MataKuliah(models.Model):
@@ -24,9 +24,26 @@ class MataKuliah(models.Model):
         string='Semester',
         default=1,
     )
-    dosen_pengampu = fields.Char(
+    dosen_ids = fields.Many2many(
+        comodel_name='feature.dosen',
+        relation='dosen_mata_kuliah_rel',
+        column1='mata_kuliah_id',
+        column2='dosen_id',
         string='Dosen Pengampu',
     )
+    dosen_pengampu = fields.Char(
+        string='Dosen Pengampu',
+        compute='_compute_dosen_pengampu',
+        store=True,
+    )
+
+    @api.depends('dosen_ids.name', 'dosen_ids.nip')
+    def _compute_dosen_pengampu(self):
+        for rec in self:
+            if rec.dosen_ids:
+                rec.dosen_pengampu = ", ".join([f"{d.name} ({d.nip})" for d in rec.dosen_ids])
+            else:
+                rec.dosen_pengampu = ""
     active = fields.Boolean(
         string='Active',
         default=True,

@@ -13,7 +13,7 @@ class ImportRelasiMataKuliah(models.TransientModel):
         ('dosen', 'Dosen ke Mata Kuliah')
     ], string='Tipe Import', default='mahasiswa', required=True)
     
-    file_data = fields.Binary(string='File CSV', required=True)
+    file_data = fields.Binary(string='File CSV')
     file_name = fields.Char(string='Nama File')
 
     def action_download_template(self):
@@ -87,7 +87,7 @@ class ImportRelasiMataKuliah(models.TransientModel):
                     error_logs.append(f"Mata Kuliah dengan Kode '{kode_matkul}' tidak ditemukan.")
                     continue
                     
-                course.write({'dosen_id': dosen.id})
+                course.write({'dosen_ids': [(4, dosen.id)]})
                 success_count += 1
                 
         message = f"Berhasil mengimpor {success_count} data relasi."

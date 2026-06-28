@@ -115,6 +115,127 @@ function initWebcam() {
     }
 }
 
+// --- Analisis Wajah (Jarak, Posisi Tengah, Pose Lurus) ---
+function analyzeFace(detection, video) {
+    if (!detection) return { ok: false, reason: "Wajah tidak terdeteksi" };
+
+    const box = detection.detection.box;
+    const videoWidth = video.videoWidth || video.clientWidth || 640;
+    const videoHeight = video.videoHeight || video.clientHeight || 480;
+
+    // 1. Cek Jarak Wajah (Lebar Box dibanding Lebar Video)
+    const boxWidthRatio = box.width / videoWidth;
+    let distanceOk = true;
+    let distanceMsg = "Jarak Sesuai";
+    let distanceStatus = "ok";
+    if (boxWidthRatio < 0.28) {
+        distanceOk = false;
+        distanceMsg = "Terlalu Jauh, Mendekatlah";
+        distanceStatus = "too-far";
+    } else if (boxWidthRatio > 0.55) {
+        distanceOk = false;
+        distanceMsg = "Terlalu Dekat, Menjauhlah";
+        distanceStatus = "too-close";
+    }
+
+    // 2. Cek Posisi Tengah (Centeredness)
+    const boxCenterX = box.x + box.width / 2;
+    const boxCenterY = box.y + box.height / 2;
+    const videoCenterX = videoWidth / 2;
+    const videoCenterY = videoHeight / 2;
+    const devX = Math.abs(boxCenterX - videoCenterX) / videoWidth;
+    const devY = Math.abs(boxCenterY - videoCenterY) / videoHeight;
+    let positionOk = true;
+    let positionMsg = "Posisi Tengah";
+    if (devX > 0.12 || devY > 0.15) {
+        positionOk = false;
+        positionMsg = "Posisikan Wajah di Tengah";
+    }
+
+    // 3. Cek Pose (Menghadap Lurus) menggunakan Landmarks 68 titik
+    let poseOk = true;
+    let poseMsg = "Menghadap Lurus";
+    let ratio = 1.0;
+    if (detection.landmarks) {
+        const nose = detection.landmarks.getNose()[3]; // Ujung hidung
+        const leftEye = detection.landmarks.getLeftEye()[0]; // Sudut luar mata kiri
+        const rightEye = detection.landmarks.getRightEye()[3]; // Sudut luar mata kanan
+        
+        const distToLeft = Math.abs(nose.x - leftEye.x);
+        const distToRight = Math.abs(nose.x - rightEye.x);
+        ratio = distToLeft / distToRight;
+
+        // Ratio ideal adalah ~1.0 jika lurus. Toleransi antara 0.65 - 1.5.
+        if (ratio < 0.65 || ratio > 1.5) {
+            poseOk = false;
+            poseMsg = "Hadapkan Wajah Lurus ke Depan";
+        }
+    }
+
+    const ok = distanceOk && positionOk && poseOk;
+    return {
+        ok: ok,
+        distanceOk: distanceOk,
+        distanceMsg: distanceMsg,
+        distanceStatus: distanceStatus,
+        positionOk: positionOk,
+        positionMsg: positionMsg,
+        poseOk: poseOk,
+        poseMsg: poseMsg,
+        ratio: ratio
+    };
+}
+
+// --- Perbarui Badge Indikator di Layar ---
+function updateIndicators(analysis) {
+    const distBadge = document.getElementById('distanceIndicator');
+    const distText = document.getElementById('distanceText');
+    const distIcon = document.getElementById('distanceIcon');
+    const poseBadge = document.getElementById('poseIndicator');
+    const poseText = document.getElementById('poseText');
+    const poseIcon = document.getElementById('poseIcon');
+
+    if (!analysis || (analysis.ok === false && analysis.reason === "Wajah tidak terdeteksi")) {
+        if (distBadge) {
+            distBadge.style.background = 'rgba(15, 23, 42, 0.75)';
+            if (distText) distText.innerText = "Jarak Wajah: Mendeteksi...";
+            if (distIcon) distIcon.className = "bi bi-arrows-expand";
+        }
+        if (poseBadge) {
+            poseBadge.style.background = 'rgba(15, 23, 42, 0.75)';
+            if (poseText) poseText.innerText = "Petunjuk: Posisikan Wajah Anda";
+            if (poseIcon) poseIcon.className = "bi bi-person-badge";
+        }
+        return;
+    }
+
+    // Update Jarak
+    if (distBadge && distText) {
+        if (analysis.distanceOk) {
+            distBadge.style.background = 'rgba(34, 197, 94, 0.85)'; // Hijau
+            distText.innerText = "Jarak Wajah: Sesuai";
+            if (distIcon) distIcon.className = "bi bi-check-circle-fill";
+        } else {
+            distBadge.style.background = 'rgba(239, 68, 68, 0.85)'; // Merah
+            distText.innerText = analysis.distanceMsg;
+            if (distIcon) distIcon.className = "bi bi-exclamation-triangle-fill";
+        }
+    }
+
+    // Update Pose & Posisi Tengah
+    if (poseBadge && poseText) {
+        if (analysis.positionOk && analysis.poseOk) {
+            poseBadge.style.background = 'rgba(34, 197, 94, 0.85)'; // Hijau
+            poseText.innerText = "Posisi & Pose: Sesuai";
+            if (poseIcon) poseIcon.className = "bi bi-check-circle-fill";
+        } else {
+            poseBadge.style.background = 'rgba(245, 158, 11, 0.85)'; // Jingga
+            poseText.innerText = !analysis.positionOk ? analysis.positionMsg : analysis.poseMsg;
+            if (poseIcon) poseIcon.className = "bi bi-person-badge-fill";
+        }
+    }
+}
+
 // --- Loop Pelacakan Wajah Real-Time ---
 function startFaceTracking() {
     var video = document.getElementById('webcam');
@@ -128,29 +249,29 @@ function startFaceTracking() {
         if (video.paused || video.ended) return;
         
         try {
-            const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+            const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.4 }))
                 .withFaceLandmarks()
                 .withFaceDescriptor();
                 
             if (detection) {
-                // Sesuaikan koordinat kotak pembatas dengan ukuran CSS elemen video
                 const displaySize = { width: video.clientWidth, height: video.clientHeight };
                 const resizedDetection = faceapi.resizeResults(detection, displaySize);
                 const box = resizedDetection.detection.box;
                 
-                // Pindahkan kotak pelacak wajah di atas wajah pengguna
-                trackingBox.style.left = box.x + 'px';
+                // Mirror the X coordinate for the tracking box because the video feed is mirrored via CSS (scaleX(-1))
+                const mirroredLeft = displaySize.width - box.x - box.width;
+                
+                trackingBox.style.left = mirroredLeft + 'px';
                 trackingBox.style.top = box.y + 'px';
                 trackingBox.style.width = box.width + 'px';
                 trackingBox.style.height = box.height + 'px';
-                trackingBox.style.transform = 'none'; // bersihkan translate bawaan CSS
+                trackingBox.style.transform = 'none';
                 trackingBox.classList.remove('hidden');
                 
-                // Simpan descriptor wajah terbaru
                 latestFaceDescriptor = detection.descriptor;
             } else {
-                // Sembunyikan kotak jika tidak ada wajah yang terdeteksi
                 trackingBox.classList.add('hidden');
+                latestFaceDescriptor = null;
             }
         } catch (e) {
             console.error("Error pada pelacakan wajah:", e);
@@ -179,8 +300,20 @@ function updateStatusBox(stateClass, htmlContent) {
     statusMsg.innerHTML = htmlContent;
 }
 
+// --- Memulihkan Gaya Tampilan Halaman ---
+function restorePageStyle() {
+    document.body.style.backgroundColor = '';
+    document.body.style.transition = '';
+    var video = document.getElementById('webcam');
+    if (video) {
+        video.style.filter = '';
+        video.style.transition = '';
+    }
+}
+
 // --- Proses Validasi Face ID & GPS Riil ---
 function startPresenceSimulation() {
+    latestFaceDescriptor = null; // Bersihkan cache data wajah sebelumnya
     var metadataEl = document.getElementById('presenceMetadata');
     if (!metadataEl) return;
     
@@ -204,33 +337,63 @@ function startPresenceSimulation() {
     scannerCard.classList.add('scanning');
     
     async function proceedWithFaceCheck(lat, lon, isMock, accuracy) {
-        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Memverifikasi wajah...');
+        latestFaceDescriptor = null; // Bersihkan cache data wajah sebelum pemindaian aktif
+        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Menyiapkan kamera...');
         
         var video = document.getElementById('webcam');
-        if (video && !latestFaceDescriptor) {
+        if (!video) {
+            triggerScanFailure("Kamera tidak ditemukan.");
+            return;
+        }
+
+        stopFaceTracking(); // Hentikan pelacakan pasif
+
+        // One-Shot Instant Scan: Naikkan kecerahan & gunakan kilatan layar putih untuk penerangan fisik
+        video.style.transition = 'filter 0.3s ease';
+        video.style.filter = 'brightness(1.4) contrast(1.2)';
+        
+        document.body.style.transition = 'background-color 0.2s ease';
+        document.body.style.backgroundColor = '#ffffff'; // Kilatan putih penuh (Flash)
+
+        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Memindai Wajah...</strong><br>Harap hadap ke kamera.');
+
+        let detectedDescriptor = null;
+        let attempts = 0;
+        const maxAttempts = 30; // Maksimum 3 detik batas waktu deteksi
+
+        // Tunggu kilatan layar sebentar (150ms)
+        await new Promise(resolve => setTimeout(resolve, 150));
+
+        while (!detectedDescriptor && attempts < maxAttempts) {
+            attempts++;
             try {
-                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
                     .withFaceLandmarks()
                     .withFaceDescriptor();
                     
                 if (detection) {
-                    latestFaceDescriptor = detection.descriptor;
+                    detectedDescriptor = detection.descriptor;
+                    break;
                 }
             } catch (e) {
-                console.error("Gagal melakukan deteksi wajah:", e);
+                console.error("Gagal mendeteksi wajah:", e);
             }
+            await new Promise(resolve => setTimeout(resolve, 100)); // Scan setiap 100ms
         }
-        
-        if (latestFaceDescriptor) {
-            stopFaceTracking();
-            var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
-            submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVector);
+
+        restorePageStyle(); // Kembalikan warna layar
+
+        if (detectedDescriptor) {
+            const faceVectorJSON = JSON.stringify(Array.from(detectedDescriptor));
+            updateStatusBox('active', '<i class="bi bi-cloud-arrow-up-fill spin"></i> Mengirim data verifikasi ke server...');
+            submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVectorJSON);
         } else {
             scannerCard.classList.remove('scanning');
             if (btnText) btnText.classList.remove('hidden');
             if (btnLoader) btnLoader.classList.add('hidden');
             btn.disabled = false;
-            updateStatusBox('camera-denied', '<i class="bi bi-x-circle-fill"></i> Wajah tidak terdeteksi. Silakan arahkan wajah Anda dengan jelas ke kamera.');
+            startFaceTracking();
+            triggerScanFailure("Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
         }
     }
     
@@ -270,6 +433,21 @@ function startPresenceSimulation() {
     } else {
         proceedWithFaceCheck(0.0, 0.0, false, 10);
     }
+}
+
+// Fungsi menghitung rata-rata vektor wajah (128-dimensi)
+function averageDescriptors(descriptors) {
+    if (descriptors.length === 0) return null;
+    const length = descriptors[0].length;
+    const averaged = new Float32Array(length);
+    for (let i = 0; i < length; i++) {
+        let sum = 0;
+        for (let j = 0; j < descriptors.length; j++) {
+            sum += descriptors[j][i];
+        }
+        averaged[i] = sum / descriptors.length;
+    }
+    return averaged;
 }
 
 // --- Submit Check-In data ke API Odoo ---
