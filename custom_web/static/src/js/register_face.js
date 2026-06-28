@@ -201,10 +201,10 @@ function submitFaceRegistrationAPI(faceVector) {
     })
     .then(function(res) {
         return res.json().then(function(json) {
-            if (res.ok && json.result && json.result.status === 'success') {
-                return json.result;
+            if (res.ok && json.status === 'success') {
+                return json;
             } else {
-                throw new Error((json.result && json.result.message) || 'Gagal mendaftarkan wajah.');
+                throw new Error(json.message || 'Gagal mendaftarkan wajah.');
             }
         });
     })

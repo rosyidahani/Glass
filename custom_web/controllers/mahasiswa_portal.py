@@ -67,15 +67,32 @@ class MahasiswaPortalController(http.Controller):
             'mahasiswa': mahasiswa,
         })
 
-    @http.route('/api/mahasiswa/register-face', type='json', auth='public', methods=['POST'], cors='*', csrf=False)
+    @http.route('/api/mahasiswa/register-face', type='http', auth='public', methods=['POST'], cors='*', csrf=False)
     def api_register_face(self, **kwargs):
         mahasiswa = get_active_mahasiswa()
         if not mahasiswa:
-            return {'status': 'error', 'message': 'Session expired or not logged in'}
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Session expired or not logged in'}),
+                headers=[('Content-Type', 'application/json')],
+                status=401
+            )
             
-        face_vector = kwargs.get('face_vector')
+        try:
+            body = json.loads(request.httprequest.data)
+        except Exception:
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Format JSON tidak valid.'}),
+                headers=[('Content-Type', 'application/json')],
+                status=400
+            )
+            
+        face_vector = body.get('face_vector')
         if not face_vector:
-            return {'status': 'error', 'message': 'Data wajah tidak boleh kosong.'}
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Data wajah tidak boleh kosong.'}),
+                headers=[('Content-Type', 'application/json')],
+                status=400
+            )
             
         # Encrypt the face descriptor using aes256_encrypt_b64 from faceid_utils
         from presensi.models.faceid_utils import aes256_encrypt_b64
@@ -88,9 +105,16 @@ class MahasiswaPortalController(http.Controller):
             mahasiswa.sudo().write({
                 'face_descriptor': encrypted_descriptor
             })
-            return {'status': 'success', 'message': 'Pendaftaran wajah berhasil.'}
+            return request.make_response(
+                json.dumps({'status': 'success', 'message': 'Pendaftaran wajah berhasil.'}),
+                headers=[('Content-Type', 'application/json')]
+            )
         except Exception as e:
-            return {'status': 'error', 'message': str(e)}
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': str(e)}),
+                headers=[('Content-Type', 'application/json')],
+                status=500
+            )
 
     @http.route([
         '/dashboard/mahasiswa/settings',
