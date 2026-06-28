@@ -149,14 +149,18 @@ function initFormSubmit() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: payload
+            })
         })
         .then(function(res) {
             return res.json().then(function(json) {
-                if (res.ok && json.status === 'success') {
-                    return json.data;
+                if (json.result && json.result.status === 'success') {
+                    return json.result.data;
                 } else {
-                    throw new Error(json.message || 'Gagal membuka sesi.');
+                    throw new Error((json.result && json.result.message) || (json.error && json.error.message) || 'Gagal membuka sesi.');
                 }
             });
         })
@@ -199,14 +203,18 @@ function initTutupSesi() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ sesi_id: parseInt(sesiId) })
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'call',
+                params: { sesi_id: parseInt(sesiId) }
+            })
         })
         .then(function(res) {
             return res.json().then(function(json) {
-                if (res.ok && json.status === 'success') {
-                    return json.data;
+                if (json.result && json.result.status === 'success') {
+                    return json.result.data;
                 } else {
-                    throw new Error(json.message || 'Gagal menutup sesi.');
+                    throw new Error((json.result && json.result.message) || (json.error && json.error.message) || 'Gagal menutup sesi.');
                 }
             });
         })

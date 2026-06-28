@@ -67,29 +67,24 @@ class PresensiController(http.Controller):
     # ENDPOINT: Dosen buka sesi
     # POST /api/presensi/buka-sesi
     # ================================================
-    @http.route('/api/presensi/buka-sesi', type='http',
+    @http.route('/api/presensi/buka-sesi', type='json',
                 auth='user', methods=['POST'], cors='*', csrf=False)
     def buka_sesi(self, **kw):
-        try:
-            body = json.loads(request.httprequest.data)
-        except Exception:
-            return self._error('Format JSON tidak valid.')
-
         required = ['nama_sesi', 'mata_kuliah_id', 'tipe_kelas', 'batas_waktu_telat']
         for field in required:
-            if field not in body:
-                return self._error(f'Field "{field}" wajib diisi.')
+            if field not in kw:
+                return {'status': 'error', 'message': f'Field "{field}" wajib diisi.'}
 
-        tipe_kelas = body.get('tipe_kelas', 'offline')
+        tipe_kelas = kw.get('tipe_kelas', 'offline')
         if tipe_kelas == 'offline':
-            if 'latitude' not in body or 'longitude' not in body or 'radius_meter' not in body:
-                return self._error('Untuk kelas offline, latitude, longitude, dan radius wajib diisi.')
+            if 'latitude' not in kw or 'longitude' not in kw or 'radius_meter' not in kw:
+                return {'status': 'error', 'message': 'Untuk kelas offline, latitude, longitude, dan radius wajib diisi.'}
 
         # Convert local time (Asia/Jakarta) input to UTC
         import pytz
         from datetime import datetime
         try:
-            dt_str = body['batas_waktu_telat'].replace('T', ' ')
+            dt_str = kw['batas_waktu_telat'].replace('T', ' ')
             if len(dt_str) == 16:
                 dt_str += ':00'
             local_dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
@@ -98,19 +93,19 @@ class PresensiController(http.Controller):
             utc_dt = localized_dt.astimezone(pytz.utc)
             batas_waktu_utc = utc_dt.strftime('%Y-%m-%d %H:%M:%S')
         except Exception:
-            batas_waktu_utc = body['batas_waktu_telat']
+            batas_waktu_utc = kw['batas_waktu_telat']
 
         sesi_vals = {
-            'name': body['nama_sesi'],
-            'mata_kuliah_id': int(body['mata_kuliah_id']),
+            'name': kw['nama_sesi'],
+            'mata_kuliah_id': int(kw['mata_kuliah_id']),
             'tipe_kelas': tipe_kelas,
             'batas_waktu_telat': batas_waktu_utc,
         }
         if tipe_kelas == 'offline':
             sesi_vals.update({
-                'latitude': float(body['latitude']),
-                'longitude': float(body['longitude']),
-                'radius_meter': int(body['radius_meter']),
+                'latitude': float(kw['latitude']),
+                'longitude': float(kw['longitude']),
+                'radius_meter': int(kw['radius_meter']),
             })
         else:
             sesi_vals.update({
@@ -126,107 +121,104 @@ class PresensiController(http.Controller):
         sesi = request.env['presensi.sesi'].sudo().create(sesi_vals)
         sesi.buka_sesi()
 
-        return self._success({
-            'sesi_id': sesi.id,
-            'status': sesi.status,
-            'waktu_buka': str(sesi.waktu_buka),
-        })
+        return {
+            'status': 'success',
+            'data': {
+                'sesi_id': sesi.id,
+                'status': sesi.status,
+                'waktu_buka': str(sesi.waktu_buka),
+            }
+        }
 
     # ================================================
     # ENDPOINT: Dosen tutup sesi
     # POST /api/presensi/tutup-sesi
     # ================================================
-    @http.route('/api/presensi/tutup-sesi', type='http',
+    @http.route('/api/presensi/tutup-sesi', type='json',
                 auth='user', methods=['POST'], cors='*', csrf=False)
     def tutup_sesi(self, **kw):
-        try:
-            body = json.loads(request.httprequest.data)
-        except Exception:
-            return self._error('Format JSON tidak valid.')
-
-        sesi_id = body.get('sesi_id')
+        sesi_id = kw.get('sesi_id')
         if not sesi_id:
-            return self._error('sesi_id wajib diisi.')
+            return {'status': 'error', 'message': 'sesi_id wajib diisi.'}
 
         sesi = request.env['presensi.sesi'].sudo().browse(int(sesi_id))
         if not sesi.exists():
-            return self._error('Sesi tidak ditemukan.', 404)
+            return {'status': 'error', 'message': 'Sesi tidak ditemukan.'}
 
         try:
             sesi.tutup_sesi()
         except UserError as e:
-            return self._error(str(e))
+            return {'status': 'error', 'message': str(e)}
 
-        return self._success({'sesi_id': sesi.id, 'status': sesi.status})
+        return {
+            'status': 'success',
+            'data': {'sesi_id': sesi.id, 'status': sesi.status}
+        }
 
     # ================================================
     # ENDPOINT: Mahasiswa check-in
     # POST /api/presensi/check-in
     # ================================================
-    @http.route('/api/presensi/check-in', type='http',
+    @http.route('/api/presensi/check-in', type='json',
                 auth='public', methods=['POST'], cors='*', csrf=False)
     def check_in(self, **kw):
         mhs = self._get_mahasiswa()
         if not mhs:
-            return self._error('Belum login atau sesi habis.', 401)
+            return {'status': 'error', 'message': 'Belum login atau sesi habis.'}
 
-        try:
-            body = json.loads(request.httprequest.data)
-        except Exception:
-            return self._error('Format JSON tidak valid.')
-
-        sesi_id = body.get('sesi_id')
-        is_mock = body.get('is_mock_location', False)
-        accuracy = body.get('accuracy', 0)
-        face_verified = body.get('face_verified', False)
+        sesi_id = kw.get('sesi_id')
+        is_mock = kw.get('is_mock_location', False)
+        accuracy = kw.get('accuracy', 0)
+        face_verified = kw.get('face_verified', False)
         # FaceID server-side verification (Backend 1)
         # Ambil descriptor dari client untuk dihitung kesamaannya di server.
-        client_face_descriptor = body.get('face_descriptor')
-        face_method = body.get('face_method', 'cosine')
-        face_threshold = body.get('face_threshold', 0.82)
+        client_face_descriptor = kw.get('face_descriptor')
+        face_method = kw.get('face_method', 'euclidean')
+        face_threshold = kw.get('face_threshold', 0.6)
 
         # Backend 1 - FaceID server-side only (device binding ditiadakan)
-        device_id = body.get('device_id')
-
-
+        device_id = kw.get('device_id')
 
         if not sesi_id:
-            return self._error('sesi_id wajib diisi.')
+            return {'status': 'error', 'message': 'sesi_id wajib diisi.'}
 
         # Backend 1 - verifikasi FaceID server-side
         # - Kompatibilitas: face_verified tetap dicek sebagai gate awal.
         # - Jika face_verified False => tetap ditolak.
         if not face_verified:
-            return self._error('Verifikasi wajah gagal. Presensi ditolak.', 403)
+            return {'status': 'error', 'message': 'Verifikasi wajah gagal. Presensi ditolak.'}
 
-        # Cek apakah ini sesi Web Portal (tidak menggunakan token Bearer Authorization)
-        auth_header = request.httprequest.headers.get('Authorization')
-        is_web_session = not (auth_header and auth_header.startswith('Bearer '))
+        # Pastikan client kirim descriptor face vektor untuk dibandingkan di server
+        if not client_face_descriptor:
+            return {'status': 'error', 'message': 'face_descriptor wajib dikirim untuk verifikasi server-side.'}
 
-        if not is_web_session:
-            # Pastikan client kirim descriptor face vektor untuk dibandingkan di server (wajib untuk mobile)
-            if not client_face_descriptor:
-                return self._error('face_descriptor wajib dikirim untuk verifikasi server-side.', 403)
+        # FaceID similarity check
+        from odoo.addons.presensi.models.faceid_service import verify_face_server_side
+        res = verify_face_server_side(
+            request.env,
+            stored_encrypted_descriptor_b64=mhs.face_descriptor,
+            client_descriptor=client_face_descriptor,
+            method=face_method,
+            threshold=face_threshold,
+        )
+        
+        import logging
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== FACE VERIFICATION ===")
+        _logger.info("Mahasiswa: %s (NIM: %s)", mhs.name, mhs.nim)
+        _logger.info("Method: %s, Threshold: %s", face_method, face_threshold)
+        _logger.info("Result Score: %s, Passed: %s", res.get('score'), res.get('ok'))
+        _logger.info("=========================")
 
-            # FaceID similarity check
-            from presensi.models.faceid_service import verify_face_server_side
-            res = verify_face_server_side(
-                request.env,
-                stored_encrypted_descriptor_b64=mhs.face_descriptor,
-                client_descriptor=client_face_descriptor,
-                method=face_method,
-                threshold=face_threshold,
-            )
-            if not res.get('ok'):
-                return self._error('FaceID server-side verification gagal. Presensi ditolak.', 403)
-
+        if not res.get('ok'):
+            return {'status': 'error', 'message': 'Verifikasi wajah gagal. Wajah Anda tidak cocok dengan data yang terdaftar.'}
 
         # Ambil sesi
         sesi = request.env['presensi.sesi'].sudo().browse(int(sesi_id))
         if not sesi.exists():
-            return self._error('Sesi tidak ditemukan.', 404)
+            return {'status': 'error', 'message': 'Sesi tidak ditemukan.'}
         if sesi.status != 'open':
-            return self._error('Sesi presensi sudah ditutup.', 403)
+            return {'status': 'error', 'message': 'Sesi presensi sudah ditutup.'}
 
         # Cek sudah presensi belum
         sudah = request.env['presensi.record'].sudo().search([
@@ -234,32 +226,26 @@ class PresensiController(http.Controller):
             ('mahasiswa_id', '=', mhs.id),
         ], limit=1)
         if sudah:
-            return self._error('Kamu sudah melakukan presensi di sesi ini.')
+            return {'status': 'error', 'message': 'Kamu sudah melakukan presensi di sesi ini.'}
 
         # Validasi jarak GPS hanya jika kelas offline
         jarak = 0
         if sesi.tipe_kelas == 'offline':
-            latitude = body.get('latitude')
-            longitude = body.get('longitude')
+            latitude = kw.get('latitude')
+            longitude = kw.get('longitude')
             if not latitude or not longitude:
-                return self._error('Untuk kelas luring (offline), koordinat lokasi Anda wajib dikirim.')
+                return {'status': 'error', 'message': 'Untuk kelas luring (offline), koordinat lokasi Anda wajib dikirim.'}
 
             # Cek fake GPS
             if self._deteksi_fake_gps(is_mock, accuracy):
-                return self._error(
-                    'Terdeteksi lokasi palsu (Fake GPS). Presensi ditolak.', 403
-                )
+                return {'status': 'error', 'message': 'Terdeteksi lokasi palsu (Fake GPS). Presensi ditolak.'}
 
             jarak = self._hitung_jarak_meter(
                 float(latitude), float(longitude),
                 sesi.latitude, sesi.longitude
             )
             if jarak > sesi.radius_meter:
-                return self._error(
-                    f'Lokasi kamu terlalu jauh dari kelas '
-                    f'({round(jarak)} meter, batas {sesi.radius_meter} meter).',
-                    403
-                )
+                return {'status': 'error', 'message': f'Lokasi kamu terlalu jauh dari kelas ({round(jarak)} meter, batas {sesi.radius_meter} meter).'}
 
         # Tentukan tepat waktu / terlambat
         from odoo.fields import Datetime
@@ -294,14 +280,17 @@ class PresensiController(http.Controller):
         if koin > 0:
             mhs.add_koin(koin)
 
-        return self._success({
-            'status_kehadiran': record.status_kehadiran,
-            'is_pertama': is_pertama,
-            'xp_didapat': xp,
-            'koin_didapat': koin,
-            'jarak_meter': round(jarak),
-            'mata_kuliah': sesi.mata_kuliah_id.nama,  
-        })
+        return {
+            'status': 'success',
+            'data': {
+                'status_kehadiran': record.status_kehadiran,
+                'is_pertama': is_pertama,
+                'xp_didapat': xp,
+                'koin_didapat': koin,
+                'jarak_meter': round(jarak),
+                'mata_kuliah': sesi.mata_kuliah_id.nama,  
+            }
+        }
 
     # ================================================
     # ENDPOINT: Presensi manual dosen

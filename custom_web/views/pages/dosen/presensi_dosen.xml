@@ -51,7 +51,7 @@
     <template id="presensi_dosen_buat" name="Buka Sesi Presensi Dosen">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
-            <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
+            <script src="/custom_web/static/src/js/dosen_presensi.js?v=12" type="text/javascript"></script>
 
             <div class="dosen-presensi-container">
                 <!-- Top Header HUD -->
@@ -229,7 +229,7 @@
     <template id="presensi_dosen_histori" name="Riwayat Presensi Dosen">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
-            <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
+            <script src="/custom_web/static/src/js/dosen_presensi.js?v=12" type="text/javascript"></script>
 
             <div class="dosen-presensi-container">
                 <!-- Top Header HUD -->
@@ -306,7 +306,7 @@
     <template id="presensi_dosen_histori_detail" name="Detail Sesi Presensi Dosen">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
-            <script src="/custom_web/static/src/js/dosen_presensi.js" type="text/javascript"></script>
+            <script src="/custom_web/static/src/js/dosen_presensi.js?v=12" type="text/javascript"></script>
 
             <div class="dosen-presensi-container">
                 <!-- Top Header HUD -->

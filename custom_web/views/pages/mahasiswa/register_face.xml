@@ -1,13 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="presensi_scan" name="Presensi Face ID">
+    <template id="register_face" name="Registrasi Face ID">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/presensi.css"/>
+            <script src="/custom_web/static/src/js/register_face.js?v=12" type="text/javascript"></script>
 
-            <!-- Presence Metadata for JS -->
-            <div id="presenceMetadata" 
-                 t-att-data-course-id="course['id']" 
-                 t-att-data-course-name="course['name']" 
-                 t-att-data-course-type="course['status']" 
+            <!-- Metadata for JS -->
+            <div id="registerMetadata" 
                  t-att-data-student-name="mahasiswa.name"
                  t-att-data-student-nim="mahasiswa.nim"
                  style="display: none;"></div>
@@ -15,16 +14,7 @@
             <div class="presensi-scan-container">
                 <!-- Top Mock Header Bar -->
                 <div class="presensi-top-bar glass-panel">
-                    <a href="/presensi" class="btn-back"><i class="bi bi-arrow-left"></i></a>
-                    <span class="bar-title">Presensi mahasiswa</span>
-                    <div class="bar-avatar">
-                        <t t-if="mahasiswa.foto_profil">
-                            <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
-                        </t>
-                        <t t-else="">
-                            <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile"/>
-                        </t>
-                    </div>
+                    <span class="bar-title" style="margin-left: 15px;">Registrasi Face ID</span>
                 </div>
 
                 <!-- Main Camera/Scanner Card -->
@@ -37,9 +27,7 @@
                         <div id="cameraFallback" class="camera-fallback">
                             <div class="wireframe-glow"></div>
                             <svg viewBox="0 0 200 200" class="wireframe-face">
-                                <!-- Outer boundary oval -->
                                 <ellipse cx="100" cy="95" rx="55" ry="70" fill="none" stroke="rgba(59, 130, 246, 0.4)" stroke-width="2" stroke-dasharray="5,5" />
-                                <!-- Simplified face silhouette -->
                                 <path d="M70,140 C80,165 120,165 130,140" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2.5" />
                                 <path d="M80,90 C90,100 110,100 120,90" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2" />
                                 <circle cx="85" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
@@ -51,13 +39,9 @@
 
                         <!-- Scan Overlay Frame -->
                         <div class="scan-overlay">
-                            <!-- Glowing Scanner Line (moves down/up) -->
                             <div class="laser-scanner" id="laserScanner"></div>
+                            <div class="face-oval-frame" id="faceOvalFrame"></div>
                             
-                            <!-- The Oval Outline mapping the face area -->
-                            <div class="face-oval-frame" id="faceOvalFrame">
-                            </div>
-
                             <!-- Real-time Tracking Box (moving around the face) -->
                             <div class="face-tracking-box hidden" id="faceTrackingBox" style="position: absolute; border: 2px dashed #3b82f6; border-radius: 12px; width: 120px; height: 120px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.2s ease; z-index: 4;">
                                 <div style="position: absolute; top: -5px; left: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
@@ -79,7 +63,7 @@
                             </div>
                         </div>
 
-                        <!-- Vector Success Checklist SVG (Hidden initially) -->
+                        <!-- Vector Success Checklist SVG -->
                         <div class="success-checkmark-overlay hidden" id="successCheckmark">
                             <div class="checkmark-circle-glow">
                                 <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -87,42 +71,36 @@
                                     <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                                 </svg>
                             </div>
-                            <h3>Presensi Sukses!</h3>
-                            <p id="successMessage">Selamat belajar, presensi Anda telah terekam.</p>
+                            <h3>Registrasi Berhasil!</h3>
+                            <p id="successMessage">Data wajah Anda telah terdaftar dalam sistem.</p>
                         </div>
 
                         <!-- Micro Info Box on Scanner Top -->
                         <div class="scanner-status-box" id="scannerStatusBox">
-                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> Menunggu Pemindaian...</span>
+                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> Posisikan wajah Anda pada area lingkaran</span>
                         </div>
                     </div>
 
-                    <!-- Scan Oval Button at center-bottom of scanner block -->
+                    <!-- Action Button -->
                     <div class="scanner-action">
-                        <button type="button" class="btn-scan-oval" id="btnMulaiPresensi" onclick="startPresenceSimulation()">
-                            <span class="btn-text">Mulai Presensi</span>
+                        <button type="button" class="btn-scan-oval" id="btnMulaiRegistrasi" onclick="startFaceRegistration()">
+                            <span class="btn-text">Daftarkan Wajah</span>
                             <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> memproses...</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Bottom Stats Card -->
-                <div class="student-info-card glass-panel">
-                    <div class="info-row">
-                        <div class="info-label">Nama</div>
-                        <div class="info-separator">:</div>
-                        <div class="info-value text-highlight"><t t-esc="mahasiswa.name"/></div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Nim</div>
-                        <div class="info-separator">:</div>
-                        <div class="info-value"><t t-esc="mahasiswa.nim"/></div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Matkul</div>
-                        <div class="info-separator">:</div>
-                        <div class="info-value text-accent"><t t-esc="course['name']"/></div>
-                    </div>
+                <!-- Bottom Instructions Card -->
+                <div class="student-info-card glass-panel" style="padding: 18px;">
+                    <h4 style="margin-top: 0; color: var(--accent-color); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-info-circle-fill"></i> Petunjuk Registrasi Wajah
+                    </h4>
+                    <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 13px; color: var(--text-color); opacity: 0.85; line-height: 1.6;">
+                        <li>Pastikan wajah Anda terlihat jelas dengan pencahayaan yang cukup.</li>
+                        <li>Jangan menggunakan kacamata hitam, masker, atau topi.</li>
+                        <li>Posisikan wajah tepat di dalam bingkai oval di atas.</li>
+                        <li>Sistem akan mendeteksi dan mengamankan data biometrik wajah Anda untuk kebutuhan absensi otomatis.</li>
+                    </ul>
                 </div>
             </div>
         </t>

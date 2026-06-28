@@ -1,50 +1,3 @@
-/* LOGIKA INTERAKTIF PRESENSI FACE ID & SELEKSI KELAS */
-
-// --- Fungsi Pencarian Kelas ---
-function filterCourses() {
-    var searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-    
-    var query = searchInput.value.toLowerCase().trim();
-    var cards = document.querySelectorAll('.course-card');
-    
-    cards.forEach(function(card) {
-        var name = card.getAttribute('data-name') || '';
-        if (name.includes(query)) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-// --- Fungsi Filter Status ---
-function filterStatus(status) {
-    var buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(function(btn) {
-        btn.classList.remove('active');
-    });
-    
-    var activeBtn = document.getElementById('btn-' + status);
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-    }
-    
-    var cards = document.querySelectorAll('.course-card');
-    cards.forEach(function(card) {
-        if (status === 'all') {
-            card.style.display = '';
-        } else {
-            var cardStatus = card.getAttribute('data-status') || '';
-            if (cardStatus === status) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        }
-    });
-}
-
 // --- Inisialisasi Model AI & Kamera ---
 var webcamStream = null;
 var modelsLoaded = false;
@@ -70,7 +23,7 @@ function loadFaceApiModels(onSuccess, onFailure) {
     ])
     .then(function() {
         modelsLoaded = true;
-        console.log("Model AI face-api.js berhasil dimuat untuk presensi.");
+        console.log("Model AI face-api.js berhasil dimuat.");
         if (onSuccess) onSuccess();
     })
     .catch(function(err) {
@@ -101,7 +54,7 @@ function initWebcam() {
             if (fallback) {
                 fallback.classList.add('hidden');
             }
-            updateStatusBox('camera-active', '<i class="bi bi-camera-fill"></i> Kamera Siap. Posisikan wajah Anda.');
+            updateStatusBox('camera-active', '<i class="bi bi-camera-fill"></i> Kamera Siap. Hadapkan wajah ke kamera.');
             
             // Mulai loop pelacakan wajah real-time
             startFaceTracking();
@@ -253,17 +206,9 @@ function runFaceScanSequence(onComplete) {
     }, 10500);
 }
 
-// --- Proses Validasi Face ID & GPS Riil ---
-function startPresenceSimulation() {
-    var metadataEl = document.getElementById('presenceMetadata');
-    if (!metadataEl) return;
-    
-    var courseId = parseInt(metadataEl.getAttribute('data-course-id'));
-    var courseType = metadataEl.getAttribute('data-course-type') || 'online';
-    var courseName = metadataEl.getAttribute('data-course-name') || 'Mata Kuliah';
-    var studentNim = metadataEl.getAttribute('data-student-nim') || '';
-    
-    var btn = document.getElementById('btnMulaiPresensi');
+// --- Memulai Proses Pendaftaran Wajah ---
+function startFaceRegistration() {
+    var btn = document.getElementById('btnMulaiRegistrasi');
     var scannerCard = document.getElementById('scannerCard');
     
     if (!btn || !scannerCard) return;
@@ -277,112 +222,44 @@ function startPresenceSimulation() {
     
     scannerCard.classList.add('scanning');
     
-    if (courseType === 'offline') {
-        updateStatusBox('location-active', '<i class="bi bi-geo-alt-fill spin"></i> Mendeteksi GPS Handphone/Browser Anda...');
+    // Jalankan sekuens panduan
+    runFaceScanSequence(async function() {
+        // Hentikan tracking sementara untuk memfokuskan ekstraksi final
+        stopFaceTracking();
         
-        if (!navigator.geolocation) {
-            triggerScanFailure("Sensor lokasi GPS tidak didukung oleh browser Anda.");
-            return;
+        var video = document.getElementById('webcam');
+        if (video) {
+            updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Mengekstraksi biometrik wajah asli...');
+            
+            // Lakukan deteksi wajah sekali lagi secara presisi
+            try {
+                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                    
+                if (detection) {
+                    latestFaceDescriptor = detection.descriptor;
+                }
+            } catch (e) {
+                console.error("Gagal melakukan deteksi akhir:", e);
+            }
         }
         
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var lat = position.coords.latitude;
-                var lon = position.coords.longitude;
-                var accuracy = position.coords.accuracy;
-                var isMock = position.coords.mocked || false;
-                
-                updateStatusBox('active', '<i class="bi bi-person-bounding-box"></i> GPS Valid! Memproses Pemindaian Wajah...');
-                
-                runFaceScanSequence(async function() {
-                    // Hentikan tracking sementara untuk memfokuskan ekstraksi final
-                    stopFaceTracking();
-                    
-                    var video = document.getElementById('webcam');
-                    if (video) {
-                        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Memverifikasi biometrik wajah Anda...');
-                        try {
-                            const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
-                                .withFaceLandmarks()
-                                .withFaceDescriptor();
-                                
-                            if (detection) {
-                                latestFaceDescriptor = detection.descriptor;
-                            }
-                        } catch (e) {
-                            console.error("Gagal melakukan deteksi akhir:", e);
-                        }
-                    }
-                    
-                    if (latestFaceDescriptor) {
-                        var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
-                        submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVector);
-                    } else {
-                        startFaceTracking();
-                        triggerScanFailure("Wajah tidak terdeteksi. Posisikan wajah tepat di depan kamera.");
-                    }
-                });
-            },
-            function(error) {
-                console.error("GPS error:", error);
-                var errorMsg = "Gagal memverifikasi lokasi GPS.";
-                if (error.code === error.PERMISSION_DENIED) {
-                    errorMsg = "Akses lokasi ditolak. Harap aktifkan izin lokasi di browser Anda.";
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    errorMsg = "Sinyal GPS tidak tersedia.";
-                }
-                triggerScanFailure(errorMsg);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 8000,
-                maximumAge: 0
-            }
-        );
-    } else {
-        runFaceScanSequence(async function() {
-            stopFaceTracking();
-            
-            var video = document.getElementById('webcam');
-            if (video) {
-                updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Memverifikasi biometrik wajah Anda...');
-                try {
-                    const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                        
-                    if (detection) {
-                        latestFaceDescriptor = detection.descriptor;
-                    }
-                } catch (e) {
-                    console.error("Gagal melakukan deteksi akhir:", e);
-                }
-            }
-            
-            if (latestFaceDescriptor) {
-                var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
-                submitCheckInAPI(courseId, courseName, 0.0, 0.0, false, 10, faceVector);
-            } else {
-                startFaceTracking();
-                triggerScanFailure("Wajah tidak terdeteksi. Posisikan wajah tepat di depan kamera.");
-            }
-        });
-    }
+        if (latestFaceDescriptor) {
+            // Konversi Float32Array ke string CSV untuk dikirim ke Odoo
+            var faceVector = Array.from(latestFaceDescriptor).map(function(x) { return x.toFixed(6); }).join(',');
+            submitFaceRegistrationAPI(faceVector);
+        } else {
+            // Hidupkan kembali tracking jika gagal agar user bisa mencoba lagi
+            startFaceTracking();
+            triggerRegistrationFailure("Wajah tidak terdeteksi. Posisikan wajah tepat di depan kamera.");
+        }
+    });
 }
 
-// --- Submit Check-In data ke API Odoo ---
-function submitCheckInAPI(sesiId, courseName, lat, lon, isMock, accuracy, faceVector) {
-    var payload = {
-        sesi_id: sesiId,
-        latitude: lat,
-        longitude: lon,
-        is_mock_location: isMock,
-        accuracy: accuracy,
-        face_verified: true,
-        face_descriptor: faceVector
-    };
-
-    fetch('/api/presensi/check-in', {
+// --- Kirim Data ke API Odoo ---
+function submitFaceRegistrationAPI(faceVector) {
+    fetch('/api/mahasiswa/register-face', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -390,31 +267,69 @@ function submitCheckInAPI(sesiId, courseName, lat, lon, isMock, accuracy, faceVe
         body: JSON.stringify({
             jsonrpc: '2.0',
             method: 'call',
-            params: payload
+            params: {
+                face_vector: faceVector
+            }
         })
     })
     .then(function(res) {
         return res.json().then(function(json) {
             if (json.result && json.result.status === 'success') {
-                return json.result.data;
+                return json.result;
             } else {
-                throw new Error((json.result && json.result.message) || (json.error && json.error.message) || 'Gagal merekam presensi.');
+                throw new Error((json.result && json.result.message) || (json.error && json.error.message) || 'Gagal mendaftarkan wajah.');
             }
         });
     })
     .then(function(data) {
-        triggerScanSuccess(courseName, data);
+        triggerRegistrationSuccess();
     })
     .catch(function(err) {
         console.error(err);
-        triggerScanFailure(err.message);
+        triggerRegistrationFailure(err.message);
     });
 }
 
-// --- Menangani Kegagalan Scan & API ---
-function triggerScanFailure(errorMessage) {
+// --- Menangani Registrasi Sukses ---
+function triggerRegistrationSuccess() {
     var scannerCard = document.getElementById('scannerCard');
-    var btn = document.getElementById('btnMulaiPresensi');
+    var successCheckmark = document.getElementById('successCheckmark');
+    var btn = document.getElementById('btnMulaiRegistrasi');
+    var statusBox = document.getElementById('scannerStatusBox');
+    var trackingBox = document.getElementById('faceTrackingBox');
+    
+    if (scannerCard) scannerCard.classList.remove('scanning');
+    if (statusBox) statusBox.classList.add('hidden');
+    if (trackingBox) trackingBox.classList.add('hidden');
+    
+    if (successCheckmark) {
+        successCheckmark.classList.remove('hidden');
+    }
+    
+    if (btn) {
+        btn.innerHTML = '<span class="text-green"><i class="bi bi-check-circle-fill"></i> Registrasi Berhasil!</span>';
+        btn.disabled = true;
+        btn.style.background = '#e6f4ea';
+        btn.style.borderColor = '#34a853';
+        btn.style.color = '#137333';
+    }
+    
+    if (webcamStream) {
+        webcamStream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+    }
+    
+    // Redirect ke dashboard setelah 3 detik
+    setTimeout(function() {
+        window.location.href = '/dashboard/mahasiswa';
+    }, 3000);
+}
+
+// --- Menangani Registrasi Gagal ---
+function triggerRegistrationFailure(errorMessage) {
+    var scannerCard = document.getElementById('scannerCard');
+    var btn = document.getElementById('btnMulaiRegistrasi');
     
     if (scannerCard) scannerCard.classList.remove('scanning');
     
@@ -436,58 +351,9 @@ function triggerScanFailure(errorMessage) {
     }
 }
 
-// --- Menangani Keberhasilan Scan & Menampilkan Reward Gamifikasi ---
-function triggerScanSuccess(courseName, data) {
-    var scannerCard = document.getElementById('scannerCard');
-    var successCheckmark = document.getElementById('successCheckmark');
-    var btn = document.getElementById('btnMulaiPresensi');
-    var statusBox = document.getElementById('scannerStatusBox');
-    var trackingBox = document.getElementById('faceTrackingBox');
-    
-    if (scannerCard) scannerCard.classList.remove('scanning');
-    if (statusBox) statusBox.classList.add('hidden');
-    if (trackingBox) trackingBox.classList.add('hidden');
-    
-    var successMsgText = `Presensi Sukses! Anda mendapatkan +${data.xp_didapat} XP and +${data.koin_didapat} Koin.`;
-    if (data.is_pertama) {
-        successMsgText = `🎉 LUAR BIASA! Anda yang Pertama Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
-    } else if (data.status_kehadiran === 'terlambat') {
-        successMsgText = `Presensi Sukses! Namun Anda terlambat (mendapatkan +0 XP / +0 Koin). Tetap semangat!`;
-    }
-    
-    if (successCheckmark) {
-        successCheckmark.classList.remove('hidden');
-        var successMsg = document.getElementById('successMessage');
-        if (successMsg) {
-            successMsg.innerText = successMsgText;
-        }
-    }
-    
-    if (btn) {
-        btn.innerHTML = '<span class="text-green"><i class="bi bi-check-circle-fill"></i> Presensi Berhasil!</span>';
-        btn.disabled = true;
-        btn.style.background = '#e6f4ea';
-        btn.style.borderColor = '#34a853';
-        btn.style.color = '#137333';
-    }
-    
-    if (webcamStream) {
-        webcamStream.getTracks().forEach(function(track) {
-            track.stop();
-        });
-    }
-    
-    setTimeout(function() {
-        window.location.href = '/presensi';
-    }, 4000);
-}
-
-// --- Self-Initialization saat DOM Terunggah ---
+// --- Inisialisasi Kamera saat DOM Siap ---
 document.addEventListener('DOMContentLoaded', function() {
-    // Hanya jalankan pemindaian wajah jika kita berada di halaman scan presensi
-    if (document.getElementById('presenceMetadata')) {
-        loadFaceApiModels(function() {
-            initWebcam();
-        });
-    }
+    loadFaceApiModels(function() {
+        initWebcam();
+    });
 });

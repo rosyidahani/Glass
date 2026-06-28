@@ -7,9 +7,14 @@
             <div class="profile-container">
                 <div class="profile-header">
                     <div class="profile-picture-wrapper">
-                        <div class="profile-picture" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
-                            <t t-esc="dosen.name[0].upper()"/>
-                        </div>
+                        <t t-if="dosen.foto_profil">
+                            <img t-att-src="'data:image/png;base64,' + dosen.foto_profil.decode('utf-8')" class="profile-picture" style="object-fit: cover; width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-color);"/>
+                        </t>
+                        <t t-else="">
+                            <div class="profile-picture" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; color: #fff;">
+                                <t t-esc="dosen.name[0].upper()"/>
+                            </div>
+                        </t>
                     </div>
                     <div class="profile-details">
                         <h2>Foto Profil</h2>

@@ -9,7 +9,10 @@ class AuthController(http.Controller):
     def login_page(self, **kwargs):
         """Show the custom login page."""
         # If already logged in, redirect to respective dashboard
-        if get_active_mahasiswa():
+        mhs = get_active_mahasiswa()
+        if mhs:
+            if not mhs.face_descriptor:
+                return request.redirect('/mahasiswa/register-face')
             return request.redirect('/dashboard/mahasiswa')
         if get_active_dosen():
             return request.redirect('/dashboard/dosen')
@@ -36,6 +39,8 @@ class AuthController(http.Controller):
                 request.session['mahasiswa_id'] = mahasiswa.id
                 request.session['mahasiswa_nim'] = mahasiswa.nim
                 request.session['mahasiswa_name'] = mahasiswa.name
+                if not mahasiswa.face_descriptor:
+                    return request.redirect('/mahasiswa/register-face')
                 return request.redirect('/dashboard/mahasiswa')
             else:
                 return request.render('custom_web.login', {
