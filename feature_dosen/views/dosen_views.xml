@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <form string="Form Dosen">
                 <sheet>
+                    <field name="foto_profil" widget="image" class="oe_avatar" options="{'preview_image': 'foto_profil'}"/>
                     <!-- Judul Utama (Modern Style) -->
                     <div class="oe_title">
                         <label for="name" string="Nama Dosen"/>

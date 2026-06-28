@@ -18,7 +18,7 @@
                                 <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
                             </t>
                             <t t-else="">
-                                <t t-esc="mahasiswa.name[0].upper()"/>
+                                <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile"/>
                             </t>
                         </div>
                         <div class="edit-icon" title="Ubah Foto" onclick="document.getElementById('fotoProfilInput').click();"><i class="bi bi-pencil-fill"></i></div>

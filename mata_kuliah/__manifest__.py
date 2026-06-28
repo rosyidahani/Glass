@@ -5,6 +5,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/mata_kuliah_views.xml',
+        'wizard/import_relasi_view.xml',
     ],
     'installable': True,
     'application': True,

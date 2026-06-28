@@ -93,7 +93,7 @@
                         <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile" class="avatar-img-round"/>
                     </t>
                     <t t-else="">
-                        <span class="avatar-shortcut"><i class="bi bi-person-fill"></i></span>
+                        <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile" class="avatar-img-round"/>
                     </t>
                 </div>
             </div>
