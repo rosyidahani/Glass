@@ -16,6 +16,10 @@
             </t>
 
             <div class="leaderboard-container mhs-leaderboard-container">
+                <!-- Header Topbar -->
+                <t t-call="custom_web.shared_student_header">
+                    <t t-set="title" t-value="'Leaderboard'"/>
+                </t>
 
 
                 <!-- Section 1: Podium Top 3 -->
