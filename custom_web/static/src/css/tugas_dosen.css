@@ -978,9 +978,9 @@
 .dosen-single-form-layout {
     max-width: 680px;
     margin: 0 auto 40px auto;
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
     border-radius: 24px;
     padding: 40px;
     backdrop-filter: blur(16px);
