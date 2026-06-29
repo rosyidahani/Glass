@@ -34,7 +34,7 @@
                         <h1 class="lb-hero-title">Leaderboard</h1>
                         <p class="lb-hero-subtitle">
                             <i class="bi bi-mortarboard-fill"></i>
-                            <t t-esc="mahasiswa.program_studi or 'Teknologi Informasi'"/>
+                            <t t-esc="mahasiswa.prodi or 'Teknologi Informasi'"/>
                         </p>
                     </div>
 
