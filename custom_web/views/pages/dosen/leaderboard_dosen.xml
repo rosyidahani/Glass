@@ -6,7 +6,7 @@
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
 
             <div class="leaderboard-container">
-                <!-- Profiles HUD Header -->
+                 <!-- Profiles HUD Header -->
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
@@ -14,24 +14,24 @@
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
-                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Leaderboard Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> <span data-translate-id="dosen_lb_portal">Portal Leaderboard Dosen</span> (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
                     <a href="/dashboard/dosen" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_btn_back_dashboard">Kembali ke Dashboard</span>
                     </a>
                 </div>
 
                 <div class="glass-panel" style="padding: 16px 18px;">
                     <div style="display:flex; gap: 12px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
                         <div>
-                            <div style="font-weight:800; color:var(--text-color);">Filter Angkatan</div>
+                            <div style="font-weight:800; color:var(--text-color);" data-translate-id="dosen_filter_batch">Filter Angkatan</div>
                         </div>
 
                         <form method="get" action="/dosen/leaderboard" style="display:flex; gap:10px; align-items:center;">
                             <input type="hidden" name="prodi" t-att-value="prodi_id"/>
                             <select name="angkatan" style="padding:10px 12px; border-radius:12px; border:1px solid var(--card-border); background:var(--bg-color); color:var(--text-color); font-weight:700;">
-                                <option value="semua" t-att-selected="'selected' if str(angkatan_selected)=='semua' else None">Semua</option>
+                                <option value="semua" t-att-selected="'selected' if str(angkatan_selected)=='semua' else None" data-translate-id="pre_all">Semua</option>
                                 <t t-foreach="angkatan_list" t-as="a">
                                     <option t-att-value="a" t-att-selected="'selected' if (str(angkatan_selected)==str(a)) else None">
                                         <t t-esc="a"/>
@@ -39,7 +39,7 @@
                                 </t>
                             </select>
 
-                            <button type="submit" style="padding:10px 14px; border-radius:12px; border:none; background:#3b82f6; color:white; font-weight:800; cursor:pointer;">
+                            <button type="submit" style="padding:10px 14px; border-radius:12px; border:none; background:#3b82f6; color:white; font-weight:800; cursor:pointer;" data-translate-id="dosen_btn_apply">
                                 Terapkan
                             </button>
                         </form>
@@ -48,8 +48,8 @@
 
                 <div class="leaderboard-list-section" style="margin-top: 15px;">
                     <div class="list-header">
-                        <div class="list-title" style="color: var(--text-color);">Peringkat Mahasiswa</div>
-                        <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Angkatan: <t t-esc="angkatan_selected"/></div>
+                        <div class="list-title" style="color: var(--text-color);" data-translate-id="lb_title">Peringkat Mahasiswa</div>
+                        <div style="font-size:13px; color:var(--text-muted); margin-top:4px;"><span data-translate-id="lb_angkatan">Angkatan</span>: <t t-esc="angkatan_selected"/></div>
                     </div>
 
                     <div class="leaderboard-rows-container">
@@ -74,10 +74,11 @@
                         </t>
 
                         <t t-if="not students">
-                            <div class="no-more-rank glass-panel">Belum ada data peringkat untuk angkatan ini.</div>
+                            <div class="no-more-rank glass-panel" data-translate-id="lb_no_data">Belum ada data peringkat untuk angkatan ini.</div>
                         </t>
                     </div>
                 </div>
+
             </div>
         </t>
     </template>

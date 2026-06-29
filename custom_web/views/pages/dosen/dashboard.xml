@@ -12,11 +12,11 @@
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
-                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> <span data-translate-id="lecturer_portal">Portal Dosen</span> (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
                     <!-- Settings Button -->
-                    <a href="/dashboard/dosen/settings" class="dosen-settings-btn" title="Pengaturan Akun">
+                    <a href="/dashboard/dosen/settings" class="dosen-settings-btn" data-translate-title-id="dash_settings" title="Pengaturan Akun">
                         <i class="bi bi-gear-fill"></i>
                     </a>
                 </div>
@@ -29,11 +29,11 @@
                             <i class="bi bi-file-earmark-plus-fill"></i>
                         </div>
                         <div class="dosen-card-body">
-                            <h3>Buat Tugas</h3>
-                            <p>Kelola dan buat penugasan baru untuk mahasiswa secara terorganisir.</p>
+                            <h3 data-translate-id="card_make_task_title">Buat Tugas</h3>
+                            <p data-translate-id="card_make_task_desc">Kelola dan buat penugasan baru untuk mahasiswa secara terorganisir.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="/dosen/tugas" class="dosen-action-btn btn-blue">Kelola Tugas</a>
+                            <a href="/dosen/tugas" class="dosen-action-btn btn-blue" data-translate-id="card_make_task_btn">Kelola Tugas</a>
                         </div>
                     </div>
 
@@ -43,11 +43,11 @@
                             <i class="bi bi-calendar-check-fill"></i>
                         </div>
                         <div class="dosen-card-body">
-                            <h3>Presensi</h3>
-                            <p>Buka sesi kehadiran kelas baru dan awasi partisipasi mahasiswa secara instan.</p>
+                            <h3 data-translate-id="card_attendance_title">Presensi</h3>
+                            <p data-translate-id="card_attendance_desc">Buka sesi kehadiran kelas baru dan awasi partisipasi mahasiswa secara instan.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="/dosen/presensi" class="dosen-action-btn btn-purple">Mulai Presensi</a>
+                            <a href="/dosen/presensi" class="dosen-action-btn btn-purple" data-translate-id="card_attendance_btn">Mulai Presensi</a>
                         </div>
                     </div>
 
@@ -57,11 +57,11 @@
                             <i class="bi bi-people-fill"></i>
                         </div>
                         <div class="dosen-card-body">
-                            <h3>Pengumpulan</h3>
-                            <p>Periksa berkas jawaban tugas mahasiswa dan berikan feedback nilai secara instan.</p>
+                            <h3 data-translate-id="card_submission_title">Pengumpulan</h3>
+                            <p data-translate-id="card_submission_desc">Periksa berkas jawaban tugas mahasiswa dan berikan feedback nilai secara instan.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="/dosen/tugas/pengumpulan" class="dosen-action-btn btn-amber">Periksa Tugas</a>
+                            <a href="/dosen/tugas/pengumpulan" class="dosen-action-btn btn-amber" data-translate-id="card_submission_btn">Periksa Tugas</a>
                         </div>
                     </div>
 
@@ -71,14 +71,15 @@
                             <i class="bi bi-trophy-fill"></i>
                         </div>
                         <div class="dosen-card-body">
-                            <h3>Leaderboard</h3>
-                            <p>Pantau peringkat mahasiswa berdasarkan akumulasi XP dan pencapaian mereka.</p>
+                            <h3 data-translate-id="card_leaderboard_title">Leaderboard</h3>
+                            <p data-translate-id="card_leaderboard_desc">Pantau peringkat mahasiswa berdasarkan akumulasi XP dan pencapaian mereka.</p>
                         </div>
                         <div class="dosen-card-footer">
-                            <a href="/dosen/leaderboard" class="dosen-action-btn btn-emerald">Lihat Peringkat</a>
+                            <a href="/dosen/leaderboard" class="dosen-action-btn btn-emerald" data-translate-id="card_leaderboard_btn">Lihat Peringkat</a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </t>
     </template>

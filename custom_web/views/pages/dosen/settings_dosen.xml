@@ -30,7 +30,7 @@
                         <!-- Form to upload profile photo -->
                         <form id="form_upload_foto_dosen" style="margin-top: 8px;">
                             <label for="foto_profil_input" class="btn-change-photo" style="background: var(--accent-color); color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
-                                <i class="bi bi-camera-fill"></i> Ubah Foto Profil
+                                <i class="bi bi-camera-fill"></i> <span data-translate-id="dosen_btn_change_photo">Ubah Foto Profil</span>
                             </label>
                             <input type="file" id="foto_profil_input" accept="image/*" style="display: none;" onchange="document.getElementById('btn_submit_foto_dosen').click();"/>
                             <button type="submit" id="btn_submit_foto_dosen" style="display: none;"></button>
@@ -42,11 +42,11 @@
                 <div class="stats-container">
                     <div class="stat-box prodi-box">
                         <h4><t t-esc="dosen.prodi or '-'"/></h4>
-                        <span>Program Studi</span>
+                        <span data-translate-id="dosen_prodi">Program Studi</span>
                     </div>
                     <div class="stat-box kepakaran-box">
                         <h4><t t-esc="dosen.spesialisasi or '-'"/></h4>
-                        <span>Kepakaran / Keilmuan</span>
+                        <span data-translate-id="dosen_kepakaran">Kepakaran / Keilmuan</span>
                     </div>
                 </div>
 

@@ -12,7 +12,7 @@
                         </div>
                     </div>
                     <div class="profile-details">
-                        <h2>Sandi &amp; Keamanan</h2>
+                        <h2 data-translate-id="set_security">Sandi &amp; Keamanan</h2>
                         <p>NIP: <t t-esc="dosen.nip"/></p>
                     </div>
                 </div>
@@ -22,13 +22,13 @@
                         <div class="settings-item" style="border:none;cursor:default;">
                             <div class="item-left">
                                 <div class="item-icon"><i class="bi bi-shield-lock-fill"></i></div>
-                                <span>Ganti sandi</span>
+                                <span data-translate-id="dosen_change_password">Ganti sandi</span>
                             </div>
 
                             <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;align-items:flex-start;">
-                                <input id="old_password" name="old_password" type="password" placeholder="Password lama"/>
-                                <input id="new_password" name="new_password" type="password" placeholder="Password baru"/>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                <input id="old_password" name="old_password" type="password" data-translate-placeholder-id="dosen_old_password_placeholder" placeholder="Password lama"/>
+                                <input id="new_password" name="new_password" type="password" data-translate-placeholder-id="dosen_new_password_placeholder" placeholder="Password baru"/>
+                                <button type="submit" class="btn btn-primary" data-translate-id="dosen_btn_save">Simpan</button>
                             </div>
                         </div>
                     </form>
@@ -36,9 +36,10 @@
                     <a href="/dashboard/dosen/settings" class="settings-item">
                         <div class="item-left">
                             <div class="item-icon"><i class="bi bi-arrow-left"></i></div>
-                            <span>Kembali</span>
+                            <span data-translate-id="dosen_btn_back">Kembali</span>
                         </div>
                     </a>
+
                 </div>
             </div>
         </t>

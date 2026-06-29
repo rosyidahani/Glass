@@ -12,8 +12,16 @@ function postJSON(url, payload) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Pre-select current language radio button
+    var savedLang = localStorage.getItem("portal_lang") || "id";
+    var langRadio = document.querySelector('input[name="bahasa_preference"][value="' + savedLang + '"]');
+    if (langRadio) {
+        langRadio.checked = true;
+    }
+
     // Foto profil
     var formPhoto = document.getElementById('form_upload_foto_dosen');
+
     if (formPhoto) {
         formPhoto.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -78,20 +86,24 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             var bahasa = document.querySelector('input[name="bahasa_preference"]:checked');
             bahasa = bahasa ? bahasa.value : '';
+            var lang = localStorage.getItem("portal_lang") || "id";
             if (!bahasa) {
-                alert('Pilih bahasa.');
+                alert(lang === 'en' ? 'Please select a language.' : 'Pilih bahasa.');
                 return;
             }
             postJSON('/api/dosen/settings/set-bahasa', { bahasa_preference: bahasa }).then(function (json) {
                 if (json && json.status === 'success') {
-                    alert('Bahasa berhasil disimpan.');
+                    localStorage.setItem("portal_lang", bahasa);
+                    document.cookie = "portal_lang=" + bahasa + "; path=/; max-age=31536000";
+                    alert(bahasa === 'en' ? 'Language preference saved successfully.' : 'Bahasa berhasil disimpan.');
                     window.location.reload();
                 } else {
-                    alert(json.message || 'Gagal menyimpan bahasa.');
+                    alert(json.message || (lang === 'en' ? 'Failed to save language preference.' : 'Gagal menyimpan bahasa.'));
                 }
             });
         });
     }
+
 
     // Sandi
     var formPassword = document.getElementById('form_ganti_sandi');

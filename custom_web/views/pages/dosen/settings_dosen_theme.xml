@@ -12,7 +12,7 @@
                         </div>
                     </div>
                     <div class="profile-details">
-                        <h2>Tema</h2>
+                        <h2 data-translate-id="set_theme">Tema</h2>
                         <p>NIP: <t t-esc="dosen.nip"/></p>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
                         <div class="settings-item" style="border:none;cursor:default;">
                             <div class="item-left">
                                 <div class="item-icon"><i class="bi bi-palette-fill"></i></div>
-                                <span>Pilih tema</span>
+                                <span data-translate-id="dosen_select_theme">Pilih tema</span>
                             </div>
                             <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;margin-top:10px;">
                                 <label><input type="radio" name="tema_preference" value="oceanbreeze"/> Oceanbreeze</label>
@@ -30,7 +30,7 @@
                                 <label><input type="radio" name="tema_preference" value="amethyst_dream"/> Amethyst Dream</label>
                             </div>
                             <div style="margin-top:10px;">
-                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                <button type="submit" class="btn btn-primary" data-translate-id="dosen_btn_save">Simpan</button>
                             </div>
                         </div>
                     </form>
@@ -41,9 +41,10 @@
 
                         <div class="item-left">
                             <div class="item-icon"><i class="bi bi-arrow-left"></i></div>
-                            <span>Kembali</span>
+                            <span data-translate-id="dosen_btn_back">Kembali</span>
                         </div>
                     </a>
+
                 </div>
             </div>
         </t>
