@@ -2,7 +2,7 @@
 <odoo>
     <template id="leaderboard" name="Leaderboard Mahasiswa">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css?v=3"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css?v=4"/>
 
             <!-- Fetch and prepare rank variables safely -->
             <t t-set="rank_1" t-value="students[0] if len(students) &gt; 0 else False"/>
