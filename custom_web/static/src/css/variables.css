@@ -174,3 +174,106 @@ body {
 .activity-text p {
     color: var(--text-muted) !important;
 }
+
+/* =========================================================
+   TYPOGRAPHY POLISHING (SLIGHTLY SMALLER BOLD TEXT)
+   ========================================================= */
+/* Scale down default headers and bold weights */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-weight: 700 !important; /* Avoid 800/900 weight which is too heavy */
+    letter-spacing: -0.01em;
+}
+
+/* Specific bold text sizing overrides for better readability */
+.dosen-name, 
+.profile-name, 
+.row-student-name, 
+.podium-name, 
+.student-info .name, 
+.topbar-title, 
+.list-title, 
+.card-header h3, 
+.modal-title, 
+.hud-profile-meta h2,
+.lb-hero-title {
+    font-weight: 700 !important;
+    letter-spacing: -0.015em;
+}
+
+/* Adjust font-sizes of bold headings to be slightly smaller and cleaner */
+.topbar-title {
+    font-size: 18px !important;
+}
+
+.list-title {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+
+.dosen-name, .profile-name {
+    font-size: 18px !important;
+}
+
+.row-student-name {
+    font-size: 14px !important;
+}
+
+.podium-name {
+    font-size: 12px !important;
+}
+
+.student-info .name {
+    font-size: 13px !important;
+}
+
+.card-header h3 {
+    font-size: 15px !important;
+}
+
+.modal-title {
+    font-size: 18px !important;
+}
+
+.hud-profile-meta h2 {
+    font-size: 18px !important;
+}
+
+.lb-hero-title {
+    font-size: 24px !important;
+}
+
+/* Stats and numbers bold text scale down */
+.stat-num, 
+.stat-card .stat-info p, 
+.stat-box h4 {
+    font-weight: 700 !important;
+}
+
+.stat-num {
+    font-size: 20px !important;
+}
+
+.aktif-stat-card .stat-num {
+    font-size: 22px !important;
+}
+
+/* Button & interactive bold items */
+.btn-submit-sesi, 
+.btn-tutup-sesi, 
+.btn-submit-batch,
+.btn-modal-primary {
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+
+/* Badges */
+.badge, .badge-text {
+    font-weight: 600 !important;
+    font-size: 11px !important;
+}
+
+th {
+    font-weight: 600 !important;
+    font-size: 12px !important;
+}
