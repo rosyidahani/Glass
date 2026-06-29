@@ -13,14 +13,6 @@
                             <i class="bi bi-building"></i>
                             <t t-esc="prodi_name"/>
                         </div>
-                        <div class="topbar-profile">
-                            <t t-if="dosen and dosen.name">
-                                <t t-esc="dosen.name[0].upper()"/>
-                            </t>
-                            <t t-else="">
-                                <t t-esc="'D'"/>
-                            </t>
-                        </div>
                     </div>
                 </div>
 
