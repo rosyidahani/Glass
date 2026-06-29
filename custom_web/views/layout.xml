@@ -5,12 +5,12 @@
                 <meta charset="utf-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
                 <title>Portal Mahasiswa</title>
-                <link rel="stylesheet" href="/custom_web/static/src/css/variables.css?v=11"/>
+                <link rel="stylesheet" href="/custom_web/static/src/css/variables.css?v=14"/>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-                <link rel="stylesheet" href="/custom_web/static/src/css/layout.css?v=11"/>
+                <link rel="stylesheet" href="/custom_web/static/src/css/layout.css?v=12"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/presensi.css?v=11"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css?v=11"/>
-                <link rel="stylesheet" href="/custom_web/static/src/css/tugas_dosen.css?v=11"/>
+                <link rel="stylesheet" href="/custom_web/static/src/css/tugas_dosen.css?v=12"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/tugas_mahasiswa.css?v=11"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/shop.css?v=11"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css?v=11"/>

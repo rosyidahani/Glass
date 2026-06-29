@@ -174,3 +174,155 @@ body {
 .activity-text p {
     color: var(--text-muted) !important;
 }
+
+/* =========================================================
+   TYPOGRAPHY POLISHING (SLIGHTLY SMALLER BOLD TEXT)
+   ========================================================= */
+/* Scale down default headers and bold weights */
+h1, .h1 { font-size: 1.4rem !important; font-weight: 700 !important; letter-spacing: -0.015em; }
+h2, .h2 { font-size: 1.2rem !important; font-weight: 700 !important; letter-spacing: -0.01em; }
+h3, .h3 { font-size: 1.05rem !important; font-weight: 700 !important; }
+h4, .h4 { font-size: 0.95rem !important; font-weight: 700 !important; }
+h5, .h5 { font-size: 0.85rem !important; font-weight: 700 !important; }
+
+/* Specific bold text sizing overrides for better readability */
+.dosen-name, 
+.profile-name, 
+.row-student-name, 
+.podium-name, 
+.student-info .name, 
+.topbar-title, 
+.list-title, 
+.card-header h3, 
+.modal-title, 
+.hud-profile-meta h2,
+.lb-hero-title {
+    font-weight: 600 !important; /* Changed from 700 to 600 for a less heavy/more elegant look */
+    letter-spacing: -0.015em;
+}
+
+/* Adjust font-sizes of bold headings to be slightly smaller and cleaner */
+.topbar-title {
+    font-size: 16px !important;
+}
+
+.list-title {
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+}
+
+.dosen-name, .profile-name {
+    font-size: 16px !important;
+}
+
+.row-student-name {
+    font-size: 13px !important;
+}
+
+.podium-name {
+    font-size: 11px !important;
+}
+
+.student-info .name {
+    font-size: 12px !important;
+}
+
+.card-header h3 {
+    font-size: 13.5px !important;
+}
+
+.modal-title {
+    font-size: 16px !important;
+}
+
+.hud-profile-meta h2 {
+    font-size: 16px !important;
+}
+
+.lb-hero-title {
+    font-size: 20px !important;
+}
+
+/* Stats and numbers bold text scale down */
+.stat-num, 
+.stat-card .stat-info p, 
+.stat-box h4 {
+    font-weight: 600 !important;
+}
+
+.stat-num {
+    font-size: 18px !important;
+}
+
+.aktif-stat-card .stat-num {
+    font-size: 19px !important;
+}
+
+/* Button & interactive bold items */
+.btn-submit-sesi, 
+.btn-tutup-sesi, 
+.btn-submit-batch,
+.btn-modal-primary {
+    font-weight: 600 !important;
+    font-size: 12px !important;
+}
+
+/* Badges */
+.badge, .badge-text {
+    font-weight: 600 !important;
+    font-size: 10px !important;
+}
+
+th {
+    font-weight: 600 !important;
+    font-size: 11px !important;
+}
+
+
+/* =========================================================
+   DARK THEME TYPOGRAPHY ADAPTATION (SPECIFICITY OVERRIDES)
+   ========================================================= */
+.theme-midnight, .theme-amethyst {
+    color: var(--text-color) !important;
+}
+
+/* Headings, titles, and bold highlights */
+.theme-midnight h1, .theme-midnight h2, .theme-midnight h3, .theme-midnight h4, .theme-midnight h5, .theme-midnight h6,
+.theme-amethyst h1, .theme-amethyst h2, .theme-amethyst h3, .theme-amethyst h4, .theme-amethyst h5, .theme-amethyst h6,
+.theme-midnight .dosen-name, .theme-midnight .profile-name, .theme-midnight .row-student-name, .theme-midnight .podium-name,
+.theme-amethyst .dosen-name, .theme-amethyst .profile-name, .theme-amethyst .row-student-name, .theme-amethyst .podium-name,
+.theme-midnight .topbar-title, .theme-midnight .list-title, .theme-midnight .card-header h3, .theme-midnight .modal-title,
+.theme-amethyst .topbar-title, .theme-amethyst .list-title, .theme-amethyst .card-header h3, .theme-amethyst .modal-title,
+.theme-midnight .student-info .name, .theme-amethyst .student-info .name,
+.theme-midnight .meta-txt h2, .theme-amethyst .meta-txt h2,
+.theme-midnight .tugas-title, .theme-amethyst .tugas-title,
+.theme-midnight .card-title, .theme-amethyst .card-title,
+.theme-midnight .task-name, .theme-amethyst .task-name,
+.theme-midnight th, .theme-amethyst th,
+.theme-midnight td, .theme-amethyst td,
+.theme-midnight label, .theme-amethyst label,
+.theme-midnight .form-group label, .theme-amethyst .form-group label,
+.theme-midnight .form-label, .theme-amethyst .form-label {
+    color: var(--text-color) !important;
+}
+
+/* Descriptive, secondary, and muted text */
+.theme-midnight p, .theme-midnight span, .theme-midnight label, .theme-midnight li,
+.theme-amethyst p, .theme-amethyst span, .theme-amethyst label, .theme-amethyst li,
+.theme-midnight .meta-txt p, .theme-amethyst .meta-txt p,
+.theme-midnight .row-student-nim, .theme-amethyst .row-student-nim,
+.theme-midnight .student-info .nim, .theme-amethyst .student-info .nim,
+.theme-midnight .podium-xp, .theme-amethyst .podium-xp,
+.theme-midnight .input-helper, .theme-amethyst .input-helper,
+.theme-midnight .gps-status-text, .theme-amethyst .gps-status-text,
+.theme-midnight .no-more-rank, .theme-amethyst .no-more-rank,
+.theme-midnight .task-desc, .theme-amethyst .task-desc,
+.theme-midnight .tugas-meta, .theme-amethyst .tugas-meta,
+.theme-midnight .detail-row label, .theme-amethyst .detail-row label,
+.theme-midnight .detail-row span, .theme-amethyst .detail-row span,
+.theme-midnight .mhs-role, .theme-amethyst .mhs-role,
+.theme-midnight .dosen-role, .theme-amethyst .dosen-role {
+    color: var(--text-muted) !important;
+}
+
+
