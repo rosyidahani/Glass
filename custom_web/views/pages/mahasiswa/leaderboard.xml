@@ -16,57 +16,6 @@
             </t>
 
             <div class="leaderboard-container mhs-leaderboard-container">
-                <!-- Hero Header Premium -->
-                <div class="lb-hero-header">
-                    <!-- Decorative background orbs -->
-                    <div class="lb-hero-orb lb-hero-orb-1"></div>
-                    <div class="lb-hero-orb lb-hero-orb-2"></div>
-                    <div class="lb-hero-orb lb-hero-orb-3"></div>
-
-                    <!-- Trophy Icon -->
-                    <div class="lb-trophy-wrap">
-                        <i class="bi bi-trophy-fill lb-trophy-icon"></i>
-                        <div class="lb-trophy-glow"></div>
-                    </div>
-
-                    <!-- Title & Subtitle -->
-                    <div class="lb-hero-text">
-                        <h1 class="lb-hero-title">Leaderboard</h1>
-                        <p class="lb-hero-subtitle">
-                            <i class="bi bi-mortarboard-fill"></i>
-                            <t t-esc="mahasiswa.prodi or 'Teknologi Informasi'"/>
-                        </p>
-                    </div>
-
-                    <!-- My Stats Row -->
-                    <div class="lb-my-stats">
-                        <div class="lb-stat-chip lb-stat-xp">
-                            <i class="bi bi-star-fill"></i>
-                            <span><t t-esc="mahasiswa.total_xp"/> XP</span>
-                        </div>
-                        <div class="lb-stat-chip lb-stat-rank">
-                            <i class="bi bi-hash"></i>
-                            <span>
-                                <t t-if="my_rank &gt; 0">Peringkat <t t-esc="my_rank"/></t>
-                                <t t-else="">Belum masuk peringkat</t>
-                            </span>
-                        </div>
-                        <div class="lb-stat-chip lb-stat-koin">
-                            <i class="bi bi-coin"></i>
-                            <span><t t-esc="mahasiswa.koin"/> Poin</span>
-                        </div>
-                    </div>
-
-                    <!-- Avatar bottom-right -->
-                    <div class="lb-hero-avatar">
-                        <t t-if="mahasiswa and mahasiswa.foto_profil">
-                            <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile" class="lb-avatar-img"/>
-                        </t>
-                        <t t-else="">
-                            <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile" class="lb-avatar-img"/>
-                        </t>
-                    </div>
-                </div>
 
 
                 <!-- Section 1: Podium Top 3 -->
