@@ -21,6 +21,202 @@
     box-shadow: 0 8px 32px rgba(15, 23, 42, 0.05);
 }
 
+/* =========================================================
+   LEADERBOARD HERO HEADER — PREMIUM
+   ========================================================= */
+.lb-hero-header {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 75%, #6d28d9 100%);
+    padding: 28px 24px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    box-shadow: 0 12px 40px rgba(109, 40, 217, 0.35), 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* Background decorative orbs */
+.lb-hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(40px);
+    opacity: 0.35;
+}
+
+.lb-hero-orb-1 {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, #a78bfa, transparent);
+    top: -60px;
+    right: -50px;
+    animation: lbOrbFloat1 6s ease-in-out infinite;
+}
+
+.lb-hero-orb-2 {
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, #60a5fa, transparent);
+    bottom: -40px;
+    left: -30px;
+    animation: lbOrbFloat2 8s ease-in-out infinite;
+}
+
+.lb-hero-orb-3 {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #f472b6, transparent);
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.2;
+    animation: lbOrbFloat1 10s ease-in-out infinite reverse;
+}
+
+@keyframes lbOrbFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-10px, 10px) scale(1.08); }
+}
+
+@keyframes lbOrbFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(8px, -12px) scale(1.05); }
+}
+
+/* Trophy Icon */
+.lb-trophy-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.lb-trophy-icon {
+    font-size: 48px;
+    color: #fbbf24;
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.7)) drop-shadow(0 4px 8px rgba(251, 191, 36, 0.4));
+    animation: lbTrophyPulse 3s ease-in-out infinite;
+}
+
+.lb-trophy-glow {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.3), transparent 70%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: lbTrophyPulse 3s ease-in-out infinite;
+}
+
+@keyframes lbTrophyPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.06); }
+}
+
+/* Hero Title & Subtitle */
+.lb-hero-text {
+    position: relative;
+    z-index: 1;
+}
+
+.lb-hero-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.lb-hero-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(196, 181, 253, 0.9);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.lb-hero-subtitle i {
+    color: #a78bfa;
+}
+
+/* Stats chips row */
+.lb-my-stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.lb-stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: transform 0.2s ease;
+}
+
+.lb-stat-chip:hover {
+    transform: translateY(-2px);
+}
+
+.lb-stat-xp {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fcd34d;
+    border-color: rgba(251, 191, 36, 0.25);
+}
+
+.lb-stat-xp i { color: #fbbf24; }
+
+.lb-stat-rank {
+    background: rgba(167, 139, 250, 0.15);
+    color: #c4b5fd;
+    border-color: rgba(167, 139, 250, 0.25);
+}
+
+.lb-stat-rank i { color: #a78bfa; }
+
+.lb-stat-koin {
+    background: rgba(96, 165, 250, 0.15);
+    color: #93c5fd;
+    border-color: rgba(96, 165, 250, 0.25);
+}
+
+.lb-stat-koin i { color: #60a5fa; }
+
+/* Avatar */
+.lb-hero-avatar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+}
+
+.lb-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
 
 /* Podium Section */
 .podium-section {
