@@ -179,11 +179,11 @@ body {
    TYPOGRAPHY POLISHING (SLIGHTLY SMALLER BOLD TEXT)
    ========================================================= */
 /* Scale down default headers and bold weights */
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
-    font-weight: 700 !important; /* Avoid 800/900 weight which is too heavy */
-    letter-spacing: -0.01em;
-}
+h1, .h1 { font-size: 1.4rem !important; font-weight: 700 !important; letter-spacing: -0.015em; }
+h2, .h2 { font-size: 1.2rem !important; font-weight: 700 !important; letter-spacing: -0.01em; }
+h3, .h3 { font-size: 1.05rem !important; font-weight: 700 !important; }
+h4, .h4 { font-size: 0.95rem !important; font-weight: 700 !important; }
+h5, .h5 { font-size: 0.85rem !important; font-weight: 700 !important; }
 
 /* Specific bold text sizing overrides for better readability */
 .dosen-name, 
@@ -197,65 +197,65 @@ h1, h2, h3, h4, h5, h6,
 .modal-title, 
 .hud-profile-meta h2,
 .lb-hero-title {
-    font-weight: 700 !important;
+    font-weight: 600 !important; /* Changed from 700 to 600 for a less heavy/more elegant look */
     letter-spacing: -0.015em;
 }
 
 /* Adjust font-sizes of bold headings to be slightly smaller and cleaner */
 .topbar-title {
-    font-size: 18px !important;
+    font-size: 16px !important;
 }
 
 .list-title {
-    font-size: 15px !important;
-    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
 }
 
 .dosen-name, .profile-name {
-    font-size: 18px !important;
+    font-size: 16px !important;
 }
 
 .row-student-name {
-    font-size: 14px !important;
-}
-
-.podium-name {
-    font-size: 12px !important;
-}
-
-.student-info .name {
     font-size: 13px !important;
 }
 
+.podium-name {
+    font-size: 11px !important;
+}
+
+.student-info .name {
+    font-size: 12px !important;
+}
+
 .card-header h3 {
-    font-size: 15px !important;
+    font-size: 13.5px !important;
 }
 
 .modal-title {
-    font-size: 18px !important;
+    font-size: 16px !important;
 }
 
 .hud-profile-meta h2 {
-    font-size: 18px !important;
+    font-size: 16px !important;
 }
 
 .lb-hero-title {
-    font-size: 24px !important;
+    font-size: 20px !important;
 }
 
 /* Stats and numbers bold text scale down */
 .stat-num, 
 .stat-card .stat-info p, 
 .stat-box h4 {
-    font-weight: 700 !important;
+    font-weight: 600 !important;
 }
 
 .stat-num {
-    font-size: 20px !important;
+    font-size: 18px !important;
 }
 
 .aktif-stat-card .stat-num {
-    font-size: 22px !important;
+    font-size: 19px !important;
 }
 
 /* Button & interactive bold items */
@@ -264,16 +264,17 @@ h1, h2, h3, h4, h5, h6,
 .btn-submit-batch,
 .btn-modal-primary {
     font-weight: 600 !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
 }
 
 /* Badges */
 .badge, .badge-text {
     font-weight: 600 !important;
-    font-size: 11px !important;
+    font-size: 10px !important;
 }
 
 th {
     font-weight: 600 !important;
-    font-size: 12px !important;
-}
+    font-size: 11px !important;
+}
+
