@@ -29,12 +29,12 @@
                         
                         <!-- Action Buttons stacked below profile pill -->
                         <div class="hud-actions-vertical">
-                            <!-- Shop Button -->
-                            <a href="/dashboard/mahasiswa/shop" class="icon-btn shop-btn glass-panel" title="Shop">
+                             <!-- Shop Button -->
+                            <a href="/dashboard/mahasiswa/shop" class="icon-btn shop-btn glass-panel" data-translate-title-id="title_shop" title="Shop">
                                 <i class="bi bi-bag-fill"></i>
                             </a>
                             <!-- Setting Button -->
-                            <a href="/dashboard/mahasiswa/settings" class="icon-btn setting-btn glass-panel" title="Pengaturan Akun">
+                            <a href="/dashboard/mahasiswa/settings" class="icon-btn setting-btn glass-panel" data-translate-title-id="title_settings" title="Pengaturan Akun">
                                 <i class="bi bi-gear-fill"></i>
                             </a>
                         </div>
@@ -43,15 +43,16 @@
                     <!-- Right vertical stack of 2 stats pills -->
                     <div class="hud-right-vertical">
                         <!-- Coin/Poin (Top) -->
-                        <div class="coin-pill" title="Koin yang dapat ditukar">
-                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> Poin
+                        <div class="coin-pill" data-translate-title-id="title_coins_exchange" title="Koin yang dapat ditukar">
+                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> <span data-translate-id="dash_koin">Poin</span>
                         </div>
 
                         <!-- EXP Pill (Bottom) -->
-                        <div class="xp-pill" title="Total XP">
+                        <div class="xp-pill" data-translate-title-id="title_total_xp" title="Total XP">
                             <i class="bi bi-star-fill"></i> <t t-esc="mahasiswa.total_xp"/> XP
                         </div>
                     </div>
+
                 </div>
 
                 <!-- MAIN DASHBOARD CONTENT -->

@@ -140,7 +140,7 @@
                 <!-- Section 2: Remaining Rank List (Rank 4+) -->
                 <div class="leaderboard-list-section">
                     <div class="list-header">
-                        <div class="list-title">Peringkat Lainnya</div>
+                        <div class="list-title" data-translate-id="lb_others">Peringkat Lainnya</div>
                     </div>
                     
                     <div class="leaderboard-rows-container">
@@ -164,12 +164,13 @@
                             <t t-set="rank_idx" t-value="rank_idx + 1"/>
                         </t>
                         <t t-if="len(students) &lt;= 3">
-                            <div class="no-more-rank glass-panel">
+                            <div class="no-more-rank glass-panel" data-translate-id="lb_no_others">
                                 Belum ada peringkat tambahan.
                             </div>
                         </t>
                     </div>
                 </div>
+
             </div>
         </t>
     </template>

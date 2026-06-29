@@ -9,22 +9,23 @@
                     <t t-set="title" t-value="'Presensi'"/>
                 </t>
                 <div class="header-section-main" style="margin-top: 10px; margin-bottom: 20px;">
-                    <p>Silakan pilih kelas mata kuliah aktif untuk melakukan presensi kehadiran hari ini.</p>
+                    <p data-translate-id="pre_instruction">Silakan pilih kelas mata kuliah aktif untuk melakukan presensi kehadiran hari ini.</p>
                 </div>
 
                 <!-- Search and Filter Bar -->
                 <div class="filter-bar glass-panel">
                     <div class="search-box">
                         <i class="bi bi-search font-icon-search"></i>
-                        <input type="text" id="searchInput" placeholder="Cari mata kuliah atau dosen..." onkeyup="filterCourses()"/>
+                        <input type="text" id="searchInput" data-translate-placeholder-id="pre_search_placeholder" placeholder="Cari mata kuliah atau dosen..." onkeyup="filterCourses()"/>
                     </div>
                     <div class="filter-options">
-                        <button class="filter-btn active" id="btn-all" onclick="filterStatus('all')">Semua</button>
-                        <button class="filter-btn" id="btn-online" onclick="filterStatus('online')"><span class="dot dot-green"></span> Online</button>
-                        <button class="filter-btn" id="btn-offline" onclick="filterStatus('offline')"><span class="dot dot-blue"></span> Offline</button>
-                        <button class="filter-btn" id="btn-selesai" onclick="filterStatus('selesai')"><span class="dot dot-gray"></span> Selesai</button>
+                        <button class="filter-btn active" id="btn-all" onclick="filterStatus('all')" data-translate-id="pre_all">Semua</button>
+                        <button class="filter-btn" id="btn-online" onclick="filterStatus('online')"><span class="dot dot-green"></span> <span data-translate-id="pre_online">Online</span></button>
+                        <button class="filter-btn" id="btn-offline" onclick="filterStatus('offline')"><span class="dot dot-blue"></span> <span data-translate-id="pre_offline">Offline</span></button>
+                        <button class="filter-btn" id="btn-selesai" onclick="filterStatus('selesai')"><span class="dot dot-gray"></span> <span data-translate-id="pre_finished">Selesai</span></button>
                     </div>
                 </div>
+
 
                 <!-- Course Cards Grid -->
                 <div class="courses-grid" id="coursesGrid">
@@ -33,8 +34,8 @@
                             <div class="empty-icon" style="font-size: 48px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2)); width: 88px; height: 88px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 8px;">
                                 <i class="bi bi-calendar2-x text-purple" style="color: #a78bfa; filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.4));"></i>
                             </div>
-                            <h4 style="font-weight: 800; margin: 0; font-size: 20px; color: #1e293b; letter-spacing: -0.02em;">Belum Ada Sesi Presensi Aktif</h4>
-                            <p style="color: #64748b; font-size: 14.5px; margin: 0; max-width: 340px; line-height: 1.6;">Dosen pengampu Anda belum membuka sesi presensi kelas untuk saat ini. Silakan hubungi dosen bersangkutan.</p>
+                            <h4 style="font-weight: 800; margin: 0; font-size: 20px; color: #1e293b; letter-spacing: -0.02em;" data-translate-id="pre_empty_title">Belum Ada Sesi Presensi Aktif</h4>
+                            <p style="color: #64748b; font-size: 14.5px; margin: 0; max-width: 340px; line-height: 1.6;" data-translate-id="pre_empty_desc">Dosen pengampu Anda belum membuka sesi presensi kelas untuk saat ini. Silakan hubungi dosen bersangkutan.</p>
                         </div>
                     </t>
                     <t t-else="">
@@ -74,10 +75,11 @@
                                     <!-- Offline extra alert for GPS -->
                                     <t t-if="course['status'] == 'offline'">
                                         <div class="gps-badge">
-                                            <i class="bi bi-pin-map-fill"></i> Validasi GPS Aktif (Radius Kampus)
+                                            <i class="bi bi-pin-map-fill"></i> <span data-translate-id="pre_gps_badge">Validasi GPS Aktif (Radius Kampus)</span>
                                         </div>
                                     </t>
                                 </div>
+
 
                                 <!-- Footer Card Button -->
                                 <div class="card-footer-action">
@@ -86,10 +88,11 @@
                                     </t>
                                     <t t-else="">
                                         <a t-att-href="'/presensi/scan/' + str(course['id'])" class="btn-action btn-active">
-                                            Mulai Presensi <i class="bi bi-arrow-right"></i>
+                                            <t t-esc="course['action_label']"/> <i class="bi bi-arrow-right"></i>
                                         </a>
                                     </t>
                                 </div>
+
                             </div>
                         </t>
                     </t>

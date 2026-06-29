@@ -338,21 +338,23 @@ class MahasiswaPortalController(http.Controller):
                 if 0 < delta.total_seconds() <= 86400: # 1 day
                     is_soon = True
 
-            # Format Indonesian months
-            months_id = {
-                'January': 'Januari', 'February': 'Februari', 'March': 'Maret',
-                'April': 'April', 'May': 'Mei', 'June': 'Juni',
-                'July': 'Juli', 'August': 'Agustus', 'September': 'September',
-                'October': 'Oktober', 'November': 'November', 'December': 'Desember'
-            }
-            for eng, ind in months_id.items():
-                date_open_str = date_open_str.replace(eng, ind)
-                deadline_str = deadline_str.replace(eng, ind)
+            lang = request.httprequest.cookies.get('portal_lang', 'id')
+            if lang == 'id':
+                # Format Indonesian months
+                months_id = {
+                    'January': 'Januari', 'February': 'Februari', 'March': 'Maret',
+                    'April': 'April', 'May': 'Mei', 'June': 'Juni',
+                    'July': 'Juli', 'August': 'Agustus', 'September': 'September',
+                    'October': 'Oktober', 'November': 'November', 'December': 'Desember'
+                }
+                for eng, ind in months_id.items():
+                    date_open_str = date_open_str.replace(eng, ind)
+                    deadline_str = deadline_str.replace(eng, ind)
             
             task_data = {
                 'id': t.id,
                 'name': t.judul,
-                'subject': t.mata_kuliah_id.nama if t.mata_kuliah_id else 'Tanpa Mata Kuliah',
+                'subject': t.mata_kuliah_id.nama if t.mata_kuliah_id else ('Tanpa Mata Kuliah' if lang == 'id' else 'No Course'),
                 'course_id': t.mata_kuliah_id.id if t.mata_kuliah_id else None,
                 'jenis_tugas': t.jenis_tugas,
                 'deskripsi': t.deskripsi or '',
@@ -368,18 +370,18 @@ class MahasiswaPortalController(http.Controller):
             
             if sub:
                 task_data['status'] = 'completed'
-                task_data['status_label'] = 'Selesai'
+                task_data['status_label'] = 'Selesai' if lang == 'id' else 'Completed'
                 task_data['nilai'] = sub['nilai']
                 task_data['status_penilaian'] = sub['status_penilaian']
                 tugas_riwayat.append(task_data)
             else:
                 if t.deadline and now_utc > t.deadline:
                     task_data['status'] = 'missed'
-                    task_data['status_label'] = 'Terlambat'
+                    task_data['status_label'] = 'Terlambat' if lang == 'id' else 'Missed'
                     tugas_riwayat.append(task_data)
                 else:
                     task_data['status'] = 'pending'
-                    task_data['status_label'] = 'Belum Selesai'
+                    task_data['status_label'] = 'Belum Selesai' if lang == 'id' else 'Pending'
                     tugas_aktif.append(task_data)
             
         return request.render('custom_web.menu', {
@@ -497,15 +499,16 @@ class MahasiswaPortalController(http.Controller):
                     waktu_buka_utc = pytz.utc.localize(session.waktu_buka)
                     waktu_buka_wib = waktu_buka_utc.astimezone(pytz.timezone('Asia/Jakarta')).strftime('%H:%M WIB')
 
+                lang = request.httprequest.cookies.get('portal_lang', 'id')
                 courses.append({
                     'id': session.id,
                     'name': course.nama,
                     'status': session.tipe_kelas,
                     'status_label': 'Online' if session.tipe_kelas == 'online' else 'Offline',
-                    'action_label': 'Mulai Presensi',
+                    'action_label': 'Mulai Presensi' if lang == 'id' else 'Start Attendance',
                     'color': 'green' if session.tipe_kelas == 'online' else 'blue',
                     'dosen': dosen_name,
-                    'jam': waktu_buka_wib or 'Jam Aktif',
+                    'jam': waktu_buka_wib or ('Jam Aktif' if lang == 'id' else 'Active Time'),
                     'ruang': session.name,
                 })
 

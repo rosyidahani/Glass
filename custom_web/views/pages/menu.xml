@@ -13,43 +13,44 @@
                         <span class="icon-side purple"><i class="bi bi-journal-bookmark-fill"></i></span>
                         <div class="stat-info">
                             <span class="num" id="stats-active-count"><t t-esc="stats_active_count"/></span>
-                            <span class="lbl">Tugas Aktif</span>
+                            <span class="lbl" data-translate-id="tugas_active">Tugas Aktif</span>
                         </div>
                     </div>
                     <div class="stat-capsule">
                         <span class="icon-side green"><i class="bi bi-check-circle-fill"></i></span>
                         <div class="stat-info">
                             <span class="num" id="stats-history-count"><t t-esc="stats_history_count"/></span>
-                            <span class="lbl">Selesai</span>
+                            <span class="lbl" data-translate-id="tugas_completed">Selesai</span>
                         </div>
                     </div>
                     <div class="stat-capsule">
                         <span class="icon-side gold"><i class="bi bi-coin"></i></span>
                         <div class="stat-info">
-                            <span class="num"><t t-esc="mahasiswa.koin"/> Koin</span>
-                            <span class="lbl">Total Koin</span>
+                            <span class="num"><t t-esc="mahasiswa.koin"/> <span data-translate-id="dash_koin">Koin</span></span>
+                            <span class="lbl" data-translate-id="tugas_total_coins">Total Koin</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tabs: Tugas & History -->
                 <div class="tugas-tab-filters-layout">
-                    <button class="tab-btn active" id="tab-tugas" onclick="switchTugasTab('tugas')">Tugas</button>
-                    <button class="tab-btn" id="tab-history" onclick="switchTugasTab('history')">History</button>
+                    <button class="tab-btn active" id="tab-tugas" onclick="switchTugasTab('tugas')" data-translate-id="tugas_tab">Tugas</button>
+                    <button class="tab-btn" id="tab-history" onclick="switchTugasTab('history')" data-translate-id="tugas_history">History</button>
                 </div>
+
 
                 <!-- Symmetrical Sided Dashboard Filter & Sort Controls Bar -->
                 <div class="dashboard-controls-bar">
                     
                     <!-- Course Filter Dropdown -->
                     <div class="control-box course-select">
-                        <label class="dropdown-label">Pilih mata kuliah</label>
+                        <label class="dropdown-label" data-translate-id="tugas_select_course">Pilih mata kuliah</label>
                         <div class="course-dropdown-trigger" id="student_course_btn">
-                            <span id="selected_student_course">Semua Mata Kuliah</span>
+                            <span id="selected_student_course" data-translate-id="tugas_all_courses">Semua Mata Kuliah</span>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="course-dropdown-pane hidden" id="student_course_dropdown">
-                            <div class="dropdown-option-item active" data-id="all">Semua Mata Kuliah</div>
+                            <div class="dropdown-option-item active" data-id="all" data-translate-id="tugas_all_courses">Semua Mata Kuliah</div>
                             <t t-foreach="courses" t-as="c">
                                 <div class="dropdown-option-item" t-att-data-id="c.id" t-att-data-name="c.nama">
                                     <t t-esc="c.nama"/>
@@ -60,30 +61,31 @@
 
                     <!-- Sort & Status Filter Dropdown -->
                     <div class="control-box sort-select">
-                        <label class="dropdown-label">Urutkan &amp; Filter</label>
+                        <label class="dropdown-label" data-translate-id="tugas_sort_filter">Urutkan &amp; Filter</label>
                         <div class="sort-dropdown-trigger" id="student_sort_btn">
-                            <span id="selected_student_sort"><i class="bi bi-funnel-fill text-purple"></i> Urutkan &amp; Filter</span>
+                            <span id="selected_student_sort" data-translate-id="tugas_sort_filter"><i class="bi bi-funnel-fill text-purple"></i> Urutkan &amp; Filter</span>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="sort-dropdown-pane hidden" id="student_sort_dropdown">
-                            <div class="sort-option-item active" data-sort="default">Default</div>
+                            <div class="sort-option-item active" data-sort="default" data-translate-id="sort_default">Default</div>
                             
-                            <div class="dropdown-section-divider">Urutkan Nama &amp; Waktu</div>
-                            <div class="sort-option-item" data-sort="name-asc"><i class="bi bi-sort-alpha-down"></i> Nama (A-Z)</div>
-                            <div class="sort-option-item" data-sort="name-desc"><i class="bi bi-sort-alpha-up"></i> Nama (Z-A)</div>
-                            <div class="sort-option-item" data-sort="date-open-asc"><i class="bi bi-calendar-plus"></i> Tanggal Buka (Terlama)</div>
-                            <div class="sort-option-item" data-sort="date-open-desc"><i class="bi bi-calendar-plus-fill"></i> Tanggal Buka (Terbaru)</div>
-                            <div class="sort-option-item" data-sort="date-close-asc"><i class="bi bi-calendar-minus"></i> Batas Waktu (Terdekat)</div>
-                            <div class="sort-option-item" data-sort="date-close-desc"><i class="bi bi-calendar-minus-fill"></i> Batas Waktu (Terlama)</div>
+                            <div class="dropdown-section-divider" data-translate-id="sort_section_time">Urutkan Nama &amp; Waktu</div>
+                            <div class="sort-option-item" data-sort="name-asc"><i class="bi bi-sort-alpha-down"></i> <span data-translate-id="sort_name_asc">Nama (A-Z)</span></div>
+                            <div class="sort-option-item" data-sort="name-desc"><i class="bi bi-sort-alpha-up"></i> <span data-translate-id="sort_name_desc">Nama (Z-A)</span></div>
+                            <div class="sort-option-item" data-sort="date-open-asc"><i class="bi bi-calendar-plus"></i> <span data-translate-id="sort_open_asc">Tanggal Buka (Terlama)</span></div>
+                            <div class="sort-option-item" data-sort="date-open-desc"><i class="bi bi-calendar-plus-fill"></i> <span data-translate-id="sort_open_desc">Tanggal Buka (Terbaru)</span></div>
+                            <div class="sort-option-item" data-sort="date-close-asc"><i class="bi bi-calendar-minus"></i> <span data-translate-id="sort_close_asc">Batas Waktu (Terdekat)</span></div>
+                            <div class="sort-option-item" data-sort="date-close-desc"><i class="bi bi-calendar-minus-fill"></i> <span data-translate-id="sort_close_desc">Batas Waktu (Terlama)</span></div>
                             
-                            <div class="dropdown-section-divider">Filter Status</div>
-                            <div class="sort-option-item" data-sort="filter-all"><i class="bi bi-circle"></i> Semua Status</div>
-                            <div class="sort-option-item" data-sort="filter-selesai"><i class="bi bi-check-circle-fill text-success"></i> Selesai</div>
-                            <div class="sort-option-item" data-sort="filter-terlambat"><i class="bi bi-exclamation-circle-fill text-danger"></i> Terlambat</div>
+                            <div class="dropdown-section-divider" data-translate-id="sort_section_status">Filter Status</div>
+                            <div class="sort-option-item" data-sort="filter-all"><i class="bi bi-circle"></i> <span data-translate-id="sort_status_all">Semua Status</span></div>
+                            <div class="sort-option-item" data-sort="filter-selesai"><i class="bi bi-check-circle-fill text-success"></i> <span data-translate-id="tugas_completed">Selesai</span></div>
+                            <div class="sort-option-item" data-sort="filter-terlambat"><i class="bi bi-exclamation-circle-fill text-danger"></i> <span data-translate-id="tugas_missed">Terlambat</span></div>
                         </div>
                     </div>
 
                 </div>
+
 
                 <!-- TAB CONTENT 1: Active Tasks (Tugas Tab) -->
                 <div id="active-tasks-container" class="tasks-tab-content-wrapper">
@@ -91,7 +93,7 @@
                         <t t-if="not tugas_aktif">
                             <div class="empty-state" style="grid-column: span 2; text-align: center; padding: 40px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; color: var(--text-color);">
                                 <i class="bi bi-slash-circle" style="font-size: 32px; color: var(--text-muted);"></i>
-                                <p style="margin-top: 10px; color: var(--text-muted); font-weight: 600;">Belum ada tugas aktif yang perlu dikerjakan.</p>
+                                <p style="margin-top: 10px; color: var(--text-muted); font-weight: 600;" data-translate-id="tugas_empty_active">Belum ada tugas aktif yang perlu dikerjakan.</p>
                             </div>
                         </t>
                         <t t-else="" t-foreach="tugas_aktif" t-as="t">
@@ -108,7 +110,7 @@
                                         <div class="date-milestone start">
                                             <i class="bi bi-calendar-event"></i>
                                             <div class="m-txt">
-                                                <span class="lbl">Tanggal Buka</span>
+                                                <span class="lbl" data-translate-id="tugas_date_open">Tanggal Buka</span>
                                                 <span class="val"><t t-esc="t['date_open']"/></span>
                                             </div>
                                         </div>
@@ -116,7 +118,7 @@
                                         <div t-attf-class="date-milestone end #{'soon' if t['is_soon'] else ''}">
                                             <i class="bi bi-calendar-check-fill"></i>
                                             <div class="m-txt">
-                                                <span class="lbl">Batas Deadline</span>
+                                                <span class="lbl" data-translate-id="tugas_date_close">Batas Deadline</span>
                                                 <span class="val"><t t-esc="t['date_close']"/></span>
                                             </div>
                                         </div>
@@ -131,13 +133,14 @@
                                             t-att-data-has-file="'true' if t['has_file_materi'] else 'false'"
                                             t-att-data-file-name="t['file_materi_name']"
                                             t-att-data-file-url="t['file_materi_url']"
-                                            onclick="showTaskDetailsNew(this)">Detail</button>
+                                            onclick="showTaskDetailsNew(this)" data-translate-id="btn_detail">Detail</button>
                                     <button type="button" class="btn-kerjakan-task" 
                                             t-att-data-id="t['id']" 
                                             t-att-data-title="t['name']" 
                                             t-att-data-subject="t['subject']"
-                                            onclick="openSubmissionDrawerNew(this)">Kerjakan</button>
+                                            onclick="openSubmissionDrawerNew(this)" data-translate-id="btn_submit_task">Kerjakan</button>
                                 </div>
+
                             </div>
                         </t>
                     </div>
@@ -149,7 +152,7 @@
                         <t t-if="not tugas_riwayat">
                             <div class="empty-state" style="text-align: center; padding: 40px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; color: var(--text-color);">
                                 <i class="bi bi-slash-circle" style="font-size: 32px; color: var(--text-muted);"></i>
-                                <p style="margin-top: 10px; color: var(--text-muted); font-weight: 600;">Belum ada riwayat tugas.</p>
+                                <p style="margin-top: 10px; color: var(--text-muted); font-weight: 600;" data-translate-id="tugas_empty_history">Belum ada riwayat tugas.</p>
                             </div>
                         </t>
                         <t t-else="" t-foreach="tugas_riwayat" t-as="t">
@@ -160,31 +163,32 @@
                                 </div>
                                 <div class="strip-dates">
                                     <div class="date-block">
-                                        <span class="lbl">Tanggal Buka</span>
+                                        <span class="lbl" data-translate-id="tugas_date_open">Tanggal Buka</span>
                                         <span class="val"><t t-esc="t['date_open']"/></span>
                                     </div>
                                     <div class="date-block">
-                                        <span class="lbl">Batas Waktu</span>
+                                        <span class="lbl" data-translate-id="tugas_date_close">Batas Waktu</span>
                                         <span class="val"><t t-esc="t['date_close']"/></span>
                                     </div>
                                 </div>
                                 <div class="strip-badge-side">
                                     <t t-if="t['status'] == 'completed'">
                                         <t t-if="t['status_penilaian'] == 'graded'">
-                                            <span class="badge-status-pill success"><i class="bi bi-patch-check-fill"></i> Dinilai: <t t-esc="t['nilai']"/></span>
+                                            <span class="badge-status-pill success"><i class="bi bi-patch-check-fill"></i> <span data-translate-id="tugas_graded">Dinilai</span>: <t t-esc="t['nilai']"/></span>
                                         </t>
                                         <t t-else="">
-                                            <span class="badge-status-pill success" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="bi bi-patch-check-fill"></i> Selesai (Menunggu Nilai)</span>
+                                            <span class="badge-status-pill success" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="bi bi-patch-check-fill"></i> <span data-translate-id="tugas_completed_pending">Selesai (Menunggu Nilai)</span></span>
                                         </t>
                                     </t>
                                     <t t-else="">
-                                        <span class="badge-status-pill fail"><i class="bi bi-exclamation-triangle-fill"></i> Terlambat</span>
+                                        <span class="badge-status-pill fail"><i class="bi bi-exclamation-triangle-fill"></i> <span data-translate-id="tugas_missed">Terlambat</span></span>
                                     </t>
                                 </div>
                             </div>
                         </t>
                     </div>
                 </div>
+
 
             </div>
 
@@ -206,11 +210,11 @@
                         
                         <!-- Upload File Area -->
                         <div class="form-group">
-                            <label>Unggah Berkas Tugas</label>
+                            <label data-translate-id="tugas_upload_file">Unggah Berkas Tugas</label>
                             <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-upload').click()">
                                 <i class="bi bi-file-earmark-zip-fill text-purple"></i>
-                                <p class="drop-main">Tarik &amp; lepas berkas di sini atau klik untuk mencari</p>
-                                <p class="drop-sub">Mendukung format ZIP, RAR, PDF, atau DOCX (Maksimal 10MB)</p>
+                                <p class="drop-main" data-translate-id="tugas_drop_zone">Tarik &amp; lepas berkas di sini atau klik untuk mencari</p>
+                                <p class="drop-sub" data-translate-id="tugas_supported_formats">Mendukung format ZIP, RAR, PDF, atau DOCX (Maksimal 10MB)</p>
                                 <span id="file-name-display" class="file-chosen-name hidden"></span>
                                 <input type="file" id="file-upload" class="hidden" onchange="handleFileSelect(this)"/>
                             </div>
@@ -218,23 +222,24 @@
 
                         <!-- Link Submission -->
                         <div class="form-group">
-                            <label for="link-submission"><i class="bi bi-link-45deg"></i> Link Tautan Pengumpulan (Opsional)</label>
-                            <input type="url" id="link-submission" class="form-control" placeholder="Contoh: https://github.com/username/repository-tugas"/>
-                            <p class="input-helper">Sertakan tautan repository GitHub atau Google Drive jika pengerjaan menggunakan kontrol versi.</p>
+                            <label for="link-submission"><i class="bi bi-link-45deg"></i> <span data-translate-id="tugas_link_label">Link Tautan Pengumpulan (Opsional)</span></label>
+                            <input type="url" id="link-submission" class="form-control" data-translate-placeholder-id="tugas_link_placeholder" placeholder="Contoh: https://github.com/username/repository-tugas"/>
+                            <p class="input-helper" data-translate-id="tugas_link_helper">Sertakan tautan repository GitHub atau Google Drive jika pengerjaan menggunakan kontrol versi.</p>
                         </div>
 
                         <!-- Catatan Mahasiswa -->
                         <div class="form-group">
-                            <label for="catatan">Catatan untuk Dosen</label>
-                            <textarea id="catatan" class="form-control" rows="3" placeholder="Tuliskan catatan pengerjaan tambahan di sini..."></textarea>
+                            <label for="catatan" data-translate-id="tugas_notes_label">Catatan untuk Dosen</label>
+                            <textarea id="catatan" class="form-control" rows="3" data-translate-placeholder-id="tugas_notes_placeholder" placeholder="Tuliskan catatan pengerjaan tambahan di sini..."></textarea>
                         </div>
 
                         <button type="button" class="btn-submit-drawer" onclick="submitRealSubmission()">
-                            <i class="bi bi-check-circle-fill"></i> Kirim &amp; Kumpulkan Jawaban
+                            <i class="bi bi-check-circle-fill"></i> <span data-translate-id="tugas_btn_submit">Kirim &amp; Kumpulkan Jawaban</span>
                         </button>
                     </form>
                 </div>
             </div>
+
 
             <!-- Task Detail Drawer (Slide up Modal) -->
             <div class="submission-modal-overlay" id="detail-overlay" onclick="closeDetailDrawer()">
@@ -243,19 +248,19 @@
                         <div class="header-txt">
                             <span class="drawer-icon"><i class="bi bi-info-circle-fill"></i></span>
                             <div>
-                                <h3 id="detail-task-title">Detail Tugas</h3>
+                                <h3 id="detail-task-title" data-translate-id="detail_task_title">Detail Tugas</h3>
                                 <p id="detail-task-subject">Nama Mata Kuliah</p>
                             </div>
                         </div>
                         <button class="btn-close-drawer" onclick="closeDetailDrawer()"><i class="bi bi-x-lg"></i></button>
                     </div>
                     <div class="detail-drawer-body">
-                        <label class="desc-label">Deskripsi Instruksi Pengerjaan:</label>
+                        <label class="desc-label" data-translate-id="tugas_instruction">Deskripsi Instruksi Pengerjaan:</label>
                         <p id="detail-task-desc" class="desc-content"></p>
                         
                         <!-- File Lampiran Materi (Dynamic via JS) -->
                         <div id="detail-task-materi-wrapper" class="materi-attachment-wrapper hidden" style="margin-top: 16px; border-top: 1px solid rgba(0, 0, 0, 0.05); padding-top: 16px;">
-                            <label class="desc-label" style="display: block; margin-bottom: 8px;"><i class="bi bi-paperclip"></i> Lampiran File Materi:</label>
+                            <label class="desc-label" style="display: block; margin-bottom: 8px;"><i class="bi bi-paperclip"></i> <span data-translate-id="tugas_attachment">Lampiran File Materi:</span></label>
                             <a id="detail-task-materi-link" href="#" class="btn-zip-download" style="display: inline-flex; text-decoration: none; background: rgba(139, 92, 246, 0.08); color: #8b5cf6; padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; align-items: center; gap: 8px;"><i class="bi bi-file-earmark-arrow-down-fill"></i> <span id="detail-task-materi-name">nama_file.pdf</span></a>
                         </div>
                     </div>
@@ -266,19 +271,20 @@
             <div class="celebration-overlay hidden" id="celebration-panel">
                 <div class="celebration-card">
                     <div class="check-circle"><i class="bi bi-check-lg"></i></div>
-                    <h3>Tugas Berhasil Dikumpulkan!</h3>
-                    <p class="congrats">Luar biasa! Tugas Anda telah tersimpan secara aman di sistem.</p>
+                    <h3 data-translate-id="tugas_success_title">Tugas Berhasil Dikumpulkan!</h3>
+                    <p class="congrats" data-translate-id="tugas_success_subtitle">Luar biasa! Tugas Anda telah tersimpan secara aman di sistem.</p>
                     
                     <!-- Dynamic Notice for Pending Evaluation -->
-                    <p class="congrats" style="margin-top: 15px; font-weight: 500; color: #64748b;">
+                    <p class="congrats" style="margin-top: 15px; font-weight: 500; color: #64748b;" data-translate-id="tugas_success_notice">
                         Tugas Anda telah berhasil dikirim dan sedang menunggu penilaian dari Dosen.
                     </p>
 
-                    <button class="btn-close-celebration" onclick="closeCelebration()">
+                    <button class="btn-close-celebration" onclick="closeCelebration()" data-translate-id="tugas_btn_back">
                         Kembali ke Dashboard Tugas
                     </button>
                 </div>
             </div>
+
 
             <div class="glowing-toast-container" id="mhs-toast-container"></div>
         </t>

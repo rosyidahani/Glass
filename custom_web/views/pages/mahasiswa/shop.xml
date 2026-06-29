@@ -42,10 +42,10 @@
                 <div class="shop-tabs-wrapper">
                     <div class="shop-tabs">
                         <button type="button" class="shop-tab-btn active" id="tab-avatar-btn" onclick="switchShopTab('avatar')">
-                            <i class="bi bi-person-circle"></i> Avatar
+                            <i class="bi bi-person-circle"></i> <span data-translate-id="shop_tab_avatar">Avatar</span>
                         </button>
                         <button type="button" class="shop-tab-btn" id="tab-voucher-btn" onclick="switchShopTab('voucher')">
-                            <i class="bi bi-gift"></i> Voucher
+                            <i class="bi bi-gift"></i> <span data-translate-id="shop_tab_voucher">Voucher</span>
                         </button>
                     </div>
                 </div>
@@ -63,23 +63,23 @@
                                     </div>
                                     <div class="avatar-info-box">
                                         <h4 class="avatar-name"><t t-esc="item.nama_avatar"/></h4>
-                                        <p class="avatar-desc"><t t-esc="item.nama_avatar"/> yang keren.</p>
+                                        <p class="avatar-desc"><span data-translate-id="shop_cool_avatar">Avatar keren</span> <t t-esc="item.nama_avatar"/>.</p>
                                     </div>
                                     
                                     <!-- Action Button based on state -->
                                     <t t-if="mahasiswa.equipped_avatar_id.id == item.id">
                                         <button type="button" class="avatar-action-btn btn-equipped" t-att-data-id="item.avatar_id">
-                                            <i class="bi bi-check-circle-fill"></i> Digunakan
+                                            <i class="bi bi-check-circle-fill"></i> <span data-translate-id="shop_btn_equipped">Digunakan</span>
                                         </button>
                                     </t>
                                     <t t-elif="item in mahasiswa.owned_avatar_ids">
-                                        <button type="button" class="avatar-action-btn btn-equip" t-att-data-id="item.avatar_id">
+                                        <button type="button" class="avatar-action-btn btn-equip" t-att-data-id="item.avatar_id" data-translate-id="shop_btn_equip">
                                             Pasang
                                         </button>
                                     </t>
                                     <t t-else="">
                                         <button type="button" class="avatar-action-btn btn-buy" t-att-data-id="item.avatar_id">
-                                            <i class="bi bi-coin"></i> Beli <t t-esc="item.harga_koin"/>
+                                            <i class="bi bi-coin"></i> <span data-translate-id="shop_btn_buy">Beli</span> <t t-esc="item.harga_koin"/>
                                         </button>
                                     </t>
                                 </div>
@@ -103,21 +103,22 @@
                                     <div class="voucher-main-body">
                                         <h4 class="voucher-title"><t t-esc="item.name"/></h4>
                                         <p class="voucher-desc"><t t-esc="item.description or ''"/></p>
-                                        <span class="voucher-price-tag"><i class="bi bi-coin"></i> <t t-esc="item.price"/> Poin</span>
+                                        <span class="voucher-price-tag"><i class="bi bi-coin"></i> <t t-esc="item.price"/> <span data-translate-id="dash_koin">Poin</span></span>
                                     </div>
                                     <div class="voucher-divider"></div>
                                     <div class="voucher-right-action">
                                         <t t-if="claimed">
-                                            <button type="button" class="voucher-action-btn btn-claimed" t-att-data-id="item.code" disabled="disabled">Ditukar</button>
+                                            <button type="button" class="voucher-action-btn btn-claimed" t-att-data-id="item.code" disabled="disabled" data-translate-id="shop_btn_claimed">Ditukar</button>
                                         </t>
                                         <t t-else="">
-                                            <button type="button" class="voucher-action-btn btn-claim" t-att-data-id="item.code">Tukar</button>
+                                            <button type="button" class="voucher-action-btn btn-claim" t-att-data-id="item.code" data-translate-id="shop_btn_claim">Tukar</button>
                                         </t>
                                     </div>
                                 </div>
                             </t>
                         </div>
                     </div>
+
 
                 </div>
             </div>
