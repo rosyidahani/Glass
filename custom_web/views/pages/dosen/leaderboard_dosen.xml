@@ -2,7 +2,7 @@
 <odoo>
     <template id="leaderboard_dosen" name="Leaderboard Dosen">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css?v=4"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css?v=5"/>
 
             <div class="leaderboard-container">
                 <div class="leaderboard-topbar glass-panel">
@@ -20,7 +20,6 @@
                     <div style="display:flex; gap: 12px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
                         <div>
                             <div style="font-weight:800; color:var(--text-color);">Filter Angkatan</div>
-                            <div style="font-size:13px; color:var(--text-muted);">Gunakan NIM (2 digit awal) untuk filter.</div>
                         </div>
 
                         <form method="get" action="/dosen/leaderboard" style="display:flex; gap:10px; align-items:center;">
