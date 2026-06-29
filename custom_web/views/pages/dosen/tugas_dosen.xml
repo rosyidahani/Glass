@@ -12,11 +12,11 @@
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
-                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Tugas Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> <span data-translate-id="dosen_tugas_portal">Portal Tugas Dosen</span> (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
                     <a href="/dashboard" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_btn_back_dashboard">Kembali ke Dashboard</span>
                     </a>
                 </div>
 
@@ -29,7 +29,7 @@
                         <div class="card-icon-circle">
                             <i class="bi bi-journal-plus"></i>
                         </div>
-                        <h3>Buat Tugas Baru</h3>
+                        <h3 data-translate-id="dosen_btn_create_task">Buat Tugas Baru</h3>
                     </a>
 
                     <!-- Card 2: Pengumpulan Mahasiswa -->
@@ -38,10 +38,11 @@
                         <div class="card-icon-circle">
                             <i class="bi bi-people-fill"></i>
                         </div>
-                        <h3>Pengumpulan Mahasiswa</h3>
+                        <h3 data-translate-id="dosen_btn_submissions">Pengumpulan Mahasiswa</h3>
                     </a>
 
                 </div>
+
             </div>
         </t>
     </template>

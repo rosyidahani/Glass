@@ -140,7 +140,30 @@ const portalTranslations = {
         "dosen_select_theme": "Pilih tema",
         "dosen_lb_portal": "Portal Leaderboard Dosen",
         "dosen_btn_back_dashboard": "Kembali ke Dashboard",
-        "dosen_filter_batch": "Filter Angkatan"
+        "dosen_filter_batch": "Filter Angkatan",
+        // Dosen Presensi & Tugas Page
+        "dosen_presensi_portal": "Portal Presensi Dosen",
+        "dosen_presensi_history": "Riwayat Presensi",
+        "dosen_presensi_active_title": "Sesi Presensi Aktif",
+        "dosen_presensi_running": "sesi berjalan",
+        "dosen_presensi_present": "Mahasiswa Hadir",
+        "dosen_presensi_open_time": "Waktu Buka:",
+        "dosen_presensi_btn_close": "Tutup Sesi Presensi",
+        "dosen_presensi_history_title": "Riwayat Sesi Presensi",
+        "dosen_presensi_history_subtitle": "Daftar lengkap sesi presensi yang telah diselesaikan",
+        "dosen_presensi_btn_back_menu": "Kembali ke Menu Presensi",
+        "dosen_presensi_history_card_title": "Riwayat Sesi Presensi Dosen",
+        "dosen_presensi_th_session": "Nama Sesi",
+        "dosen_presensi_th_course": "Mata Kuliah",
+        "dosen_presensi_th_type": "Tipe",
+        "dosen_presensi_th_open_time": "Waktu Buka",
+        "dosen_presensi_th_close_time": "Waktu Tutup",
+        "dosen_presensi_th_total_present": "Total Hadir",
+        "dosen_presensi_th_status": "Status",
+        "dosen_presensi_no_history": "Belum ada riwayat sesi presensi yang ditutup.",
+        "dosen_tugas_portal": "Portal Tugas Dosen",
+        "dosen_btn_create_task": "Buat Tugas Baru",
+        "dosen_btn_submissions": "Pengumpulan Mahasiswa"
     },
     en: {
         "portal_title": "Student Portal",
@@ -282,7 +305,30 @@ const portalTranslations = {
         "dosen_select_theme": "Select theme",
         "dosen_lb_portal": "Lecturer Leaderboard Portal",
         "dosen_btn_back_dashboard": "Back to Dashboard",
-        "dosen_filter_batch": "Filter by Batch"
+        "dosen_filter_batch": "Filter by Batch",
+        // Dosen Presensi & Tugas Page
+        "dosen_presensi_portal": "Lecturer Attendance Portal",
+        "dosen_presensi_history": "Attendance History",
+        "dosen_presensi_active_title": "Active Attendance Sessions",
+        "dosen_presensi_running": "session(s) active",
+        "dosen_presensi_present": "Students Present",
+        "dosen_presensi_open_time": "Open Time:",
+        "dosen_presensi_btn_close": "Close Attendance Session",
+        "dosen_presensi_history_title": "Attendance Session History",
+        "dosen_presensi_history_subtitle": "Complete list of completed attendance sessions",
+        "dosen_presensi_btn_back_menu": "Back to Attendance Menu",
+        "dosen_presensi_history_card_title": "Lecturer Attendance Session History",
+        "dosen_presensi_th_session": "Session Name",
+        "dosen_presensi_th_course": "Course",
+        "dosen_presensi_th_type": "Type",
+        "dosen_presensi_th_open_time": "Open Time",
+        "dosen_presensi_th_close_time": "Close Time",
+        "dosen_presensi_th_total_present": "Total Present",
+        "dosen_presensi_th_status": "Status",
+        "dosen_presensi_no_history": "No closed attendance sessions history yet.",
+        "dosen_tugas_portal": "Lecturer Assignment Portal",
+        "dosen_btn_create_task": "Create New Assignment",
+        "dosen_btn_submissions": "Student Submissions"
     }
 };
 

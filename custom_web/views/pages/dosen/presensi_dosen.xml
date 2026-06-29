@@ -14,11 +14,11 @@
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
-                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Presensi Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> <span data-translate-id="dosen_presensi_portal">Portal Presensi Dosen</span> (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
                     <a href="/dashboard" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_btn_back_dashboard">Kembali ke Dashboard</span>
                     </a>
                 </div>
 
@@ -31,7 +31,7 @@
                         <div class="card-icon-circle">
                             <i class="bi bi-plus-circle-fill"></i>
                         </div>
-                        <h3>Buka Sesi Presensi</h3>
+                        <h3 data-translate-id="card_attendance_btn">Buka Sesi Presensi</h3>
                     </a>
 
                     <!-- Card 2: Riwayat Presensi Dosen -->
@@ -40,7 +40,7 @@
                         <div class="card-icon-circle">
                             <i class="bi bi-clock-history"></i>
                         </div>
-                        <h3>Riwayat Presensi</h3>
+                        <h3 data-translate-id="dosen_presensi_history">Riwayat Presensi</h3>
                     </a>
 
                 </div>
@@ -50,8 +50,8 @@
                     <div class="menu-active-sessions-section">
                         <div class="section-header-row">
                             <span class="live-dot-pulse"></span>
-                            <h3 class="section-title-live">Sesi Presensi Aktif</h3>
-                            <span class="live-count-badge"><t t-esc="len(open_sessions)"/> sesi berjalan</span>
+                            <h3 class="section-title-live" data-translate-id="dosen_presensi_active_title">Sesi Presensi Aktif</h3>
+                            <span class="live-count-badge"><t t-esc="len(open_sessions)"/> <span data-translate-id="dosen_presensi_running">sesi berjalan</span></span>
                         </div>
 
                         <div id="sesi-aktif-list" class="sessions-container">
@@ -65,10 +65,10 @@
                                             <p class="matkul"><t t-esc="sesi.mata_kuliah_id.nama"/></p>
                                         </div>
                                         <t t-if="sesi.tipe_kelas == 'online'">
-                                            <span class="type-badge online"><i class="bi bi-laptop"></i> Online</span>
+                                            <span class="type-badge online"><i class="bi bi-laptop"></i> <span data-translate-id="pre_online">Online</span></span>
                                         </t>
                                         <t t-else="">
-                                            <span class="type-badge offline"><i class="bi bi-geo-alt-fill"></i> Offline</span>
+                                            <span class="type-badge offline"><i class="bi bi-geo-alt-fill"></i> <span data-translate-id="pre_offline">Offline</span></span>
                                         </t>
                                     </div>
 
@@ -76,10 +76,10 @@
                                         <div class="stats-row">
                                             <div class="stat-box">
                                                 <span class="number"><t t-esc="sesi.total_hadir"/></span>
-                                                <span class="label">Mahasiswa Hadir</span>
+                                                <span class="label" data-translate-id="dosen_presensi_present">Mahasiswa Hadir</span>
                                             </div>
                                             <div class="stat-box info">
-                                                <span class="label-info"><strong>Waktu Buka:</strong></span>
+                                                <span class="label-info"><strong><span data-translate-id="dosen_presensi_open_time">Waktu Buka:</span></strong></span>
                                                 <span class="value-info time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></span>
                                             </div>
                                         </div>
@@ -87,7 +87,7 @@
 
                                     <div class="session-item-footer">
                                         <button type="button" class="btn-tutup-sesi" t-att-data-id="sesi.id" style="width: 100%;">
-                                            <i class="bi bi-stop-circle-fill"></i> Tutup Sesi Presensi
+                                            <i class="bi bi-stop-circle-fill"></i> <span data-translate-id="dosen_presensi_btn_close">Tutup Sesi Presensi</span>
                                         </button>
                                     </div>
 
@@ -96,6 +96,7 @@
                         </div>
                     </div>
                 </t>
+
 
             </div>
         </t>
@@ -255,12 +256,12 @@
                             <t t-esc="dosen.name[0].upper()"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name">Riwayat Sesi Presensi</h2>
-                            <p class="dosen-role"><i class="bi bi-clock-history"></i> Daftar lengkap sesi presensi yang telah diselesaikan</p>
+                            <h2 class="dosen-name" data-translate-id="dosen_presensi_history_title">Riwayat Sesi Presensi</h2>
+                            <p class="dosen-role"><i class="bi bi-clock-history"></i> <span data-translate-id="dosen_presensi_history_subtitle">Daftar lengkap sesi presensi yang telah diselesaikan</span></p>
                         </div>
                     </div>
                     <a href="/dosen/presensi" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Presensi</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_presensi_btn_back_menu">Kembali ke Menu Presensi</span>
                     </a>
                 </div>
 
@@ -268,26 +269,26 @@
                 <div class="riwayat-section glass-panel">
                     <div class="card-header">
                         <span class="header-icon"><i class="bi bi-clock-history"></i></span>
-                        <h3>Riwayat Sesi Presensi Dosen</h3>
+                        <h3 data-translate-id="dosen_presensi_history_card_title">Riwayat Sesi Presensi Dosen</h3>
                     </div>
 
                     <div class="table-responsive">
                         <table class="modern-table">
                             <thead>
                                 <tr>
-                                    <th>Nama Sesi</th>
-                                    <th>Mata Kuliah</th>
-                                    <th>Tipe</th>
-                                    <th>Waktu Buka</th>
-                                    <th>Waktu Tutup</th>
-                                    <th>Total Hadir</th>
-                                    <th>Status</th>
+                                    <th data-translate-id="dosen_presensi_th_session">Nama Sesi</th>
+                                    <th data-translate-id="dosen_presensi_th_course">Mata Kuliah</th>
+                                    <th data-translate-id="dosen_presensi_th_type">Tipe</th>
+                                    <th data-translate-id="dosen_presensi_th_open_time">Waktu Buka</th>
+                                    <th data-translate-id="dosen_presensi_th_close_time">Waktu Tutup</th>
+                                    <th data-translate-id="dosen_presensi_th_total_present">Total Hadir</th>
+                                    <th data-translate-id="dosen_presensi_th_status">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="riwayat-table-body">
                                 <t t-if="not closed_sessions">
                                     <tr class="row-empty">
-                                        <td colspan="7">Belum ada riwayat sesi presensi yang ditutup.</td>
+                                        <td colspan="7" data-translate-id="dosen_presensi_no_history">Belum ada riwayat sesi presensi yang ditutup.</td>
                                     </tr>
                                 </t>
                                 <t t-else="">
@@ -297,16 +298,16 @@
                                             <td><t t-esc="sesi.mata_kuliah_id.nama"/></td>
                                             <td>
                                                 <t t-if="sesi.tipe_kelas == 'online'">
-                                                    <span class="badge online">Online</span>
+                                                    <span class="badge online" data-translate-id="pre_online">Online</span>
                                                 </t>
                                                 <t t-else="">
-                                                    <span class="badge offline">Offline</span>
+                                                    <span class="badge offline" data-translate-id="pre_offline">Offline</span>
                                                 </t>
                                             </td>
                                             <td class="time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></td>
                                             <td class="time-format"><span t-field="sesi.waktu_tutup" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></td>
                                             <td class="center bold text-primary"><t t-esc="sesi.total_hadir"/> Mhs</td>
-                                            <td><span class="status-badge closed">Selesai</span></td>
+                                            <td><span class="status-badge closed"><span data-translate-id="tugas_completed">Selesai</span></span></td>
                                         </tr>
                                     </t>
                                 </t>
@@ -314,6 +315,7 @@
                         </table>
                     </div>
                 </div>
+
             </div>
         </t>
     </template>
