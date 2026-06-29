@@ -23,13 +23,13 @@
 
                 <!-- Main Action Cards Layout -->
                 <div class="dosen-grid">
-                    <!-- CARD 1: Input Tugas -->
+                    <!-- CARD 1: Buat Tugas -->
                     <div class="dosen-card glass-panel">
                         <div class="dosen-card-icon icon-blue">
                             <i class="bi bi-file-earmark-plus-fill"></i>
                         </div>
                         <div class="dosen-card-body">
-                            <h3>Input Tugas</h3>
+                            <h3>Buat Tugas</h3>
                             <p>Kelola dan buat penugasan baru untuk mahasiswa secara terorganisir.</p>
                         </div>
                         <div class="dosen-card-footer">
