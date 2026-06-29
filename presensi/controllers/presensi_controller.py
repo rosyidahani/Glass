@@ -260,24 +260,24 @@ class PresensiController(http.Controller):
         now = Datetime.now()
         is_telat = (sesi.batas_waktu_telat and now > sesi.batas_waktu_telat)
 
-        # Cek apakah termasuk 3 mahasiswa pertama yang melakukan presensi
+        # Cek urutan kehadiran
         jumlah_hadir = request.env['presensi.record'].sudo().search_count([('sesi_id', '=', sesi.id)])
-        is_pertama = (jumlah_hadir < 3)
+        urutan_hadir = jumlah_hadir + 1
 
         # Hitung reward
         if is_telat:
             xp, koin = 0, 0
-        elif is_pertama:
-            xp, koin = 25, 5
+        elif urutan_hadir == 1:
+            xp, koin = 5, 25
         else:
-            xp, koin = 15, 3
+            xp, koin = 3, 15
 
         # Simpan record
         record = request.env['presensi.record'].sudo().create({
             'sesi_id': sesi.id,
             'mahasiswa_id': mhs.id,
             'status_kehadiran': 'terlambat' if is_telat else 'tepat_waktu',
-            'is_pertama': is_pertama,
+            'is_pertama': (urutan_hadir == 1),
             'xp_didapat': xp,
             'koin_didapat': koin,
         })
@@ -292,7 +292,8 @@ class PresensiController(http.Controller):
             'status': 'success',
             'data': {
                 'status_kehadiran': record.status_kehadiran,
-                'is_pertama': is_pertama,
+                'is_pertama': (urutan_hadir == 1),
+                'urutan_hadir': urutan_hadir,
                 'xp_didapat': xp,
                 'koin_didapat': koin,
                 'jarak_meter': round(jarak),
@@ -329,13 +330,29 @@ class PresensiController(http.Controller):
         if sudah:
             return self._error('Mahasiswa sudah tercatat hadir.')
 
+        # Tentukan apakah terlambat/dalam waktu presensi
+        from odoo.fields import Datetime
+        now = Datetime.now()
+        is_telat = (sesi.status != 'open') or (sesi.batas_waktu_telat and now > sesi.batas_waktu_telat)
+
+        xp = 0 if is_telat else 3
+        koin = 0 if is_telat else 15
+        status_kehadiran = 'terlambat' if is_telat else 'tepat_waktu'
+
         request.env['presensi.record'].sudo().create({
             'sesi_id': sesi.id,
             'mahasiswa_id': int(mahasiswa_id),
-            'status_kehadiran': 'tepat_waktu',
+            'status_kehadiran': status_kehadiran,
             'is_manual': True,
-            'xp_didapat': 0,
-            'koin_didapat': 0,
+            'xp_didapat': xp,
+            'koin_didapat': koin,
         })
+
+        mhs = request.env['mahasiswa.mahasiswa'].sudo().browse(int(mahasiswa_id))
+        if mhs.exists():
+            if xp > 0:
+                mhs.add_xp(xp)
+            if koin > 0:
+                mhs.add_koin(koin)
 
         return self._success({'message': 'Presensi manual berhasil dicatat.'})

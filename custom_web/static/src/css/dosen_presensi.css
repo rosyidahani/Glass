@@ -1592,7 +1592,7 @@ body > .detail-drawer-overlay {
 }
 
 .dosen-presensi-single .dosen-form-card {
-    max-width: 700px;
+    max-width: 100%;
     width: 100%;
 }
 

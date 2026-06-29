@@ -9,7 +9,7 @@
             <t t-set="rank_2" t-value="students[1] if len(students) &gt; 1 else False"/>
             <t t-set="rank_3" t-value="students[2] if len(students) &gt; 2 else False"/>
 
-            <div class="leaderboard-container">
+            <div class="leaderboard-container mhs-leaderboard-container">
                 <!-- Header Topbar -->
                 <t t-call="custom_web.shared_student_header">
                     <t t-set="title" t-value="'Leaderboard'"/>

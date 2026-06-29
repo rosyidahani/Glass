@@ -528,11 +528,19 @@ function triggerScanSuccess(courseName, data) {
     if (statusBox) statusBox.classList.add('hidden');
     if (trackingBox) trackingBox.classList.add('hidden');
     
-    var successMsgText = `Presensi Sukses! Anda mendapatkan +${data.xp_didapat} XP and +${data.koin_didapat} Koin.`;
-    if (data.is_pertama) {
-        successMsgText = `🎉 LUAR BIASA! Anda yang Pertama Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
-    } else if (data.status_kehadiran === 'terlambat') {
+    var successMsgText = "";
+    if (data.status_kehadiran === 'terlambat') {
         successMsgText = `Presensi Sukses! Namun Anda terlambat (mendapatkan +0 XP / +0 Koin). Tetap semangat!`;
+    } else {
+        if (data.urutan_hadir === 1) {
+            successMsgText = `🎉 LUAR BIASA! Anda yang Pertama Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
+        } else if (data.urutan_hadir === 2) {
+            successMsgText = `🎉 LUAR BIASA! Anda yang Kedua Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
+        } else if (data.urutan_hadir === 3) {
+            successMsgText = `🎉 LUAR BIASA! Anda yang Ketiga Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
+        } else {
+            successMsgText = `Anda berhasil melakukan presensi`;
+        }
     }
     
     if (successCheckmark) {

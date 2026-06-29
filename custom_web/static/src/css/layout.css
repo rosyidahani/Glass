@@ -228,7 +228,8 @@
 .presensi-select-container,
 .shop-container,
 .profile-container,
-.dashboard-container {
+.dashboard-container,
+.mhs-leaderboard-container {
     max-width: 1000px !important;
     margin: 0 auto !important;
     width: 100% !important;
