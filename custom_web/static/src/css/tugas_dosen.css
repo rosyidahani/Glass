@@ -976,7 +976,7 @@
 
 /* Centered Single Column Form Layout */
 .dosen-single-form-layout {
-    max-width: 680px;
+    max-width: 100%;
     margin: 0 auto 40px auto;
     background: var(--card-bg);
     border: 1px solid var(--card-border);

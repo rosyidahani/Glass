@@ -15,7 +15,7 @@
                 <t t-set="my_rank" t-value="s_index + 1 if s.id == mahasiswa.id else my_rank"/>
             </t>
 
-            <div class="leaderboard-container">
+            <div class="leaderboard-container mhs-leaderboard-container">
                 <!-- Hero Header Premium -->
                 <div class="lb-hero-header">
                     <!-- Decorative background orbs -->
@@ -67,6 +67,7 @@
                         </t>
                     </div>
                 </div>
+
 
                 <!-- Section 1: Podium Top 3 -->
                 <div class="podium-section glass-panel">

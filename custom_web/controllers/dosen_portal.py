@@ -129,11 +129,16 @@ class DosenPortalController(http.Controller):
 
         # Get all records for this session, sorted by check-in time
         records = sesi.record_ids.sorted(key=lambda r: r.waktu_presensi)
+        hadir_records = sesi.record_ids.sorted(key=lambda r: r.mahasiswa_id.nim or '')
+        hadir_ids = list(hadir_records.mapped('mahasiswa_id.id'))
+        total_mhs = len(sesi.mata_kuliah_id.mahasiswa_ids) if sesi.mata_kuliah_id else 0
 
         return request.render('custom_web.presensi_dosen_histori_detail', {
             'dosen': dosen,
             'sesi': sesi,
             'records': records,
+            'hadir_ids': hadir_ids,
+            'total_mhs': total_mhs,
         })
 
     @http.route('/api/presensi/sesi-aktif/<int:sesi_id>/detail', auth='public', type='http', methods=['GET'], csrf=False)
@@ -206,7 +211,7 @@ class DosenPortalController(http.Controller):
 
     @http.route('/api/presensi/manual-dosen', auth='public', type='http', methods=['POST'], csrf=False)
     def api_presensi_manual_dosen(self, **kwargs):
-        """Presensi manual oleh dosen dari panel detail sesi aktif."""
+        """Presensi manual oleh dosen dari panel detail sesi aktif atau riwayat."""
         import json
         dosen = get_active_dosen()
         if not dosen:
@@ -240,11 +245,14 @@ class DosenPortalController(http.Controller):
                 headers=[('Content-Type', 'application/json')], status=403
             )
 
-        if sesi.status != 'open':
-            return request.make_response(
-                json.dumps({'status': 'error', 'message': 'Sesi sudah ditutup.'}),
-                headers=[('Content-Type', 'application/json')], status=400
-            )
+        # Tentukan apakah dalam waktu presensi (sesi masih buka dan belum melewati batas waktu telat)
+        from odoo.fields import Datetime
+        now = Datetime.now()
+        is_telat = (sesi.status != 'open') or (sesi.batas_waktu_telat and now > sesi.batas_waktu_telat)
+
+        xp = 0 if is_telat else 3
+        koin = 0 if is_telat else 15
+        status_kehadiran = 'terlambat' if is_telat else 'tepat_waktu'
 
         ids_to_process = []
         if mahasiswa_id:
@@ -265,11 +273,15 @@ class DosenPortalController(http.Controller):
                     request.env['presensi.record'].sudo().create({
                         'sesi_id': sesi.id,
                         'mahasiswa_id': m_id,
-                        'status_kehadiran': 'tepat_waktu',
+                        'status_kehadiran': status_kehadiran,
                         'is_manual': True,
-                        'xp_didapat': 0,
-                        'koin_didapat': 0,
+                        'xp_didapat': xp,
+                        'koin_didapat': koin,
                     })
+                    if xp > 0:
+                        mhs.add_xp(xp)
+                    if koin > 0:
+                        mhs.add_koin(koin)
                     created_records.append({
                         'nama': mhs.name,
                         'nim': mhs.nim
