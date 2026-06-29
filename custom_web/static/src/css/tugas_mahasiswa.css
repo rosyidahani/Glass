@@ -126,7 +126,7 @@
     padding: 10px 20px;
     font-size: 14px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     cursor: pointer;
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -136,14 +136,15 @@
 }
 
 .tab-btn:hover {
-    color: #334155;
-    background: rgba(255, 255, 255, 0.4);
+    color: var(--text-color);
+    background: var(--accent-light);
 }
 
 .tab-btn.active {
-    background: #ffffff;
-    color: #8b5cf6;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: var(--card-bg);
+    color: var(--accent-color);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--card-border);
 }
 
 /* Feed Grid */
@@ -789,7 +790,7 @@
     border: none !important;
     font-size: 15px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     padding: 8px 16px;
     cursor: pointer;
     border-radius: 0 !important;
@@ -799,11 +800,11 @@
 }
 
 .tugas-tab-filters-layout .tab-btn:hover {
-    color: #334155;
+    color: var(--text-color);
 }
 
 .tugas-tab-filters-layout .tab-btn.active {
-    color: #8b5cf6;
+    color: var(--accent-color);
     /* Matches premium purple theme */
     font-weight: 800;
 }
