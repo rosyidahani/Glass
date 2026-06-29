@@ -796,9 +796,106 @@
         left: 0px;
     }
 
-    100% {
-        top: 0px;
-        left: 0px;
+}
+
+/* --- Leaderboard Topbar for Dosen view --- */
+.leaderboard-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    gap: 12px;
+}
+
+.leaderboard-topbar .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.leaderboard-topbar .back-btn:hover {
+    background: var(--accent-light);
+    color: var(--accent-color);
+    transform: translateX(-3px);
+}
+
+.leaderboard-topbar .topbar-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -0.5px;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.leaderboard-topbar .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.leaderboard-topbar .xp-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.leaderboard-topbar .xp-display i {
+    color: var(--accent-color);
+}
+
+.leaderboard-topbar .topbar-profile {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+    text-transform: uppercase;
+}
+
+@media (max-width: 600px) {
+    .leaderboard-topbar {
+        padding: 12px 14px;
+        border-radius: 16px;
+    }
+    .leaderboard-topbar .topbar-title {
+        font-size: 16px;
+    }
+    .leaderboard-topbar .xp-display {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    .leaderboard-topbar .topbar-profile {
+        width: 36px;
+        height: 36px;
+        font-size: 15px;
     }
 }
 
