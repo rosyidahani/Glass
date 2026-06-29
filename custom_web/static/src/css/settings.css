@@ -168,9 +168,20 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
     position: relative;
+}
+
+.stat-box.prodi-box {
+    align-items: flex-start;
+    text-align: left;
+    padding-right: 16px;
+}
+
+.stat-box.kepakaran-box {
+    align-items: flex-end;
+    text-align: right;
+    padding-left: 16px;
 }
 
 .stat-box:not(:last-child)::after {
@@ -185,9 +196,10 @@
 
 .stat-box h4 {
     margin: 0;
-    font-size: 22px;
+    font-size: 14.5px;
     font-weight: 800;
     color: #0f172a;
+    line-height: 1.4;
 }
 
 .stat-box span {
@@ -253,4 +265,22 @@
     color: #94a3b8;
     font-size: 20px;
     font-weight: 400;
+}
+
+@media (max-width: 768px) {
+    .stat-box h4 {
+        font-size: 12.5px;
+    }
+    .stat-box span {
+        font-size: 11px;
+    }
+    .stats-container {
+        padding: 16px 12px;
+    }
+    .stat-box.prodi-box {
+        padding-right: 10px;
+    }
+    .stat-box.kepakaran-box {
+        padding-left: 10px;
+    }
 }

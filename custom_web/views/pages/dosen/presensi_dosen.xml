@@ -3,7 +3,8 @@
     <template id="presensi_dosen_menu" name="Menu Utama Presensi Dosen">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
-            
+            <script src="/custom_web/static/src/js/dosen_presensi.js?v=13" type="text/javascript"></script>
+
             <div class="dosen-presensi-container">
                 <!-- Top Header HUD -->
                 <div class="dosen-header-hud">
@@ -21,9 +22,9 @@
                     </a>
                 </div>
 
-                <!-- Intermediate Navigation Cards (Unified Premium Styles) -->
+                <!-- Intermediate Navigation Cards -->
                 <div class="dosen-menu-tugas-grid">
-                    
+
                     <!-- Card 1: Buka Sesi Presensi Baru -->
                     <a href="/dosen/presensi/buat" class="glass-menu-card purple-glow">
                         <div class="card-glow-bg"></div>
@@ -43,9 +44,63 @@
                     </a>
 
                 </div>
+
+                <!-- ===== SECTION SESI PRESENSI AKTIF ===== -->
+                <t t-if="open_sessions">
+                    <div class="menu-active-sessions-section">
+                        <div class="section-header-row">
+                            <span class="live-dot-pulse"></span>
+                            <h3 class="section-title-live">Sesi Presensi Aktif</h3>
+                            <span class="live-count-badge"><t t-esc="len(open_sessions)"/> sesi berjalan</span>
+                        </div>
+
+                        <div id="sesi-aktif-list" class="sessions-container">
+                            <t t-foreach="open_sessions" t-as="sesi">
+                                <div class="session-active-item session-card-clickable"
+                                     t-att-id="'sesi-item-' + str(sesi.id)"
+                                     t-attf-data-detail-url="/dosen/presensi/aktif/#{sesi.id}">
+                                    <div class="session-item-header">
+                                        <div class="session-title-block">
+                                            <h4><t t-esc="sesi.name"/></h4>
+                                            <p class="matkul"><t t-esc="sesi.mata_kuliah_id.nama"/></p>
+                                        </div>
+                                        <t t-if="sesi.tipe_kelas == 'online'">
+                                            <span class="type-badge online"><i class="bi bi-laptop"></i> Online</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="type-badge offline"><i class="bi bi-geo-alt-fill"></i> Offline</span>
+                                        </t>
+                                    </div>
+
+                                    <div class="session-item-body">
+                                        <div class="stats-row">
+                                            <div class="stat-box">
+                                                <span class="number"><t t-esc="sesi.total_hadir"/></span>
+                                                <span class="label">Mahasiswa Hadir</span>
+                                            </div>
+                                            <div class="stat-box info">
+                                                <span class="label-info"><strong>Waktu Buka:</strong></span>
+                                                <span class="value-info time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="session-item-footer">
+                                        <button type="button" class="btn-tutup-sesi" t-att-data-id="sesi.id" style="width: 100%;">
+                                            <i class="bi bi-stop-circle-fill"></i> Tutup Sesi Presensi
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+
             </div>
         </t>
     </template>
+
 
     <!-- 2. TEMPLATE BUAT / BUKA SESI PRESENSI BARU -->
     <template id="presensi_dosen_buat" name="Buka Sesi Presensi Dosen">
@@ -70,8 +125,8 @@
                     </a>
                 </div>
 
-                <div class="dosen-presensi-grid">
-                    <!-- SECTION KIRI: Form Buka Sesi Baru -->
+                <div class="dosen-presensi-single">
+                    <!-- Form Buka Sesi Baru -->
                     <div class="dosen-form-card glass-panel">
                         <div class="card-header">
                             <span class="header-icon"><i class="bi bi-plus-circle-fill"></i></span>
@@ -85,7 +140,7 @@
                             </div>
 
                             <!-- Mata Kuliah (Custom Select with Search) -->
-                            <div class="form-group">
+                            <div class="form-group mk-dropdown-group">
                                 <label for="mata_kuliah_btn">Mata Kuliah <span class="required">*</span></label>
                                 <div class="custom-select-container">
                                     <button type="button" id="mata_kuliah_btn" class="form-control select-trigger-btn">
@@ -166,61 +221,22 @@
                         </form>
                     </div>
 
-                    <!-- SECTION KANAN: Pemantauan Sesi Aktif -->
-                    <div class="dosen-list-card glass-panel">
-                        <div class="card-header">
-                            <span class="header-icon"><i class="bi bi-broadcast"></i></span>
-                            <h3>Sesi Presensi Aktif</h3>
+                </div>
+
+                <!-- Modal Pop Up Sukses Buka Sesi -->
+                <div id="successModal" class="custom-modal-overlay">
+                    <div class="custom-modal-card">
+                        <div class="modal-icon-wrapper">
+                            <i class="bi bi-check-lg"></i>
                         </div>
-
-                        <div id="sesi-aktif-list" class="sessions-container">
-                            <t t-if="not open_sessions">
-                                <div class="empty-state">
-                                    <i class="bi bi-slash-circle"></i>
-                                    <p>Belum ada sesi presensi yang sedang aktif dibuka.</p>
-                                </div>
-                            </t>
-                            <t t-else="">
-                                <t t-foreach="open_sessions" t-as="sesi">
-                                    <div class="session-active-item" t-att-id="'sesi-item-' + str(sesi.id)">
-                                        <div class="session-item-header">
-                                            <div class="session-title-block">
-                                                <h4><t t-esc="sesi.name"/></h4>
-                                                <p class="matkul"><t t-esc="sesi.mata_kuliah_id.nama"/></p>
-                                            </div>
-                                            <!-- Badge Tipe Kelas -->
-                                            <t t-if="sesi.tipe_kelas == 'online'">
-                                                <span class="type-badge online"><i class="bi bi-laptop"></i> Online</span>
-                                            </t>
-                                            <t t-else="">
-                                                <span class="type-badge offline"><i class="bi bi-geo-alt-fill"></i> Offline</span>
-                                            </t>
-                                        </div>
-
-                                        <div class="session-item-body">
-                                            <div class="stats-row">
-                                                <div class="stat-box">
-                                                    <span class="number"><t t-esc="sesi.total_hadir"/></span>
-                                                    <span class="label">Mahasiswa Hadir</span>
-                                                </div>
-                                                <div class="stat-box info">
-                                                    <span class="label-info"><strong>Waktu Buka:</strong></span>
-                                                    <span class="value-info time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'yyyy-MM-dd HH:mm:ss'}"/></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="session-item-footer">
-                                            <button type="button" class="btn-tutup-sesi" t-att-data-id="sesi.id">
-                                                <i class="bi bi-stop-circle-fill"></i> Tutup Sesi Presensi
-                                            </button>
-                                        </div>
-                                    </div>
-                                </t>
-                            </t>
-                        </div>
+                        <h3 class="modal-title">Berhasil Membuat Presensi</h3>
+                        <p class="modal-message">Sesi presensi telah berhasil dibuat dan saat ini sedang aktif.</p>
+                        <button type="button" id="btnModalClose" class="btn-modal-primary">
+                            <span>Kembali ke Portal</span> <i class="bi bi-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
+
             </div>
         </t>
     </template>
@@ -410,4 +426,176 @@
             </div>
         </t>
     </template>
+
+    <!-- 5. TEMPLATE HALAMAN DETAIL SESI AKTIF -->
+    <template id="presensi_dosen_aktif_detail" name="Detail Sesi Aktif Dosen">
+        <t t-call="custom_web.layout">
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
+            <script src="/custom_web/static/src/js/dosen_presensi.js?v=13" type="text/javascript"></script>
+
+            <div class="dosen-presensi-container">
+                <!-- Top Header HUD -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper()"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name"><t t-esc="sesi.name"/></h2>
+                            <p class="dosen-role">
+                                <i class="bi bi-broadcast"></i>
+                                <t t-esc="sesi.mata_kuliah_id.nama"/>
+                                &#8212;
+                                <span class="live-badge-inline">&#x25cf; Sesi Aktif</span>
+                            </p>
+                        </div>
+                    </div>
+                    <a href="/dosen/presensi" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu</span>
+                    </a>
+                </div>
+
+                <!-- Stat Cards Ringkasan -->
+                <div class="aktif-detail-stats">
+                    <div class="aktif-stat-card green">
+                        <span class="stat-icon"><i class="bi bi-person-check-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="stat-num"><t t-esc="len(hadir_ids)"/></span>
+                            <span class="stat-lbl">Sudah Hadir</span>
+                        </div>
+                    </div>
+                    <div class="aktif-stat-card amber">
+                        <span class="stat-icon"><i class="bi bi-person-x-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="stat-num"><t t-esc="total_mhs - len(hadir_ids)"/></span>
+                            <span class="stat-lbl">Belum Hadir</span>
+                        </div>
+                    </div>
+                    <div class="aktif-stat-card blue">
+                        <span class="stat-icon"><i class="bi bi-people-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="stat-num"><t t-esc="total_mhs"/></span>
+                            <span class="stat-lbl">Total Mahasiswa</span>
+                        </div>
+                    </div>
+                    <div class="aktif-stat-card purple">
+                        <span class="stat-icon"><i class="bi bi-clock-fill"></i></span>
+                        <div class="stat-info">
+                            <span class="stat-num time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'HH:mm'}"/></span>
+                            <span class="stat-lbl">Waktu Buka</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Konten Utama -->
+                <div class="aktif-detail-panel glass-panel">
+                    <!-- Tab Headers -->
+                    <div class="aktif-tab-header">
+                        <button id="tab-btn-hadir" class="aktif-tab-btn active" data-tab="tab-panel-hadir">
+                            <i class="bi bi-person-check"></i>
+                            Sudah Hadir (<t t-esc="len(hadir_ids)"/>)
+                        </button>
+                        <button id="tab-btn-belum" class="aktif-tab-btn" data-tab="tab-panel-belum">
+                            <i class="bi bi-person-dash"></i>
+                            Belum Hadir (<t t-esc="total_mhs - len(hadir_ids)"/>)
+                        </button>
+                    </div>
+
+                    <!-- Tab Panel: Sudah Hadir -->
+                    <div id="tab-panel-hadir" class="aktif-tab-content active">
+                        <div class="table-responsive">
+                            <table class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Mahasiswa</th>
+                                        <th>NIM</th>
+                                        <th>Waktu Presensi</th>
+                                        <th>Status</th>
+                                        <th>Metode</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="not hadir_records">
+                                        <tr class="row-empty">
+                                            <td colspan="5">Belum ada mahasiswa yang hadir pada sesi ini.</td>
+                                        </tr>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-foreach="hadir_records" t-as="r">
+                                            <tr>
+                                                <td><strong><t t-esc="r.mahasiswa_id.name"/></strong></td>
+                                                <td class="bold text-muted"><t t-esc="r.mahasiswa_id.nim"/></td>
+                                                <td class="time-format"><span t-field="r.waktu_presensi" t-options="{'widget': 'datetime', 'format': 'HH:mm:ss'}"/></td>
+                                                <td>
+                                                    <t t-if="r.status_kehadiran == 'tepat_waktu'">
+                                                        <span class="badge online">Tepat Waktu</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="badge offline">Terlambat</span>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <t t-if="r.is_manual">
+                                                        <span class="badge-text manual"><i class="bi bi-pencil-square"></i> Manual</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="badge-text auto"><i class="bi bi-phone"></i> Mandiri</span>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab Panel: Belum Hadir (dengan presensi manual) -->
+                    <div id="tab-panel-belum" class="aktif-tab-content">
+                        <div class="belum-hadir-container">
+                            <t t-set="belum_hadir_count" t-value="0"/>
+                            <t t-if="sesi.mata_kuliah_id">
+                                <t t-foreach="sesi.mata_kuliah_id.mahasiswa_ids.sorted(key=lambda m: m.nim or '')" t-as="mhs">
+                                    <t t-if="mhs.id not in hadir_ids">
+                                        <t t-set="belum_hadir_count" t-value="belum_hadir_count + 1"/>
+                                        <div class="belum-hadir-item" t-att-id="'mhs-item-' + str(sesi.id) + '-' + str(mhs.id)">
+                                            <div class="student-info">
+                                                <span class="name"><t t-esc="mhs.name"/></span>
+                                                <span class="nim"><t t-esc="mhs.nim"/></span>
+                                            </div>
+                                            <button type="button" class="btn-presensi-manual" t-att-data-sesi-id="sesi.id" t-att-data-mhs-id="mhs.id">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </div>
+                                    </t>
+                                </t>
+                            </t>
+                            <t t-if="belum_hadir_count == 0">
+                                <div class="empty-state" style="padding: 40px 20px;">
+                                    <i class="bi bi-check-circle-fill" style="font-size: 2.5rem; color: #10b981;"></i>
+                                    <p>Semua mahasiswa sudah melakukan presensi!</p>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Sticky Batch Submit Button -->
+                        <div id="batch-submit-bar" class="batch-submit-container hidden">
+                            <button type="button" id="btn-submit-batch-presensi" class="btn-submit-batch" t-att-data-sesi-id="sesi.id">
+                                <i class="bi bi-person-check-fill"></i> Simpan Kehadiran (<span id="batch-count">0</span> terpilih)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tombol Aksi Bawah -->
+                <div class="aktif-detail-actions">
+                    <button type="button" class="btn-tutup-sesi" t-att-data-id="sesi.id" style="max-width: 300px; margin: 0 auto;">
+                        <i class="bi bi-stop-circle-fill"></i> Tutup Sesi Presensi
+                    </button>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
 </odoo>

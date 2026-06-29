@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initFormSubmit();
     initTutupSesi();
     initRiwayatTable();
+    moveDrawersToBody();
+    initActiveSessionDrawer();
+    initAktifDetailTabs();
+    initClickableSessionCards();
+    initPresensiManualGlobal();
 });
 
 // 1. Inisialisasi default form (Batas Waktu = Jam Sekarang + 1 Jam)
@@ -165,8 +170,29 @@ function initFormSubmit() {
             });
         })
         .then(function(data) {
-            // Sukses: Refresh halaman agar sesi aktif tampil di kanan
-            window.location.reload();
+            // Sukses: Tampilkan Pop Up Sukses dan alihkan ke Halaman Portal Presensi
+            var successModal = document.getElementById('successModal');
+            var btnModalClose = document.getElementById('btnModalClose');
+            
+            if (successModal) {
+                successModal.classList.add('show');
+                
+                // Redirect otomatis setelah 2.5 detik
+                var redirectTimeout = setTimeout(function() {
+                    window.location.href = '/dosen/presensi';
+                }, 2500);
+                
+                // Redirect instan jika tombol diklik
+                if (btnModalClose) {
+                    btnModalClose.addEventListener('click', function() {
+                        clearTimeout(redirectTimeout);
+                        window.location.href = '/dosen/presensi';
+                    });
+                }
+            } else {
+                // Fallback jika modal HTML tidak ter-render
+                window.location.href = '/dosen/presensi';
+            }
         })
         .catch(function(err) {
             console.error(err);
@@ -219,8 +245,12 @@ function initTutupSesi() {
             });
         })
         .then(function(data) {
-            // Sukses: Refresh halaman agar sesi berpindah ke riwayat tabel bawah
-            window.location.reload();
+            // Sukses: jika di halaman detail aktif, kembali ke menu presensi
+            if (window.location.pathname.indexOf('/dosen/presensi/aktif/') !== -1) {
+                window.location.href = '/dosen/presensi';
+            } else {
+                window.location.reload();
+            }
         })
         .catch(function(err) {
             console.error(err);
@@ -397,5 +427,261 @@ function initRiwayatTable() {
                 window.location.href = '/dosen/presensi/histori/detail/' + sesiId;
             });
         }
+    });
+}
+
+// Helper: pindahkan semua drawer ke document.body agar position:fixed benar
+function moveDrawersToBody() {
+    var drawers = document.querySelectorAll('.detail-drawer-overlay');
+    drawers.forEach(function(drawer) {
+        document.body.appendChild(drawer);
+    });
+}
+
+// 8. Drawer Sesi Aktif (Server-Rendered) & Presensi Manual
+function initActiveSessionDrawer() {
+    var listContainer = document.getElementById('sesi-aktif-list');
+    if (!listContainer) return;
+
+    // Klik tombol "Lihat Detail" — buka drawer spesifik per sesi
+    listContainer.addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-detail-sesi');
+        if (!btn) return;
+        e.stopPropagation();
+
+        var sesiId = btn.getAttribute('data-id');
+        if (!sesiId) return;
+
+        openDrawerForSesi(sesiId);
+    });
+
+    // Delegasi klik tombol X (close) di seluruh halaman
+    document.addEventListener('click', function(e) {
+        var closeBtn = e.target.closest('.close-drawer-btn');
+        if (closeBtn) {
+            var targetId = closeBtn.getAttribute('data-target');
+            var drawerEl = targetId ? document.getElementById(targetId) : closeBtn.closest('.detail-drawer-overlay');
+            if (drawerEl) closeDrawer(drawerEl);
+            return;
+        }
+
+        // Tutup jika klik overlay (luar panel)
+        if (e.target.classList.contains('detail-drawer-overlay') && !e.target.classList.contains('hidden')) {
+            closeDrawer(e.target);
+        }
+    });
+
+    // Delegasi klik tab button
+    document.addEventListener('click', function(e) {
+        var tabBtn = e.target.closest('.drawer-tab-btn');
+        if (!tabBtn) return;
+
+        var drawerEl = tabBtn.closest('.detail-drawer-overlay');
+        if (!drawerEl) return;
+
+        drawerEl.querySelectorAll('.drawer-tab-btn').forEach(function(b) {
+            b.classList.remove('active');
+        });
+        drawerEl.querySelectorAll('.drawer-tab-content').forEach(function(c) {
+            c.classList.remove('active');
+        });
+
+        tabBtn.classList.add('active');
+        var tabId = tabBtn.getAttribute('data-tab');
+        var targetTab = document.getElementById(tabId);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+    });
+
+    // (Semua event listener delegasi yang butuh listContainer sudah dipindahkan ke global jika tidak berhubungan dengan drawer)
+
+    function openDrawerForSesi(sesiId) {
+        var drawer = document.getElementById('detailSesiDrawer-' + sesiId);
+        if (!drawer) return;
+
+        // Reset ke tab pertama (Sudah Hadir)
+        drawer.querySelectorAll('.drawer-tab-btn').forEach(function(b, idx) {
+            b.classList.toggle('active', idx === 0);
+        });
+        drawer.querySelectorAll('.drawer-tab-content').forEach(function(c, idx) {
+            c.classList.toggle('active', idx === 0);
+        });
+
+        drawer.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer(drawer) {
+        drawer.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function handlePresensiManual(sesiId, mahasiswaId, btn) {
+        if (btn.disabled || btn.classList.contains('checked')) return;
+
+        btn.disabled = true;
+        btn.style.borderColor = '#3b82f6';
+        btn.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon" style="color: #3b82f6;"></i>';
+
+        // Endpoint /api/presensi/manual-dosen sudah terdaftar di Odoo (tidak butuh restart)
+        fetch('/api/presensi/manual-dosen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sesi_id: parseInt(sesiId),
+                mahasiswa_id: parseInt(mahasiswaId)
+            })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(result) {
+            if (result.status === 'success') {
+                btn.className = 'btn-presensi-manual checked';
+                btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                btn.disabled = true;
+
+                // Animasi keluar lalu reload halaman agar data tersinkron
+                setTimeout(function() {
+                    var item = btn.closest('.belum-hadir-item');
+                    if (item) {
+                        item.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateX(20px)';
+                        setTimeout(function() {
+                            item.remove();
+                            window.location.reload();
+                        }, 400);
+                    } else {
+                        window.location.reload();
+                    }
+                }, 700);
+            } else {
+                alert('Gagal presensi manual: ' + (result.message || 'Terjadi kesalahan.'));
+                btn.disabled = false;
+                btn.className = 'btn-presensi-manual';
+                btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            }
+        })
+        .catch(function(err) {
+            console.error('Presensi manual error:', err);
+            alert('Kesalahan jaringan saat melakukan presensi manual.');
+            btn.className = 'btn-presensi-manual';
+            btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+        });
+    }
+}
+
+// 11. Inisialisasi Presensi Manual secara Global
+function initPresensiManualGlobal() {
+    document.addEventListener('click', function(e) {
+        var manualBtn = e.target.closest('.btn-presensi-manual');
+        if (!manualBtn) return;
+
+        var sesiId = manualBtn.getAttribute('data-sesi-id');
+        var mhsId = manualBtn.getAttribute('data-mhs-id');
+        if (!sesiId || !mhsId) return;
+
+        // Toggle checked class pada button untuk multiple select
+        manualBtn.classList.toggle('checked');
+
+        // Update counter dan tampilkan/sembunyikan submit bar
+        var checkedBtns = document.querySelectorAll('.btn-presensi-manual.checked');
+        var batchBar = document.getElementById('batch-submit-bar');
+        var batchCountSpan = document.getElementById('batch-count');
+
+        if (batchBar && batchCountSpan) {
+            batchCountSpan.textContent = checkedBtns.length;
+            if (checkedBtns.length > 0) {
+                batchBar.classList.remove('hidden');
+            } else {
+                batchBar.classList.add('hidden');
+            }
+        }
+    });
+
+    // Event listener untuk tombol submit batch
+    var batchSubmitBtn = document.getElementById('btn-submit-batch-presensi');
+    if (batchSubmitBtn) {
+        batchSubmitBtn.addEventListener('click', function() {
+            var sesiId = batchSubmitBtn.getAttribute('data-sesi-id');
+            var checkedBtns = document.querySelectorAll('.btn-presensi-manual.checked');
+            if (!sesiId || !checkedBtns.length) return;
+
+            var mhsIds = [];
+            checkedBtns.forEach(function(btn) {
+                var mhsId = btn.getAttribute('data-mhs-id');
+                if (mhsId) mhsIds.push(parseInt(mhsId));
+            });
+
+            // Disable button dan set loading status
+            batchSubmitBtn.disabled = true;
+            var originalHTML = batchSubmitBtn.innerHTML;
+            batchSubmitBtn.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Menyimpan Kehadiran...';
+
+            fetch('/api/presensi/manual-dosen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sesi_id: parseInt(sesiId),
+                    mahasiswa_ids: mhsIds
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(result) {
+                if (result.status === 'success') {
+                    // Berhasil, reload halaman untuk update tabel & stats
+                    window.location.reload();
+                } else {
+                    alert('Gagal presensi manual: ' + (result.message || 'Terjadi kesalahan.'));
+                    batchSubmitBtn.disabled = false;
+                    batchSubmitBtn.innerHTML = originalHTML;
+                }
+            })
+            .catch(function(err) {
+                console.error('Batch presensi manual error:', err);
+                alert('Kesalahan jaringan saat melakukan presensi manual.');
+                batchSubmitBtn.disabled = false;
+                batchSubmitBtn.innerHTML = originalHTML;
+            });
+        });
+    }
+}
+
+// 9. Tab Switching untuk Halaman Detail Sesi Aktif
+function initAktifDetailTabs() {
+    var tabBtns = document.querySelectorAll('.aktif-tab-btn');
+    if (!tabBtns.length) return;
+
+    tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            // Reset semua tab btn
+            tabBtns.forEach(function(b) { b.classList.remove('active'); });
+            // Sembunyikan semua tab content
+            document.querySelectorAll('.aktif-tab-content').forEach(function(c) {
+                c.classList.remove('active');
+            });
+
+            btn.classList.add('active');
+            var tabId = btn.getAttribute('data-tab');
+            var panel = document.getElementById(tabId);
+            if (panel) panel.classList.add('active');
+        });
+    });
+}
+
+// 10. Klik seluruh card sesi → navigasi ke halaman detail aktif
+function initClickableSessionCards() {
+    var cards = document.querySelectorAll('.session-card-clickable');
+    cards.forEach(function(card) {
+        var url = card.getAttribute('data-detail-url');
+        if (!url) return;
+
+        card.style.cursor = 'pointer';
+
+        card.addEventListener('click', function(e) {
+            // Jangan navigasi jika yang diklik adalah tombol tutup sesi atau link lihat detail
+            if (e.target.closest('.btn-tutup-sesi') || e.target.closest('.btn-detail-sesi')) return;
+            window.location.href = url;
+        });
     });
 }

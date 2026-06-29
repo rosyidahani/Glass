@@ -48,8 +48,13 @@ class DosenPortalController(http.Controller):
         dosen = get_active_dosen()
         if not dosen:
             return request.redirect('/login')
+
+        sesi_obj = request.env['presensi.sesi'].sudo()
+        open_sessions = sesi_obj.search([('status', '=', 'open'), ('feature_dosen_id', '=', dosen.id)], order='id desc')
+
         return request.render('custom_web.presensi_dosen_menu', {
             'dosen': dosen,
+            'open_sessions': open_sessions,
         })
 
     @http.route('/dosen/presensi/buat', auth='public', website=True, type='http')
@@ -71,6 +76,31 @@ class DosenPortalController(http.Controller):
             'dosen': dosen,
             'open_sessions': open_sessions,
             'courses_list': courses_list,
+        })
+
+    @http.route('/dosen/presensi/aktif/<int:sesi_id>', auth='public', website=True, type='http')
+    def presensi_dosen_aktif_detail(self, sesi_id, **kwargs):
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.redirect('/login')
+
+        sesi = request.env['presensi.sesi'].sudo().browse(sesi_id)
+        if not sesi.exists() or sesi.feature_dosen_id.id != dosen.id:
+            return request.redirect('/dosen/presensi')
+        if sesi.status != 'open':
+            # Sesi sudah ditutup, arahkan ke detail riwayat
+            return request.redirect('/dosen/presensi/histori/detail/' + str(sesi_id))
+
+        hadir_records = sesi.record_ids.sorted(key=lambda r: r.mahasiswa_id.nim or '')
+        hadir_ids = list(hadir_records.mapped('mahasiswa_id.id'))
+        total_mhs = len(sesi.mata_kuliah_id.mahasiswa_ids) if sesi.mata_kuliah_id else 0
+
+        return request.render('custom_web.presensi_dosen_aktif_detail', {
+            'dosen': dosen,
+            'sesi': sesi,
+            'hadir_records': hadir_records,
+            'hadir_ids': hadir_ids,
+            'total_mhs': total_mhs,
         })
 
     @http.route('/dosen/presensi/histori', auth='public', website=True, type='http')
@@ -105,6 +135,155 @@ class DosenPortalController(http.Controller):
             'sesi': sesi,
             'records': records,
         })
+
+    @http.route('/api/presensi/sesi-aktif/<int:sesi_id>/detail', auth='public', type='http', methods=['GET'], csrf=False)
+    def api_detail_sesi_aktif(self, sesi_id, **kwargs):
+        """API untuk mengambil detail sesi aktif: daftar hadir & belum hadir."""
+        import json, pytz
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Unauthorized'}),
+                headers=[('Content-Type', 'application/json')], status=401
+            )
+
+        sesi = request.env['presensi.sesi'].sudo().browse(sesi_id)
+        if not sesi.exists() or sesi.feature_dosen_id.id != dosen.id:
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Sesi tidak ditemukan.'}),
+                headers=[('Content-Type', 'application/json')], status=404
+            )
+
+        local_tz = pytz.timezone('Asia/Jakarta')
+
+        def fmt_dt(dt):
+            if not dt:
+                return '-'
+            return pytz.utc.localize(dt).astimezone(local_tz).strftime('%H:%M:%S')
+
+        # Mahasiswa yang sudah hadir
+        sudah_hadir = []
+        sudah_hadir_ids = set()
+        for rec in sesi.record_ids.sorted(key=lambda r: r.waktu_presensi):
+            sudah_hadir_ids.add(rec.mahasiswa_id.id)
+            sudah_hadir.append({
+                'id': rec.id,
+                'mahasiswa_id': rec.mahasiswa_id.id,
+                'nama': rec.mahasiswa_id.name or '-',
+                'nim': rec.mahasiswa_id.nim or '-',
+                'waktu': fmt_dt(rec.waktu_presensi),
+                'status': rec.status_kehadiran,
+                'is_manual': rec.is_manual,
+            })
+
+        # Semua mahasiswa di mata kuliah, yang belum hadir
+        mk = sesi.mata_kuliah_id
+        belum_hadir = []
+        if mk:
+            for mhs in mk.mahasiswa_ids.sorted(key=lambda m: m.name or ''):
+                if mhs.id not in sudah_hadir_ids:
+                    belum_hadir.append({
+                        'mahasiswa_id': mhs.id,
+                        'nama': mhs.name or '-',
+                        'nim': mhs.nim or '-',
+                    })
+
+        return request.make_response(
+            json.dumps({
+                'status': 'success',
+                'sesi': {
+                    'id': sesi.id,
+                    'nama': sesi.name,
+                    'matkul': mk.nama if mk else '-',
+                    'tipe': sesi.tipe_kelas,
+                    'total_terdaftar': len(mk.mahasiswa_ids) if mk else 0,
+                },
+                'sudah_hadir': sudah_hadir,
+                'belum_hadir': belum_hadir,
+            }),
+            headers=[('Content-Type', 'application/json')]
+        )
+
+    @http.route('/api/presensi/manual-dosen', auth='public', type='http', methods=['POST'], csrf=False)
+    def api_presensi_manual_dosen(self, **kwargs):
+        """Presensi manual oleh dosen dari panel detail sesi aktif."""
+        import json
+        dosen = get_active_dosen()
+        if not dosen:
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Unauthorized'}),
+                headers=[('Content-Type', 'application/json')], status=401
+            )
+
+        try:
+            body = json.loads(request.httprequest.data)
+        except Exception:
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Format JSON tidak valid.'}),
+                headers=[('Content-Type', 'application/json')], status=400
+            )
+
+        sesi_id = body.get('sesi_id')
+        mahasiswa_id = body.get('mahasiswa_id')
+        mahasiswa_ids = body.get('mahasiswa_ids', [])
+
+        if not sesi_id or (not mahasiswa_id and not mahasiswa_ids):
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'sesi_id dan mahasiswa_id/mahasiswa_ids wajib diisi.'}),
+                headers=[('Content-Type', 'application/json')], status=400
+            )
+
+        sesi = request.env['presensi.sesi'].sudo().browse(int(sesi_id))
+        if not sesi.exists() or sesi.feature_dosen_id.id != dosen.id:
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Sesi tidak valid.'}),
+                headers=[('Content-Type', 'application/json')], status=403
+            )
+
+        if sesi.status != 'open':
+            return request.make_response(
+                json.dumps({'status': 'error', 'message': 'Sesi sudah ditutup.'}),
+                headers=[('Content-Type', 'application/json')], status=400
+            )
+
+        ids_to_process = []
+        if mahasiswa_id:
+            ids_to_process.append(int(mahasiswa_id))
+        if mahasiswa_ids:
+            ids_to_process.extend([int(x) for x in mahasiswa_ids])
+        ids_to_process = list(set(ids_to_process))
+
+        created_records = []
+        for m_id in ids_to_process:
+            sudah = request.env['presensi.record'].sudo().search([
+                ('sesi_id', '=', sesi.id),
+                ('mahasiswa_id', '=', m_id),
+            ], limit=1)
+            if not sudah:
+                mhs = request.env['mahasiswa.mahasiswa'].sudo().browse(m_id)
+                if mhs.exists():
+                    request.env['presensi.record'].sudo().create({
+                        'sesi_id': sesi.id,
+                        'mahasiswa_id': m_id,
+                        'status_kehadiran': 'tepat_waktu',
+                        'is_manual': True,
+                        'xp_didapat': 0,
+                        'koin_didapat': 0,
+                    })
+                    created_records.append({
+                        'nama': mhs.name,
+                        'nim': mhs.nim
+                    })
+
+        return request.make_response(
+            json.dumps({
+                'status': 'success',
+                'count': len(created_records),
+                'data': created_records
+            }),
+            headers=[('Content-Type', 'application/json')]
+        )
+
 
     @http.route('/dosen/tugas', auth='public', website=True, type='http')
     def tugas_dosen_menu(self, **kwargs):
