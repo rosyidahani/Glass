@@ -2,18 +2,24 @@
 <odoo>
     <template id="leaderboard_dosen" name="Leaderboard Dosen">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css?v=5"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
 
             <div class="leaderboard-container">
-                <div class="leaderboard-topbar glass-panel">
-                    <a href="/dashboard/dosen" class="back-btn"><i class="bi bi-arrow-left"></i></a>
-                    <div class="topbar-title">Leaderboard Mahasiswa</div>
-                    <div class="topbar-right">
-                        <div class="xp-display" title="Prodi Dosen">
-                            <i class="bi bi-building"></i>
-                            <t t-esc="prodi_name"/>
+                <!-- Profiles HUD Header -->
+                <div class="dosen-header-hud">
+                    <div class="dosen-profile-info">
+                        <div class="dosen-avatar-wrapper">
+                            <t t-esc="dosen.name[0].upper() if dosen and dosen.name else 'D'"/>
+                        </div>
+                        <div class="dosen-meta">
+                            <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
+                            <p class="dosen-role"><i class="bi bi-shield-check"></i> Portal Leaderboard Dosen (NIP: <t t-esc="dosen.nip if dosen else 'N/A'"/>)</p>
                         </div>
                     </div>
+                    <a href="/dashboard/dosen" class="btn-back-dashboard">
+                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Dashboard</span>
+                    </a>
                 </div>
 
                 <div class="glass-panel" style="padding: 16px 18px;">
