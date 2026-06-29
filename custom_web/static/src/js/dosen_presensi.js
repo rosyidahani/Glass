@@ -204,12 +204,10 @@ function initFormSubmit() {
     });
 }
 
-// 5. AJAX Tutup Sesi Instan
+// 5. AJAX Tutup Sesi Instan — global delegation agar bekerja di semua halaman
 function initTutupSesi() {
-    var listContainer = document.getElementById('sesi-aktif-list');
-    if (!listContainer) return;
-
-    listContainer.addEventListener('click', function(e) {
+    // Gunakan document-level delegation agar tombol pada halaman detail aktif juga terdeteksi
+    document.addEventListener('click', function(e) {
         var btn = e.target.closest('.btn-tutup-sesi');
         if (!btn) return;
 
