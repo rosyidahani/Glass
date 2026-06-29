@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy to Hostinger VPS
 
 on:
   push:
@@ -15,24 +15,26 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ubuntu
+          username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           script: |
             set -e
 
-            echo "Pull kode terbaru..."
-            cd ~/odoo-glass/addons
+            echo "Masuk ke folder project..."
+            cd /root/odoo-glass/addons
+
+            echo "Mengambil update terbaru dari GitHub..."
             git pull origin main
 
-            echo "Upgrade Odoo modules..."
+            echo "Upgrade module Odoo..."
             docker exec odoo-glass-odoo-1 odoo \
               -d odoo_glass \
               -u custom_web,feature_dosen,mahasiswa,mata_kuliah,presensi,tugas,shop \
               --stop-after-init \
               --no-http
 
-            echo "Restart container..."
+            echo "Restart container Odoo..."
             docker restart odoo-glass-odoo-1
 
             echo "Deploy selesai!"
