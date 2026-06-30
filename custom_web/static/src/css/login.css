@@ -39,25 +39,45 @@ body::after {
 .header-section {
     text-align: center;
     margin-bottom: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header-logo {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: -4px;
+    filter: drop-shadow(0 12px 24px rgba(59, 130, 246, 0.25));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+}
+
+.header-logo:hover {
+    transform: scale(1.08) rotate(1deg);
+    filter: drop-shadow(0 18px 36px rgba(59, 130, 246, 0.4));
 }
 
 .header-title {
-    font-size: 56px;
+    font-size: 40px;
     font-weight: 800;
-    letter-spacing: 4px;
-    margin-bottom: 8px;
+    letter-spacing: 5px;
+    margin-bottom: 2px;
+    line-height: 1.1;
     background: linear-gradient(135deg, #1e3a8a, #3b82f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .header-subtitle {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: #475569;
-    line-height: 1.5;
+    line-height: 1.2;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
+    max-width: 400px;
+    text-align: center;
 }
 
 /* Login Card */
