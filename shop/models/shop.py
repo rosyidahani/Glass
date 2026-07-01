@@ -110,7 +110,7 @@ class ShopAvatar(models.Model):
             elif rec.gambar_url:
                 rec.image_src = rec.gambar_url
             else:
-                rec.image_src = f"/custom_web/static/src/img/{rec.avatar_id or 'char_default'}.png"
+                rec.image_src = False
 
 
 
