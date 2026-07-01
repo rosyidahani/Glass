@@ -171,17 +171,4 @@ class Mahasiswa(models.Model):
             rec.write({
                 'face_descriptor': False,
                 'device_id': False
-            })
-    # Di dalam class model Mahasiswa pada models/mahasiswa.py
-
-    @classmethod
-    def get_leaderboard(cls, limit=10):
-        """
-        Menarik daftar mahasiswa diurutkan berdasarkan total_xp tertinggi.
-        """
-    # Contoh query jika menggunakan SQLAlchemy/Flask:
-    # return cls.query.order_by(cls.total_xp.desc()).limit(limit).all()
-    
-    # Contoh query jika menggunakan Odoo ORM:
-    # return cls.search([], order='total_xp desc', limit=limit)
-    pass
+            })
