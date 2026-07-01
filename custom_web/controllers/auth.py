@@ -72,3 +72,50 @@ class AuthController(http.Controller):
         request.session.pop('dosen_nip', None)
         request.session.pop('dosen_name', None)
         return request.redirect('/login')
+
+    # ================================================
+    # LUPA PASSWORD
+    # ================================================
+    @http.route('/lupa-password', auth='public', website=True, type='http', methods=['GET'])
+    def lupa_password_page(self, **kwargs):
+        """Tampilkan halaman lupa password."""
+        return request.render('custom_web.lupa_password', {
+            'error': None,
+            'success': False,
+        })
+
+    @http.route('/lupa-password', auth='public', website=True, type='http', methods=['POST'], csrf=True)
+    def lupa_password_submit(self, **post):
+        """Proses permintaan reset password berdasarkan email."""
+        email = post.get('email', '').strip().lower()
+
+        if not email:
+            return request.render('custom_web.lupa_password', {
+                'error': 'Alamat email wajib diisi.',
+                'success': False,
+            })
+
+        # Cek apakah email terdaftar (mahasiswa atau dosen)
+        mahasiswa = request.env['mahasiswa.mahasiswa'].sudo().search(
+            [('email', '=', email), ('active', '=', True)], limit=1
+        )
+        dosen = request.env['feature.dosen'].sudo().search(
+            [('email', '=', email)], limit=1
+        )
+
+        if not mahasiswa and not dosen:
+            return request.render('custom_web.lupa_password', {
+                'error': 'Email tidak ditemukan. Pastikan email yang Anda masukkan sudah terdaftar.',
+                'success': False,
+            })
+
+        # TODO: Kirim email reset password via mail server
+        # Di sini nanti akan dihubungkan ke Odoo mail server
+        # Contoh: request.env['mail.mail'].sudo().create({...}).send()
+
+        return request.render('custom_web.lupa_password', {
+            'error': None,
+            'success': True,
+            'email': email,
+        })
+

@@ -7,6 +7,7 @@
         'security/ir.model.access.csv',
         'views/layout.xml',
         'views/pages/login.xml',
+        'views/pages/lupa_password.xml',
         'views/pages/mahasiswa/dashboard.xml',
         'views/pages/mahasiswa/settings.xml',
         'views/pages/mahasiswa/presensi_select.xml',
