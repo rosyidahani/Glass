@@ -28,14 +28,19 @@ function setRole(role) {
 document.addEventListener('DOMContentLoaded', function () {
     var container = document.getElementById('scrollContainer');
     var loginSection = document.getElementById('loginSection');
+    var splashSection = document.getElementById('splashSection');
     var hint = document.getElementById('scrollHint');
     var btnLogin = document.querySelector('.btn-login');
 
     if (!container || !loginSection) return;
 
+    var currentSection = 0; // 0 = splash, 1 = login
+    var isAnimating = false;
+
     // ---- Auto-Scroll on Login Error ----
     var hasError = !!document.querySelector('.error-msg');
     if (hasError) {
+        currentSection = 1;
         // Delay slightly for smooth transition
         setTimeout(function () {
             loginSection.scrollIntoView({ behavior: 'auto' });
@@ -43,17 +48,82 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 100);
     }
 
-    // ---- Intersection Observer to Trigger Entry Animation ----
+    // ---- Smooth Navigation Helper ----
+    function navigateToSection(index) {
+        if (isAnimating) return;
+        isAnimating = true;
+        currentSection = index;
+
+        // Disable scroll snap temporarily to prevent native snapping conflicts during JS-smooth-scrolling
+        container.style.scrollSnapType = 'none';
+
+        var targetSection = index === 0 ? splashSection : loginSection;
+        if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        setTimeout(function () {
+            // Restore native snap type for viewport matching and touch swipes
+            container.style.scrollSnapType = 'y mandatory';
+            isAnimating = false;
+        }, 800); // Duration aligned with standard smooth scroll
+    }
+
+    // ---- Wheel Event Listener for Smooth Scrolling ----
+    container.addEventListener('wheel', function (e) {
+        // Prevent default desktop wheel scroll (which is discrete and jarring)
+        e.preventDefault();
+
+        if (isAnimating) return;
+
+        // Small threshold to avoid accidental micro-scrolls
+        if (e.deltaY > 10 && currentSection === 0) {
+            navigateToSection(1);
+        } else if (e.deltaY < -10 && currentSection === 1) {
+            navigateToSection(0);
+        }
+    }, { passive: false });
+
+    // ---- Keyboard Navigation for Smooth Scrolling ----
+    window.addEventListener('keydown', function (e) {
+        var key = e.key;
+        if (isAnimating) return;
+
+        if (key === 'ArrowDown' || key === 'PageDown' || key === ' ' || key === 'Enter') {
+            if (currentSection === 0) {
+                e.preventDefault();
+                navigateToSection(1);
+            }
+        } else if (key === 'ArrowUp' || key === 'PageUp') {
+            if (currentSection === 1) {
+                // Do not hijack scrolling if focusing an input/textarea
+                var activeEl = document.activeElement;
+                if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+                    return;
+                }
+                e.preventDefault();
+                navigateToSection(0);
+            }
+        }
+    });
+
+    // ---- Intersection Observer to Trigger Entry Animation & Sync State ----
     if ('IntersectionObserver' in window) {
         var observer = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active-login');
+                    currentSection = 1;
                     // Focus NIM input automatically when login card is fully in view
                     setTimeout(function () {
                         var nimInput = document.getElementById('nim');
                         if (nimInput) nimInput.focus();
                     }, 400);
+                } else {
+                    // Update current section if we have scrolled back to splash screen
+                    if (container.scrollTop < window.innerHeight / 2) {
+                        currentSection = 0;
+                    }
                 }
             });
         }, { threshold: 0.4 });
@@ -66,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ---- Click Hint Arrow to Scroll Down ----
     if (hint) {
         hint.addEventListener('click', function () {
-            loginSection.scrollIntoView({ behavior: 'smooth' });
+            navigateToSection(1);
         });
     }
 

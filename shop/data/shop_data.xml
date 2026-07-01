@@ -3,10 +3,10 @@
     <data noupdate="0">
         <!-- Avatars Master Data -->
         <record id="avatar_char_default" model="shop.avatar">
-            <field name="avatar_id">char_default</field>
-            <field name="nama_avatar">Ksatria Default</field>
+            <field name="avatar_id">avatar_default_character_l</field>
+            <field name="nama_avatar">Default Character L</field>
             <field name="harga_koin">0</field>
-            <field name="gambar_url">/custom_web/static/src/img/char_default.png</field>
+            <field name="gambar_url">/custom_web/static/src/img/avatar_default_character_l.png</field>
             <field name="active">True</field>
         </record>
 

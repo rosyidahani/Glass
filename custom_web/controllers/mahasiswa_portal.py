@@ -166,8 +166,8 @@ class MahasiswaPortalController(http.Controller):
         if not mahasiswa:
             return {'status': 'error', 'message': 'Session expired or not logged in'}
 
-        owned_avatars = mahasiswa.owned_avatar_ids.mapped('avatar_id') or ['char_default']
-        equipped_avatar = mahasiswa.equipped_avatar_id.avatar_id or 'char_default'
+        owned_avatars = mahasiswa.owned_avatar_ids.mapped('avatar_id') or ['avatar_default_character_l']
+        equipped_avatar = mahasiswa.equipped_avatar_id.avatar_id or 'avatar_default_character_l'
         
         # Get list of voucher codes claimed by this student
         claimed_vouchers = request.env['shop.transaction'].sudo().search([

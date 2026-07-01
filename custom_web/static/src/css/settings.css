@@ -284,3 +284,28 @@
         padding-left: 10px;
     }
 }
+
+/* ---- HEADER LOGOUT BUTTON ---- */
+.btn-logout-header {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    border: 1.5px solid rgba(239, 68, 68, 0.18);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13.5px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+}
+
+.btn-logout-header:hover {
+    background: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1.5px);
+}
