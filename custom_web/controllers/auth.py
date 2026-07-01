@@ -84,6 +84,8 @@ class AuthController(http.Controller):
             'success': False,
         })
 
+
+
     @http.route('/lupa-password', auth='public', website=True, type='http', methods=['POST'], csrf=True)
     def lupa_password_submit(self, **post):
         """Proses permintaan reset password berdasarkan email."""
