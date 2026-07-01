@@ -123,14 +123,29 @@ function initFormSubmit() {
 
         // Siapkan loading feedback
         var originalBtnHTML = btnSubmit.innerHTML;
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Memproses Sesi...';
 
         // Ambil data form
-        var namaSesi = document.getElementById('nama_sesi').value;
+        var namaSesi = document.getElementById('nama_sesi').value.trim();
         var mataKuliahId = document.getElementById('mata_kuliah_id').value;
         var tipeKelas = document.querySelector('input[name="tipe_kelas"]:checked').value;
         var datetimeVal = document.getElementById('batas_waktu_telat').value; // format: YYYY-MM-DDTHH:MM
+
+        // Validasi client-side sebelum submit
+        if (!namaSesi) {
+            alert('Nama sesi wajib diisi.');
+            return;
+        }
+        if (!mataKuliahId || parseInt(mataKuliahId) <= 0) {
+            alert('Silakan pilih Mata Kuliah terlebih dahulu.');
+            return;
+        }
+        if (!datetimeVal) {
+            alert('Batas Waktu Tepat Waktu wajib diisi.');
+            return;
+        }
+
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Memproses Sesi...';
         
         // Ubah format datetime ke YYYY-MM-DD HH:MM:00 untuk Odoo ORM
         var formatBatasTelat = datetimeVal.replace('T', ' ') + ':00';

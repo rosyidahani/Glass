@@ -7,8 +7,10 @@ class PresensiSesi(models.Model):
     _description = 'Sesi Presensi'
 
     name = fields.Char(string='Nama Sesi', required=True)
-    dosen_id = fields.Many2one('res.users', string='Dosen',
+    dosen_id = fields.Many2one('res.users', string='Dosen (Odoo User)',
                                 default=lambda self: self.env.user)
+    feature_dosen_id = fields.Many2one('feature.dosen', string='Dosen',
+                                        ondelete='set null')
     mata_kuliah_id = fields.Many2one(
     comodel_name='mata.kuliah',
     string='Mata Kuliah',
