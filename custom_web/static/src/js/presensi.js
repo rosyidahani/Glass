@@ -336,6 +336,13 @@ function startPresenceSimulation() {
     
     scannerCard.classList.add('scanning');
     
+    function calculateEAR(eye) {
+        const v1 = Math.hypot(eye[1].x - eye[5].x, eye[1].y - eye[5].y);
+        const v2 = Math.hypot(eye[2].x - eye[4].x, eye[2].y - eye[4].y);
+        const h = Math.hypot(eye[0].x - eye[3].x, eye[0].y - eye[3].y);
+        return (v1 + v2) / (2.0 * h);
+    }
+
     async function proceedWithFaceCheck(lat, lon, isMock, accuracy) {
         latestFaceDescriptor = null; // Bersihkan cache data wajah sebelum pemindaian aktif
         updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Menyiapkan kamera...');
@@ -355,16 +362,18 @@ function startPresenceSimulation() {
         document.body.style.transition = 'background-color 0.2s ease';
         document.body.style.backgroundColor = '#ffffff'; // Kilatan putih penuh (Flash)
 
-        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Memindai Wajah...</strong><br>Harap hadap ke kamera.');
+        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Silakan kedipkan mata Anda sekali...');
 
         let detectedDescriptor = null;
         let attempts = 0;
-        const maxAttempts = 30; // Maksimum 3 detik batas waktu deteksi
+        const maxAttempts = 100; // Maksimum 10 detik batas waktu deteksi kedipan
+        let eyesClosed = false;
+        let blinkDetected = false;
 
         // Tunggu kilatan layar sebentar (150ms)
         await new Promise(resolve => setTimeout(resolve, 150));
 
-        while (!detectedDescriptor && attempts < maxAttempts) {
+        while (attempts < maxAttempts) {
             attempts++;
             try {
                 const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
@@ -373,7 +382,30 @@ function startPresenceSimulation() {
                     
                 if (detection) {
                     detectedDescriptor = detection.descriptor;
-                    break;
+                    
+                    // Hitung Eye Aspect Ratio (EAR) untuk deteksi mata berkedip (Liveness Detection)
+                    const landmarks = detection.landmarks;
+                    const leftEye = landmarks.getLeftEye();
+                    const rightEye = landmarks.getRightEye();
+                    
+                    const earLeft = calculateEAR(leftEye);
+                    const earRight = calculateEAR(rightEye);
+                    const avgEAR = (earLeft + earRight) / 2.0;
+                    
+                    // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
+                    if (avgEAR < 0.17) {
+                        eyesClosed = true;
+                        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Kedipan Terdeteksi!</strong><br>Buka mata Anda kembali...');
+                    } else if (eyesClosed && avgEAR > 0.22) {
+                        blinkDetected = true;
+                        break; // Selesai jika berkedip berhasil dideteksi
+                    }
+                    
+                    if (!eyesClosed) {
+                        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Silakan kedipkan mata Anda sekali...');
+                    }
+                } else {
+                    updateStatusBox('active', '<i class="bi bi-camera-fill"></i> Wajah tidak terdeteksi. Posisikan wajah Anda.');
                 }
             } catch (e) {
                 console.error("Gagal mendeteksi wajah:", e);
@@ -383,7 +415,7 @@ function startPresenceSimulation() {
 
         restorePageStyle(); // Kembalikan warna layar
 
-        if (detectedDescriptor) {
+        if (detectedDescriptor && blinkDetected) {
             const faceVectorJSON = JSON.stringify(Array.from(detectedDescriptor));
             updateStatusBox('active', '<i class="bi bi-cloud-arrow-up-fill spin"></i> Mengirim data verifikasi ke server...');
             submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVectorJSON);
@@ -393,7 +425,11 @@ function startPresenceSimulation() {
             if (btnLoader) btnLoader.classList.add('hidden');
             btn.disabled = false;
             startFaceTracking();
-            triggerScanFailure("Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
+            if (detectedDescriptor && !blinkDetected) {
+                triggerScanFailure("Deteksi Liveness Gagal: Kedipan mata tidak terdeteksi. Silakan gunakan wajah asli.");
+            } else {
+                triggerScanFailure("Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
+            }
         }
     }
     
