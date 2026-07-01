@@ -50,6 +50,12 @@
                             </div>
 
                             <button type="submit" class="btn-login">Masuk</button>
+
+                            <div class="forgot-password-wrapper">
+                                <a href="/lupa-password" class="forgot-password-link">
+                                    <i class="bi bi-lock-fill"></i> Lupa Password?
+                                </a>
+                            </div>
                         </form>
 
                     </div>

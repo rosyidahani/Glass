@@ -218,3 +218,33 @@ body::after {
     color: #3b82f6;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
+
+/* ===== LUPA PASSWORD ===== */
+.forgot-password-wrapper {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.forgot-password-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+}
+
+.forgot-password-link:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+    text-decoration: underline;
+}
+
+.forgot-password-link i {
+    font-size: 12px;
+}
