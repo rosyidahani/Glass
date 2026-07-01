@@ -44,7 +44,7 @@
                     <div class="hud-right-vertical">
                         <!-- Coin/Poin (Top) -->
                         <div class="coin-pill" data-translate-title-id="title_coins_exchange" title="Koin yang dapat ditukar">
-                            <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> <span data-translate-id="dash_koin">Poin</span>
+                            <i class="bi bi-coin"></i> <span class="student-coins-amount"><t t-esc="mahasiswa.koin"/></span> <span data-translate-id="dash_koin">Poin</span>
                         </div>
 
                         <!-- EXP Pill (Bottom) -->

@@ -166,13 +166,25 @@ function updateShopUI() {
     // Update koin di topbar dan bagian stat lain
     const coinDisplays = document.querySelectorAll('.sync-coins');
     coinDisplays.forEach(el => {
-        el.innerHTML = `<i class="bi bi-coin"></i> ${studentState.coins} Poin`;
+        const amountEl = el.querySelector('.student-coins-amount');
+        if (amountEl) {
+            amountEl.textContent = studentState.coins;
+        } else {
+            el.innerHTML = `<i class="bi bi-coin"></i> <span class="student-coins-amount">${studentState.coins}</span> <span data-translate-id="dash_koin">Poin</span>`;
+            if (window.applyPortalTranslations) window.applyPortalTranslations();
+        }
     });
     
     // Update koin di dashboard top-hud
     const dashboardCoinPill = document.querySelector('.coin-pill');
     if (dashboardCoinPill) {
-        dashboardCoinPill.innerHTML = `<i class="bi bi-coin"></i> ${studentState.coins} Poin`;
+        const amountEl = dashboardCoinPill.querySelector('.student-coins-amount');
+        if (amountEl) {
+            amountEl.textContent = studentState.coins;
+        } else {
+            dashboardCoinPill.innerHTML = `<i class="bi bi-coin"></i> <span class="student-coins-amount">${studentState.coins}</span> <span data-translate-id="dash_koin">Poin</span>`;
+            if (window.applyPortalTranslations) window.applyPortalTranslations();
+        }
     }
 
     // Update status kartu avatar
@@ -241,24 +253,9 @@ async function equipAvatar(avatarId) {
 
 // Sinkronisasi karakter di dashboard utama
 function syncDashboardAvatar() {
-    const dashboardAvatarImg = document.querySelector('.user-image');
-    if (dashboardAvatarImg) {
-        const equipped = localStorage.getItem('equipped_avatar') || 'avatar_default_character_l';
-        
-        // Jika avatar berasal dari database (berawalan 'avatar_'), biarkan server-side rendering
-        // dari Odoo (dashboard.xml) yang menentukan URL gambarnya (/avatar/image/<id>).
-        // Jangan timpa dengan path lokal /custom_web/static/src/img/ yang tidak ada di disk.
-        if (equipped.startsWith('avatar_')) {
-            return;
-        }
-        
-        const imgItem = getAvatarData()[equipped];
-        if (imgItem && imgItem.img) {
-            dashboardAvatarImg.src = imgItem.img;
-        } else {
-            dashboardAvatarImg.src = `/custom_web/static/src/img/${equipped}.png`;
-        }
-    }
+    // Biarkan server-side rendering dari Odoo (dashboard.xml) yang menentukan gambar karakter
+    // karena seluruh gambar avatar tersimpan dan dilayani secara biner langsung dari database.
+    return;
 }
 
 // Menampilkan Toast Notifikasi

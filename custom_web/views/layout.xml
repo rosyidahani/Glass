@@ -81,7 +81,7 @@
             <div class="avatar-circle-header-container" style="display: flex; align-items: center; gap: 12px;">
                 <t t-if="show_coins">
                     <div class="coin-display sync-coins" data-translate-title-id="title_coins_exchange" title="Saldo koin Anda">
-                        <i class="bi bi-coin"></i> <t t-esc="mahasiswa.koin"/> <span data-translate-id="dash_koin">Poin</span>
+                        <i class="bi bi-coin"></i> <span class="student-coins-amount"><t t-esc="mahasiswa.koin"/></span> <span data-translate-id="dash_koin">Poin</span>
                     </div>
                 </t>
                 <t t-if="show_xp">
