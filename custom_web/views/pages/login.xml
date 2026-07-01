@@ -9,71 +9,72 @@
                 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/variables.css?v=14"/>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-                <link rel="stylesheet" href="/custom_web/static/src/css/login.css?v=5"/>
-                <script src="/custom_web/static/src/js/auth.js?v=5" type="text/javascript"></script>
+                <link rel="stylesheet" href="/custom_web/static/src/css/login.css?v=6"/>
+                <script src="/custom_web/static/src/js/auth.js?v=6" type="text/javascript"></script>
             </head>
             <body>
 
-                <!-- =============================================
-                     SPLASH SCREEN — Hanya logo
-                ============================================= -->
-                <div class="splash-screen" id="splashScreen">
-                    <img src="/custom_web/static/src/img/logo.png" alt="GLASS Logo" class="splash-logo"/>
-                    <div class="splash-title">GLASS</div>
-                    <div class="splash-subtitle">Sistem Presensi Akademik</div>
-
-                    <!-- Hint geser ke atas -->
-                    <div class="scroll-hint" id="scrollHint">
-                        <div class="scroll-hint-arrow">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <div class="scroll-hint-text">Geser ke atas untuk masuk</div>
-                    </div>
-                </div>
-
-                <!-- =============================================
-                     LOGIN PANEL — Naik dari bawah
-                ============================================= -->
-                <div class="login-panel" id="loginPanel">
-                    <div class="login-card">
-                        <h2>Selamat Datang</h2>
-                        <p class="subtitle">Masuk untuk mengelola kehadiran Anda</p>
-
-                        <t t-if="error">
-                            <div class="error-msg">
-                                <i class="bi bi-exclamation-triangle-fill"></i> <t t-esc="error"/>
-                            </div>
-                        </t>
-
-                        <div class="role-selector">
-                            <button type="button" t-att-class="'role-btn ' + ('active' if role == 'mahasiswa' or not role else '')" onclick="setRole('mahasiswa')">Mahasiswa</button>
-                            <button type="button" t-att-class="'role-btn ' + ('active' if role == 'dosen' else '')" onclick="setRole('dosen')">Dosen</button>
+                <!-- SCROLL SNAP CONTAINER -->
+                <div class="scroll-container" id="scrollContainer">
+                    
+                    <!-- SECTION 1: SPLASH SCREEN -->
+                    <div class="scroll-section splash-section" id="splashSection">
+                        <div class="splash-content">
+                            <img src="/custom_web/static/src/img/logo.png" alt="GLASS Logo" class="splash-logo"/>
+                            <div class="splash-title">GLASS</div>
+                            <div class="splash-subtitle">Sistem Presensi Akademik</div>
                         </div>
 
-                        <form action="/login" method="post">
-                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                            <input type="hidden" name="role" id="role_input" t-att-value="role if role else 'mahasiswa'"/>
-
-                            <div class="form-group">
-                                <label for="nim" id="label_nim"><t t-esc="'NIP' if role == 'dosen' else 'NIM'"/></label>
-                                <input type="text" id="nim" name="nim"
-                                       t-att-placeholder="'Masukkan NIP Anda' if role == 'dosen' else 'Masukkan NIM Anda'"
-                                       required="required"/>
+                        <!-- Hint geser ke bawah -->
+                        <div class="scroll-hint" id="scrollHint">
+                            <div class="scroll-hint-arrow">
+                                <span></span>
+                                <span></span>
+                                <span></span>
                             </div>
-
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" id="password" name="password"
-                                       placeholder="Masukkan password" required="required"/>
-                            </div>
-
-                            <button type="submit" class="btn-login">Masuk</button>
-                        </form>
-
-                        <!-- Lupa Password link disuntik via JS di auth.js -->
+                            <div class="scroll-hint-text">Scroll ke bawah untuk masuk</div>
+                        </div>
                     </div>
+
+                    <!-- SECTION 2: LOGIN CARD -->
+                    <div class="scroll-section login-section" id="loginSection">
+                        <div class="login-card">
+                            <h2>Selamat Datang</h2>
+                            <p class="subtitle">Masuk untuk mengelola kehadiran Anda</p>
+
+                            <t t-if="error">
+                                <div class="error-msg">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> <t t-esc="error"/>
+                                </div>
+                            </t>
+
+                            <div class="role-selector">
+                                <button type="button" t-att-class="'role-btn ' + ('active' if role == 'mahasiswa' or not role else '')" onclick="setRole('mahasiswa')">Mahasiswa</button>
+                                <button type="button" t-att-class="'role-btn ' + ('active' if role == 'dosen' else '')" onclick="setRole('dosen')">Dosen</button>
+                            </div>
+
+                            <form action="/login" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="role" id="role_input" t-att-value="role if role else 'mahasiswa'"/>
+
+                                <div class="form-group">
+                                    <label for="nim" id="label_nim"><t t-esc="'NIP' if role == 'dosen' else 'NIM'"/></label>
+                                    <input type="text" id="nim" name="nim"
+                                           t-att-placeholder="'Masukkan NIP Anda' if role == 'dosen' else 'Masukkan NIM Anda'"
+                                           required="required"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" id="password" name="password"
+                                           placeholder="Masukkan password" required="required"/>
+                                </div>
+
+                                <button type="submit" class="btn-login">Masuk</button>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
 
             </body>
