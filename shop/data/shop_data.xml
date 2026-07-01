@@ -50,13 +50,6 @@
             <field name="active">True</field>
         </record>
 
-        <record id="avatar_gambar_3" model="shop.avatar">
-            <field name="avatar_id">gambar_3</field>
-            <field name="nama_avatar">Robot Tempur</field>
-            <field name="harga_koin">80</field>
-            <field name="gambar_url">/custom_web/static/src/img/gambar_3.png</field>
-            <field name="active">True</field>
-        </record>
 
 
         <!-- Vouchers Master Data -->
