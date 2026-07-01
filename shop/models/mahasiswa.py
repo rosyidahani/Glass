@@ -24,7 +24,7 @@ class Mahasiswa(models.Model):
     def create(self, vals_list):
         records = super(Mahasiswa, self).create(vals_list)
         # Berikan avatar default saat mahasiswa pertama kali dibuat
-        default_avatar = self.env['shop.avatar'].sudo().search([('avatar_id', '=', 'char_default')], limit=1)
+        default_avatar = self.env['shop.avatar'].sudo().search([('avatar_id', '=', 'avatar_default_character_l')], limit=1)
         if default_avatar:
             for rec in records:
                 rec.sudo().write({

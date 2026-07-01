@@ -3,15 +3,15 @@
 // Inisialisasi State dari LocalStorage / Default values
 let studentState = {
     coins: 0,
-    ownedAvatars: ['char_default'],
-    equippedAvatar: 'char_default',
+    ownedAvatars: ['avatar_default_character_l'],
+    equippedAvatar: 'avatar_default_character_l',
     claimedVouchers: []
 };
 
 // Data list yang ada di toko (Dibaca secara dinamis dari database Odoo)
 function getAvatarData() {
     return window.avatarData || {
-        'char_default': { name: 'Ksatria Default', price: 0, img: '/custom_web/static/src/img/char_default.png' },
+        'avatar_default_character_l': { name: 'Default Character L', price: 0, img: '/custom_web/static/src/img/avatar_default_character_l.png' },
         'char_cyber': { name: 'Cyber Ninja', price: 15, img: '/custom_web/static/src/img/char_cyber.png' },
         'char_royal': { name: 'Cendekiawan Kerajaan', price: 30, img: '/custom_web/static/src/img/char_royal.png' },
         'char_neon': { name: 'Hacker Neon', price: 50, img: '/custom_web/static/src/img/char_neon.png' }
@@ -243,7 +243,7 @@ async function equipAvatar(avatarId) {
 function syncDashboardAvatar() {
     const dashboardAvatarImg = document.querySelector('.user-image');
     if (dashboardAvatarImg) {
-        const equipped = localStorage.getItem('equipped_avatar') || 'char_default';
+        const equipped = localStorage.getItem('equipped_avatar') || 'avatar_default_character_l';
         
         // Jika avatar berasal dari database (berawalan 'avatar_'), biarkan server-side rendering
         // dari Odoo (dashboard.xml) yang menentukan URL gambarnya (/avatar/image/<id>).
