@@ -58,29 +58,6 @@
             <field name="active">True</field>
         </record>
 
-        <record id="avatar_video_1" model="shop.avatar">
-            <field name="avatar_id">video_1</field>
-            <field name="nama_avatar">Penjaga Galaksi (Video)</field>
-            <field name="harga_koin">100</field>
-            <field name="gambar_url">/custom_web/static/src/video/video_1.mp4</field>
-            <field name="active">True</field>
-        </record>
-
-        <record id="avatar_video_2" model="shop.avatar">
-            <field name="avatar_id">video_2</field>
-            <field name="nama_avatar">Pemicu Badai (Video)</field>
-            <field name="harga_koin">150</field>
-            <field name="gambar_url">/custom_web/static/src/video/video_2.mp4</field>
-            <field name="active">True</field>
-        </record>
-
-        <record id="avatar_video_3" model="shop.avatar">
-            <field name="avatar_id">video_3</field>
-            <field name="nama_avatar">Penguasa Cyber (Video)</field>
-            <field name="harga_koin">200</field>
-            <field name="gambar_url">/custom_web/static/src/video/video_3.mp4</field>
-            <field name="active">True</field>
-        </record>
 
         <!-- Vouchers Master Data -->
         <record id="voucher_v_wifi" model="shop.voucher">
