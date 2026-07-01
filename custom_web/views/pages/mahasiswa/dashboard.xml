@@ -61,12 +61,7 @@
                     <!-- LEFT: 2D Character Area -->
                     <div class="avatar-section glass-panel">
                         <div class="avatar-glow"/>
-                        <t t-if="mahasiswa.foto_profil">
-                            <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" class="user-image" alt="Character Glass"/>
-                        </t>
-                        <t t-else="">
-                            <img src="/custom_web/static/src/img/avatar g2.png" class="user-image" alt="Character Glass"/>
-                        </t>
+                        <img t-att-src="mahasiswa.equipped_avatar_id.image_src or '/custom_web/static/src/img/avatar_default_character_l.png'" class="user-image" alt="Character Glass"/>
                     </div>
 
                 </div>
