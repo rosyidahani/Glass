@@ -76,8 +76,12 @@ class PresensiController(http.Controller):
     # POST /api/presensi/buka-sesi
     # ================================================
     @http.route('/api/presensi/buka-sesi', type='json',
-                auth='user', methods=['POST'], cors='*', csrf=False)
+                auth='public', methods=['POST'], cors='*', csrf=False)
     def buka_sesi(self, **kw):
+        dosen_id = request.session.get('dosen_id')
+        if not dosen_id:
+            return {'status': 'error', 'message': 'Unauthorized: Sesi Anda habis atau belum login.'}
+
         required = ['nama_sesi', 'mata_kuliah_id', 'tipe_kelas', 'batas_waktu_telat']
         for field in required:
             if field not in kw:
@@ -143,8 +147,12 @@ class PresensiController(http.Controller):
     # POST /api/presensi/tutup-sesi
     # ================================================
     @http.route('/api/presensi/tutup-sesi', type='json',
-                auth='user', methods=['POST'], cors='*', csrf=False)
+                auth='public', methods=['POST'], cors='*', csrf=False)
     def tutup_sesi(self, **kw):
+        dosen_id = request.session.get('dosen_id')
+        if not dosen_id:
+            return {'status': 'error', 'message': 'Unauthorized: Sesi Anda habis atau belum login.'}
+
         sesi_id = kw.get('sesi_id')
         if not sesi_id:
             return {'status': 'error', 'message': 'sesi_id wajib diisi.'}
