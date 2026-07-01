@@ -65,6 +65,9 @@ class Mahasiswa(models.Model):
         string='Bahasa',
         default='id'
     )
+    email = fields.Char(
+        string='Email'
+    )
 
     prodi = fields.Char(
         string='Program Studi',

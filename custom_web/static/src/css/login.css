@@ -65,6 +65,7 @@ body::after {
     height: 100vh;
     overflow-y: auto;
     scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
     position: relative;
     z-index: 10;
     /* Hide scrollbar for Chrome, Safari and Opera */
@@ -102,17 +103,72 @@ body::after {
     text-align: center;
 }
 
+/* ---- LOGO ANIMATION & GLOW ---- */
+.logo-animation-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 180px;
+    margin-bottom: 8px;
+    animation: logoEntrance 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.ambient-glow {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(99, 102, 241, 0.2) 50%, rgba(59, 130, 246, 0) 70%);
+    border-radius: 50%;
+    z-index: 1;
+    filter: blur(12px);
+    pointer-events: none;
+    animation: glowBreathe 4s ease-in-out infinite alternate;
+}
+
 .splash-logo {
+    position: relative;
+    z-index: 2;
     width: 140px;
     height: 140px;
     object-fit: contain;
     filter: drop-shadow(0 16px 32px rgba(59, 130, 246, 0.35));
     animation: logoFloat 4s ease-in-out infinite;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.splash-logo:hover {
+    transform: scale(1.08) translateY(-5px);
+    filter: drop-shadow(0 24px 40px rgba(59, 130, 246, 0.5));
+}
+
+@keyframes logoEntrance {
+    0% {
+        opacity: 0;
+        transform: scale(0.4) translateY(30px) rotate(-10deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotate(0deg);
+    }
 }
 
 @keyframes logoFloat {
     0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(-10px); }
+    50%       { transform: translateY(-8px); }
+}
+
+@keyframes glowBreathe {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.55;
+    }
+    100% {
+        transform: scale(1.12);
+        opacity: 0.95;
+    }
 }
 
 .splash-title {

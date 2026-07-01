@@ -6,10 +6,12 @@
             <script src="/custom_web/static/src/js/settings_dosen.js" type="text/javascript"></script>
 
             <div class="profile-container">
-                <t t-call="custom_web.shared_student_header">
-                    <t t-set="title" t-value="'Pengaturan'"/>
-                    <t t-set="back_url" t-value="'/dashboard/dosen'"/>
-                </t>
+                <div class="mhs-header-hud">
+                    <div class="hud-profile-meta">
+                        <a href="/dashboard/dosen" class="back-btn-header" style="margin-right: 8px;"><i class="bi bi-arrow-left"></i></a>
+                        <h2 data-translate-id="title_pengaturan">Pengaturan</h2>
+                    </div>
+                </div>
 
                 <!-- Header Section -->
                 <div class="profile-header">

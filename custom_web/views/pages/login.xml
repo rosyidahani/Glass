@@ -9,8 +9,8 @@
                 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
                 <link rel="stylesheet" href="/custom_web/static/src/css/variables.css?v=14"/>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-                <link rel="stylesheet" href="/custom_web/static/src/css/login.css?v=6"/>
-                <script src="/custom_web/static/src/js/auth.js?v=6" type="text/javascript"></script>
+                <link rel="stylesheet" href="/custom_web/static/src/css/login.css?v=7"/>
+                <script src="/custom_web/static/src/js/auth.js?v=7" type="text/javascript"></script>
             </head>
             <body>
 
@@ -20,9 +20,12 @@
                     <!-- SECTION 1: SPLASH SCREEN -->
                     <div class="scroll-section splash-section" id="splashSection">
                         <div class="splash-content">
-                            <img src="/custom_web/static/src/img/logo.png" alt="GLASS Logo" class="splash-logo"/>
+                            <div class="logo-animation-container">
+                                <div class="ambient-glow"></div>
+                                <img src="/custom_web/static/src/img/logo.png" alt="GLASS Logo" class="splash-logo"/>
+                            </div>
                             <div class="splash-title">GLASS</div>
-                            <div class="splash-subtitle">Sistem Presensi Akademik</div>
+                            <div class="splash-subtitle">Gamified Learning Attendance and Student System</div>
                         </div>
 
                         <!-- Hint geser ke bawah -->
