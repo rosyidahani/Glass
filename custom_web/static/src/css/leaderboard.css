@@ -445,7 +445,6 @@
 .podium-name {
     font-size: 13px;
     font-weight: 700;
-    color: var(--text-color);
     max-width: 90px;
     white-space: nowrap;
     overflow: hidden;
@@ -455,13 +454,33 @@
 .podium-xp {
     font-size: 11px;
     font-weight: 800;
-    color: var(--text-muted);
 }
 
-/* Highlight Current User */
-.podium-card.highlight .podium-name {
-    color: var(--accent-color);
-    font-weight: 800;
+/* Specific readable dark colors on the light podium cards regardless of theme */
+.content-gold .podium-name {
+    color: #78350f !important;
+}
+.content-gold .podium-xp {
+    color: #b45309 !important;
+}
+
+.content-silver .podium-name {
+    color: #1e293b !important;
+}
+.content-silver .podium-xp {
+    color: #475569 !important;
+}
+
+.content-bronze .podium-name {
+    color: #7c2d12 !important;
+}
+.content-bronze .podium-xp {
+    color: #c2410c !important;
+}
+
+/* Highlight Current User on Podium */
+.podium-card.highlight .podium-bar-content {
+    box-shadow: inset 0 0 0 2px var(--accent-color) !important;
 }
 
 /* Section 2: Remaining Rank List (Rank 4+) */

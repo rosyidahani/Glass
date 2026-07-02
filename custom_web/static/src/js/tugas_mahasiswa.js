@@ -415,9 +415,10 @@ function handleFileSelect(input) {
 
 // 7. Submit Real Submission to Odoo Backend (Multipart/FormData to HTTP route)
 async function submitRealSubmission() {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     const btnSubmit = document.querySelector(".btn-submit-drawer");
     if (!btnSubmit) {
-        showToast("Error", "Tombol submit tidak ditemukan (btn-submit-drawer).", "bi-exclamation-triangle-fill text-danger");
+        showToast("Error", isEng ? "Submit button not found (btn-submit-drawer)." : "Tombol submit tidak ditemukan (btn-submit-drawer).", "bi-exclamation-triangle-fill text-danger");
         return;
     }
 
@@ -431,23 +432,23 @@ async function submitRealSubmission() {
         tipe_file = "zip";
         var file = fileInput.files[0];
         if (file.size > 10 * 1024 * 1024) {
-            showToast("Peringatan", "Ukuran berkas tugas maksimal 10MB!", "bi-exclamation-triangle-fill text-warning");
+            showToast(isEng ? "Warning" : "Peringatan", isEng ? "Maximum assignment file size is 10MB!" : "Ukuran berkas tugas maksimal 10MB!", "bi-exclamation-triangle-fill text-warning");
             return;
         }
     }
 
     if (tipe_file === "link" && !linkInput) {
-        showToast("Pengumpulan Gagal", "Harap isi tautan (Link) tugas Anda!", "bi-exclamation-triangle-fill text-warning");
+        showToast(isEng ? "Submission Failed" : "Pengumpulan Gagal", isEng ? "Please enter your assignment link!" : "Harap isi tautan (Link) tugas Anda!", "bi-exclamation-triangle-fill text-warning");
         return;
     }
     if (tipe_file === "zip" && !fileInput.files[0]) {
-        showToast("Pengumpulan Gagal", "Harap unggah file tugas Anda!", "bi-exclamation-triangle-fill text-warning");
+        showToast(isEng ? "Submission Failed" : "Pengumpulan Gagal", isEng ? "Please upload your assignment file!" : "Harap unggah file tugas Anda!", "bi-exclamation-triangle-fill text-warning");
         return;
     }
 
     var originalBtnHTML = btnSubmit.innerHTML;
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = '<i class="bi bi-arrow-repeat pulsing-icon"></i> Mengirim...';
+    btnSubmit.innerHTML = `<i class="bi bi-arrow-repeat pulsing-icon"></i> ${isEng ? 'Sending...' : 'Mengirim...'}`;
 
     // Construct multipart form data
     var formData = new FormData();
@@ -469,7 +470,7 @@ async function submitRealSubmission() {
         const resultData = await res.json();
 
         if (!res.ok || resultData.status !== 'success') {
-            throw new Error(resultData.message || 'Gagal mengumpulkan tugas. Silakan coba lagi.');
+            throw new Error(resultData.message || (isEng ? 'Failed to submit assignment. Please try again.' : 'Gagal mengumpulkan tugas. Silakan coba lagi.'));
         }
 
         // Success
@@ -481,7 +482,7 @@ async function submitRealSubmission() {
 
     } catch (e) {
         // Catches network errors, JSON parsing errors, and thrown errors from the 'if' block
-        showToast("Error", e.message || "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+        showToast("Error", e.message || (isEng ? "Network connection to server failed." : "Koneksi ke server gagal."), "bi-wifi-off text-danger");
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = originalBtnHTML;
     }

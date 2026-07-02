@@ -338,10 +338,25 @@ window.selectLanguage = function(lang) {
     
     const overlay = document.getElementById("settings-modal-overlay");
     if (overlay) {
-        overlay.remove();
+        // Efek transisi keluar (fade out & slide down)
+        overlay.style.opacity = "0";
+        const modal = overlay.querySelector("div");
+        if (modal) {
+            modal.style.transform = "translateY(20px)";
+            modal.style.transition = "transform 0.2s ease";
+        }
     }
-    // Reload page to re-initialize and apply full translations
-    location.reload();
+    
+    // Tentukan URL induk (tanpa akhiran /3) agar modal tidak terbuka lagi setelah reload
+    const parentPath = window.location.pathname.replace(/\/\d+$/, '') + window.location.search;
+    
+    // Tunggu transisi selesai sebelum mengarahkan ke URL induk
+    setTimeout(() => {
+        if (overlay) {
+            overlay.remove();
+        }
+        window.location.href = parentPath;
+    }, 200);
 };
 
 // Modal 4: Bantuan (faq)

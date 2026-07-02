@@ -289,8 +289,8 @@ th {
 /* Headings, titles, and bold highlights */
 .theme-midnight h1, .theme-midnight h2, .theme-midnight h3, .theme-midnight h4, .theme-midnight h5, .theme-midnight h6,
 .theme-amethyst h1, .theme-amethyst h2, .theme-amethyst h3, .theme-amethyst h4, .theme-amethyst h5, .theme-amethyst h6,
-.theme-midnight .dosen-name, .theme-midnight .profile-name, .theme-midnight .row-student-name, .theme-midnight .podium-name,
-.theme-amethyst .dosen-name, .theme-amethyst .profile-name, .theme-amethyst .row-student-name, .theme-amethyst .podium-name,
+.theme-midnight .dosen-name, .theme-midnight .profile-name, .theme-midnight .row-student-name,
+.theme-amethyst .dosen-name, .theme-amethyst .profile-name, .theme-amethyst .row-student-name,
 .theme-midnight .topbar-title, .theme-midnight .list-title, .theme-midnight .card-header h3, .theme-midnight .modal-title,
 .theme-amethyst .topbar-title, .theme-amethyst .list-title, .theme-amethyst .card-header h3, .theme-amethyst .modal-title,
 .theme-midnight .student-info .name, .theme-amethyst .student-info .name,
@@ -312,7 +312,6 @@ th {
 .theme-midnight .meta-txt p, .theme-amethyst .meta-txt p,
 .theme-midnight .row-student-nim, .theme-amethyst .row-student-nim,
 .theme-midnight .student-info .nim, .theme-amethyst .student-info .nim,
-.theme-midnight .podium-xp, .theme-amethyst .podium-xp,
 .theme-midnight .input-helper, .theme-amethyst .input-helper,
 .theme-midnight .gps-status-text, .theme-amethyst .gps-status-text,
 .theme-midnight .no-more-rank, .theme-amethyst .no-more-rank,
