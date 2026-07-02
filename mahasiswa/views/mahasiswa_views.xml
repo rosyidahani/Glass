@@ -33,6 +33,7 @@
                     <group>
                         <group string="Informasi Akademik">
                             <field name="nim"/>
+                            <field name="email"/>
                             <field name="password" password="True"/>
                             <field name="semester"/>
                             <field name="prodi"/>

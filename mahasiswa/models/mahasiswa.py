@@ -20,6 +20,11 @@ class Mahasiswa(models.Model):
         required=True,
         help='Password untuk login (disimpan dalam bentuk hash SHA-256).',
     )
+    email = fields.Char(
+        string='Email',
+        help='Alamat email untuk kebutuhan reset password dan notifikasi.',
+        index=True,
+    )
     name = fields.Char(
         string='Nama',
         required=True,
@@ -64,9 +69,6 @@ class Mahasiswa(models.Model):
     bahasa = fields.Char(
         string='Bahasa',
         default='id'
-    )
-    email = fields.Char(
-        string='Email'
     )
 
     prodi = fields.Char(
@@ -174,4 +176,4 @@ class Mahasiswa(models.Model):
             rec.write({
                 'face_descriptor': False,
                 'device_id': False
-            })
+            })
