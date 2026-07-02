@@ -7,6 +7,55 @@ import random
 _logger = logging.getLogger(__name__)
 
 
+def _send_otp_email(env, to_email, otp_code, user_name=''):
+    """Kirim email OTP menggunakan Odoo mail.mail.
+    Returns True jika berhasil, False jika gagal."""
+    try:
+        subject = 'Kode OTP Reset Password - Glass Presence'
+        body_html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; 
+                    border: 1px solid #e0e0e0; border-radius: 8px; background: #ffffff;">
+            <h2 style="color: #1a1a2e; margin-bottom: 8px;">Reset Password</h2>
+            <p style="color: #555; font-size: 14px;">Halo{' <strong>' + user_name + '</strong>' if user_name else ''},</p>
+            <p style="color: #555; font-size: 14px;">
+                Kami menerima permintaan reset password untuk akun Anda.
+                Gunakan kode OTP di bawah ini untuk melanjutkan:
+            </p>
+            <div style="text-align: center; margin: 24px 0;">
+                <div style="display: inline-block; background: #f0f4ff; border: 2px dashed #4a6cf7;
+                            border-radius: 12px; padding: 16px 32px;">
+                    <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; 
+                                 color: #4a6cf7;">{otp_code}</span>
+                </div>
+            </div>
+            <p style="color: #555; font-size: 13px;">Kode ini berlaku selama <strong>10 menit</strong>.</p>
+            <p style="color: #999; font-size: 12px;">
+                Jika Anda tidak meminta reset password, abaikan email ini.
+                Akun Anda tetap aman.
+            </p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 16px 0;"/>
+            <p style="color: #bbb; font-size: 11px; text-align: center;">Glass Presence System</p>
+        </div>
+        """
+
+        mail_values = {
+            'subject': subject,
+            'body_html': body_html,
+            'email_to': to_email,
+            'email_from': env['ir.config_parameter'].sudo().get_param(
+                'mail.catchall.email', 'noreply@glass.local'
+            ),
+            'auto_delete': True,
+        }
+        mail = env['mail.mail'].sudo().create(mail_values)
+        mail.send()
+        _logger.info(f"[OTP] Email OTP berhasil dikirim ke {to_email}")
+        return True
+    except Exception as e:
+        _logger.error(f"[OTP] Gagal mengirim email OTP ke {to_email}: {e}")
+        return False
+
+
 class AuthController(http.Controller):
 
     @http.route('/login', auth='public', website=True, type='http', methods=['GET'])
@@ -136,10 +185,28 @@ class AuthController(http.Controller):
         request.session['reset_user_id'] = mahasiswa.id if mahasiswa else dosen.id
         request.session['reset_otp_verified'] = False
 
-        # Log OTP di console untuk simulasi lokal
+        # Ambil nama user untuk personalisasi email
+        user_name = ''
+        if mahasiswa:
+            user_name = mahasiswa.name or ''
+        elif dosen:
+            user_name = dosen.name or ''
+
+        # Kirim OTP via email
+        email_sent = _send_otp_email(request.env, email, otp, user_name)
+
+        # Log OTP di console sebagai backup
         _logger.info("==================================================")
-        _logger.info(f"RESET PASSWORD OTP FOR {email}: {otp}")
+        _logger.info(f"RESET PASSWORD OTP FOR {email}: {otp} (email_sent={email_sent})")
         _logger.info("==================================================")
+
+        if not email_sent:
+            return request.render('custom_web.lupa_password', {
+                'error': 'Gagal mengirim email OTP. Pastikan server email sudah dikonfigurasi di Odoo Settings.',
+                'success': False,
+                'step': 1,
+                'email': email,
+            })
 
         return request.render('custom_web.lupa_password', {
             'error': None,
@@ -193,10 +260,25 @@ class AuthController(http.Controller):
         otp = str(random.randint(100000, 999999))
         request.session['reset_otp'] = otp
 
-        # Log OTP di console untuk simulasi lokal
+        # Ambil nama user
+        user_name = ''
+        try:
+            user = request.env[user_model].sudo().browse(user_id)
+            if user.exists():
+                user_name = user.name or ''
+        except Exception:
+            pass
+
+        # Kirim OTP via email
+        email_sent = _send_otp_email(request.env, email, otp, user_name)
+
+        # Log OTP di console sebagai backup
         _logger.info("==================================================")
-        _logger.info(f"RESEND RESET PASSWORD OTP FOR {email}: {otp}")
+        _logger.info(f"RESEND RESET PASSWORD OTP FOR {email}: {otp} (email_sent={email_sent})")
         _logger.info("==================================================")
+
+        if not email_sent:
+            return {'success': False, 'message': 'Gagal mengirim ulang email OTP. Cek konfigurasi server email.'}
 
         return {'success': True}
 
@@ -208,13 +290,21 @@ class AuthController(http.Controller):
         user_id = request.session.get('reset_user_id')
         otp_verified = request.session.get('reset_otp_verified')
 
+        _logger.info("=== RESET PASSWORD SUBMIT ===")
+        _logger.info(f"Session info - email: {email}, model: {user_model}, id: {user_id}, verified: {otp_verified}")
+        _logger.info(f"POST params: {post}")
+
         if not email or not user_model or not user_id or not otp_verified:
+            _logger.warning("Reset verification failed - session variables missing or invalid. Redirecting to /lupa-password")
             return request.redirect('/lupa-password')
 
-        password = post.get('password', '').strip()
+        password = post.get('new_password', '').strip()
         confirm_password = post.get('confirm_password', '').strip()
 
+        _logger.info(f"Passwords - len(new): {len(password)}, len(confirm): {len(confirm_password)}")
+
         if not password or len(password) < 6:
+            _logger.warning("Password too short error")
             return request.render('custom_web.lupa_password', {
                 'error': 'Password minimal terdiri dari 6 karakter.',
                 'success': False,
@@ -223,6 +313,7 @@ class AuthController(http.Controller):
             })
 
         if password != confirm_password:
+            _logger.warning("Passwords do not match error")
             return request.render('custom_web.lupa_password', {
                 'error': 'Password baru dan konfirmasi password tidak cocok.',
                 'success': False,
@@ -233,6 +324,7 @@ class AuthController(http.Controller):
         # Dapatkan record user
         user = request.env[user_model].sudo().browse(user_id)
         if not user.exists():
+            _logger.error(f"User with ID {user_id} in model {user_model} does not exist!")
             return request.render('custom_web.lupa_password', {
                 'error': 'User tidak ditemukan. Silakan ulangi proses.',
                 'success': False,
@@ -241,7 +333,18 @@ class AuthController(http.Controller):
             })
 
         # Update password ( Mahasiswa write password dihash SHA-256 otomatis )
-        user.write({'password': password})
+        _logger.info(f"Updating password for user ID {user_id}...")
+        try:
+            user.write({'password': password})
+            _logger.info("Password write successful in DB!")
+        except Exception as write_err:
+            _logger.error(f"Error writing password to database: {write_err}")
+            return request.render('custom_web.lupa_password', {
+                'error': f'Gagal menyimpan password ke database: {write_err}',
+                'success': False,
+                'step': 3,
+                'email': email,
+            })
 
         # Bersihkan session reset
         request.session.pop('reset_email', None)
@@ -249,6 +352,7 @@ class AuthController(http.Controller):
         request.session.pop('reset_user_model', None)
         request.session.pop('reset_user_id', None)
         request.session.pop('reset_otp_verified', None)
+        _logger.info("Session reset parameters cleared.")
 
         return request.render('custom_web.lupa_password', {
             'error': None,
@@ -256,5 +360,6 @@ class AuthController(http.Controller):
             'step': 4,
             'email': None,
         })
+
 
 
