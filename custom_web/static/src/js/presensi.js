@@ -337,10 +337,16 @@ function startPresenceSimulation() {
     scannerCard.classList.add('scanning');
     
     function calculateEAR(eye) {
-        const v1 = Math.hypot(eye[1].x - eye[5].x, eye[1].y - eye[5].y);
-        const v2 = Math.hypot(eye[2].x - eye[4].x, eye[2].y - eye[4].y);
-        const h = Math.hypot(eye[0].x - eye[3].x, eye[0].y - eye[3].y);
-        return (v1 + v2) / (2.0 * h);
+        try {
+            if (!eye || eye.length < 6) return 0.0;
+            const v1 = Math.hypot(eye[1].x - eye[5].x, eye[1].y - eye[5].y);
+            const v2 = Math.hypot(eye[2].x - eye[4].x, eye[2].y - eye[4].y);
+            const h = Math.hypot(eye[0].x - eye[3].x, eye[0].y - eye[3].y);
+            return h > 0 ? (v1 + v2) / (2.0 * h) : 0.0;
+        } catch (e) {
+            console.error("Gagal menghitung EAR:", e);
+            return 0.0;
+        }
     }
 
     async function proceedWithFaceCheck(lat, lon, isMock, accuracy) {
@@ -395,20 +401,29 @@ function startPresenceSimulation() {
                     const earRight = calculateEAR(rightEye);
                     const avgEAR = (earLeft + earRight) / 2.0;
                     
+                    if (isNaN(avgEAR) || avgEAR <= 0.0) {
+                        continue;
+                    }
+                    
                     // Fase 1: Kalibrasi baseline EAR mata terbuka (ambil rata-rata dari 5 frame awal)
-                    if (baselineFrames.length < 5) {
-                        if (avgEAR > 0.18 && avgEAR < 0.45) {
+                    // Jika dalam 3 detik (attempts < 30) kalibrasi belum selesai, paksa fallback ke default
+                    if (baselineFrames.length < 5 && attempts < 30) {
+                        if (avgEAR > 0.14 && avgEAR < 0.48) {
                             baselineFrames.push(avgEAR);
                         }
                         updateStatusBox('active', '<i class="bi bi-cpu spin"></i> <strong>Kalibrasi Sensor...</strong><br>Harap tatap kamera dengan mata terbuka.');
                     } else {
                         if (baselineEAR === 0.0) {
-                            baselineEAR = baselineFrames.reduce((a, b) => a + b, 0) / 5.0;
+                            if (baselineFrames.length > 0) {
+                                baselineEAR = baselineFrames.reduce((a, b) => a + b, 0) / baselineFrames.length;
+                            } else {
+                                baselineEAR = 0.28; // Fallback default aman
+                            }
                             console.log("Baseline EAR Calibrated:", baselineEAR);
                         }
                         
                         // Menghitung threshold secara adaptif berdasarkan mata pengguna
-                        const closedThreshold = baselineEAR * 0.76; // Turun 24% dari kondisi mata terbuka
+                        const closedThreshold = baselineEAR * 0.77; // Turun 23% dari kondisi mata terbuka
                         const openedThreshold = baselineEAR * 0.88; // Kembali ke 88% dari kondisi mata terbuka
                         
                         // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
