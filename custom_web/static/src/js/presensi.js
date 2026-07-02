@@ -362,13 +362,16 @@ function startPresenceSimulation() {
         document.body.style.transition = 'background-color 0.2s ease';
         document.body.style.backgroundColor = '#ffffff'; // Kilatan putih penuh (Flash)
 
-        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Silakan kedipkan mata Anda sekali...');
+        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Mengkalibrasi sensor mata...');
 
         let detectedDescriptor = null;
         let attempts = 0;
-        const maxAttempts = 100; // Maksimum 10 detik batas waktu deteksi kedipan
+        const maxAttempts = 120; // Maksimum 12 detik batas waktu deteksi kedipan
         let eyesClosed = false;
         let blinkDetected = false;
+
+        let baselineEAR = 0.0;
+        let baselineFrames = [];
 
         // Tunggu kilatan layar sebentar (150ms)
         await new Promise(resolve => setTimeout(resolve, 150));
@@ -392,17 +395,34 @@ function startPresenceSimulation() {
                     const earRight = calculateEAR(rightEye);
                     const avgEAR = (earLeft + earRight) / 2.0;
                     
-                    // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
-                    if (avgEAR < 0.17) {
-                        eyesClosed = true;
-                        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Kedipan Terdeteksi!</strong><br>Buka mata Anda kembali...');
-                    } else if (eyesClosed && avgEAR > 0.22) {
-                        blinkDetected = true;
-                        break; // Selesai jika berkedip berhasil dideteksi
-                    }
-                    
-                    if (!eyesClosed) {
-                        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Silakan kedipkan mata Anda sekali...');
+                    // Fase 1: Kalibrasi baseline EAR mata terbuka (ambil rata-rata dari 5 frame awal)
+                    if (baselineFrames.length < 5) {
+                        if (avgEAR > 0.18 && avgEAR < 0.45) {
+                            baselineFrames.push(avgEAR);
+                        }
+                        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> <strong>Kalibrasi Sensor...</strong><br>Harap tatap kamera dengan mata terbuka.');
+                    } else {
+                        if (baselineEAR === 0.0) {
+                            baselineEAR = baselineFrames.reduce((a, b) => a + b, 0) / 5.0;
+                            console.log("Baseline EAR Calibrated:", baselineEAR);
+                        }
+                        
+                        // Menghitung threshold secara adaptif berdasarkan mata pengguna
+                        const closedThreshold = baselineEAR * 0.76; // Turun 24% dari kondisi mata terbuka
+                        const openedThreshold = baselineEAR * 0.88; // Kembali ke 88% dari kondisi mata terbuka
+                        
+                        // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
+                        if (avgEAR < closedThreshold) {
+                            eyesClosed = true;
+                            updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Kedipan Terdeteksi!</strong><br>Buka mata Anda kembali...');
+                        } else if (eyesClosed && avgEAR > openedThreshold) {
+                            blinkDetected = true;
+                            break; // Selesai jika berkedip berhasil dideteksi
+                        }
+                        
+                        if (!eyesClosed) {
+                            updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Silakan kedipkan mata Anda sekali...');
+                        }
                     }
                 } else {
                     updateStatusBox('active', '<i class="bi bi-camera-fill"></i> Wajah tidak terdeteksi. Posisikan wajah Anda.');
