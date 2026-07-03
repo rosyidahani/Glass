@@ -16,7 +16,7 @@
                 <!-- Top Mock Header Bar -->
                 <div class="presensi-top-bar glass-panel">
                     <a href="/presensi" class="btn-back"><i class="bi bi-arrow-left"></i></a>
-                    <span class="bar-title">Presensi mahasiswa</span>
+                    <span class="bar-title" data-translate-id="face_pres_title">Presensi mahasiswa</span>
                     <div class="bar-avatar">
                         <t t-if="mahasiswa.foto_profil">
                             <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile"/>
@@ -37,28 +37,22 @@
                         <div id="cameraFallback" class="camera-fallback">
                             <div class="wireframe-glow"></div>
                             <svg viewBox="0 0 200 200" class="wireframe-face">
-                                <!-- Outer boundary oval -->
                                 <ellipse cx="100" cy="95" rx="55" ry="70" fill="none" stroke="rgba(59, 130, 246, 0.4)" stroke-width="2" stroke-dasharray="5,5" />
-                                <!-- Simplified face silhouette -->
                                 <path d="M70,140 C80,165 120,165 130,140" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2.5" />
                                 <path d="M80,90 C90,100 110,100 120,90" fill="none" stroke="rgba(59, 130, 246, 0.5)" stroke-width="2" />
                                 <circle cx="85" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
                                 <circle cx="115" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
                                 <path d="M100,75 L100,100 L95,102" fill="none" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" />
                             </svg>
-                            <span class="fallback-text"><i class="bi bi-camera-video-off-fill"></i> Kamera tidak aktif / diblokir</span>
+                            <span class="fallback-text"><i class="bi bi-camera-video-off-fill"></i> <span data-translate-id="face_reg_camera_blocked">Kamera tidak aktif / diblokir</span></span>
                         </div>
 
                         <!-- Scan Overlay Frame -->
                         <div class="scan-overlay">
-                            <!-- Glowing Scanner Line (moves down/up) -->
                             <div class="laser-scanner" id="laserScanner"></div>
+                            <div class="face-oval-frame" id="faceOvalFrame"></div>
                             
-                            <!-- The Oval Outline mapping the face area -->
-                            <div class="face-oval-frame" id="faceOvalFrame">
-                            </div>
-
-                            <!-- Real-time Tracking Box (moving around the face) -->
+                            <!-- Real-time Tracking Box -->
                             <div class="face-tracking-box hidden" id="faceTrackingBox" style="position: absolute; border: 2px dashed #3b82f6; border-radius: 12px; width: 120px; height: 120px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.2s ease; z-index: 4;">
                                 <div style="position: absolute; top: -5px; left: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
                                 <div style="position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-right: 3px solid #3b82f6;"></div>
@@ -71,15 +65,15 @@
                         <div class="interactive-indicators hidden" id="interactiveIndicators" style="position: absolute; bottom: 15px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 6; pointer-events: none;">
                             <!-- Distance Indicator -->
                             <div id="distanceIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
-                                <i class="bi bi-arrows-expand" id="distanceIcon"></i> <span id="distanceText">Jarak Wajah: Mendeteksi...</span>
+                                <i class="bi bi-arrows-expand" id="distanceIcon"></i> <span id="distanceText" data-translate-id="face_reg_distance_detecting">Jarak Wajah: Mendeteksi...</span>
                             </div>
                             <!-- Pose/Liveness Guide -->
                             <div id="poseIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
-                                <i class="bi bi-person-badge" id="poseIcon"></i> <span id="poseText">Petunjuk: Posisikan Wajah Anda</span>
+                                <i class="bi bi-person-badge" id="poseIcon"></i> <span id="poseText" data-translate-id="face_reg_pose_instruction">Petunjuk: Posisikan Wajah Anda</span>
                             </div>
                         </div>
 
-                        <!-- Vector Success Checklist SVG (Hidden initially) -->
+                        <!-- Vector Success Checklist SVG -->
                         <div class="success-checkmark-overlay hidden" id="successCheckmark">
                             <div class="checkmark-circle-glow">
                                 <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -87,21 +81,21 @@
                                     <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                                 </svg>
                             </div>
-                            <h3>Presensi Sukses!</h3>
-                            <p id="successMessage">Selamat belajar, presensi Anda telah terekam.</p>
+                            <h3 data-translate-id="face_pres_success_title">Presensi Sukses!</h3>
+                            <p id="successMessage" data-translate-id="face_pres_success_desc">Selamat belajar, presensi Anda telah terekam.</p>
                         </div>
 
                         <!-- Micro Info Box on Scanner Top -->
                         <div class="scanner-status-box" id="scannerStatusBox">
-                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> Menunggu Pemindaian...</span>
+                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> <span data-translate-id="face_pres_status_waiting">Menunggu Pemindaian...</span></span>
                         </div>
                     </div>
 
-                    <!-- Scan Oval Button at center-bottom of scanner block -->
+                    <!-- Scan Oval Button -->
                     <div class="scanner-action">
                         <button type="button" class="btn-scan-oval" id="btnMulaiPresensi" onclick="startPresenceSimulation()">
-                            <span class="btn-text">Mulai Presensi</span>
-                            <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> memproses...</span>
+                            <span class="btn-text" data-translate-id="face_pres_btn_text">Mulai Presensi</span>
+                            <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> <span data-translate-id="face_pres_btn_loader">memproses...</span></span>
                         </button>
                     </div>
                 </div>
@@ -109,17 +103,17 @@
                 <!-- Bottom Stats Card -->
                 <div class="student-info-card glass-panel">
                     <div class="info-row">
-                        <div class="info-label">Nama</div>
+                        <div class="info-label" data-translate-id="pre_info_name">Nama</div>
                         <div class="info-separator">:</div>
                         <div class="info-value text-highlight"><t t-esc="mahasiswa.name"/></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">Nim</div>
+                        <div class="info-label" data-translate-id="pre_info_nim">Nim</div>
                         <div class="info-separator">:</div>
                         <div class="info-value"><t t-esc="mahasiswa.nim"/></div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">Matkul</div>
+                        <div class="info-label" data-translate-id="pre_info_course">Matkul</div>
                         <div class="info-separator">:</div>
                         <div class="info-value text-accent"><t t-esc="course['name']"/></div>
                     </div>

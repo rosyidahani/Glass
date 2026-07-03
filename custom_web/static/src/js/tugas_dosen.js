@@ -142,6 +142,8 @@ async function loadTugasDetailAndSubmissions(taskId) {
         var descEl = document.getElementById("detail-spec-desc");
         var hudTitle = document.getElementById("detail-hud-title");
 
+        const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
+
         if (titleEl) titleEl.innerText = task.title;
         if (hudTitle) hudTitle.innerText = task.title;
         if (subjectEl) {
@@ -154,7 +156,7 @@ async function loadTugasDetailAndSubmissions(taskId) {
             typeEl.innerText = task.type;
             typeEl.className = "badge-tag outline";
         }
-        if (deadlineEl) deadlineEl.innerHTML = '<i class="bi bi-clock-fill"></i> Batas Waktu: ' + task.deadline;
+        if (deadlineEl) deadlineEl.innerHTML = '<i class="bi bi-clock-fill"></i> ' + (isEng ? 'Deadline: ' : 'Batas Waktu: ') + task.deadline;
         if (descEl) descEl.innerText = task.desc;
 
         // Populate optional file materi
@@ -181,7 +183,7 @@ async function loadTugasDetailAndSubmissions(taskId) {
                 <tr>
                     <td colspan="6" class="text-center py-40 text-muted font-bold">
                         <i class="bi bi-folder-x" style="font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.5;"></i>
-                        Belum ada pengumpulan tugas dari mahasiswa untuk saat ini.
+                        ${isEng ? 'No task submissions from students at this time.' : 'Belum ada pengumpulan tugas dari mahasiswa untuk saat ini.'}
                     </td>
                 </tr>
             `;
@@ -192,19 +194,19 @@ async function loadTugasDetailAndSubmissions(taskId) {
         task.submissions.forEach(function(sub) {
             var fileBtn = "";
             if (sub.type === "zip") {
-                fileBtn = `<a href="${sub.file}" class="btn-zip-download" download onclick="showToast('Mengunduh', 'Unduhan untuk jawaban ${sub.name} akan dimulai...', 'bi-cloud-download text-primary');"><i class="bi bi-file-earmark-zip-fill"></i> Unduh ZIP</a>`;
+                fileBtn = `<a href="${sub.file}" class="btn-zip-download" download onclick="showToast('${isEng ? 'Downloading' : 'Mengunduh'}', '${isEng ? 'Download for ' + sub.name + '\'s answer will start...' : 'Unduhan untuk jawaban ' + sub.name + ' akan dimulai...'}', 'bi-cloud-download text-primary');"><i class="bi bi-file-earmark-zip-fill"></i> ${isEng ? 'Download ZIP' : 'Unduh ZIP'}</a>`;
             } else {
-                fileBtn = `<a href="${sub.file}" target="_blank" class="btn-link-view"><i class="bi bi-link-45deg"></i> Buka Tautan</a>`;
+                fileBtn = `<a href="${sub.file}" target="_blank" class="btn-link-view"><i class="bi bi-link-45deg"></i> ${isEng ? 'Open Link' : 'Buka Tautan'}</a>`;
             }
 
             var gradeBadge = "";
             var gradeInput = "";
 
             if (sub.status === "graded") {
-                gradeBadge = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> Dinilai (${sub.grade})</span>`;
+                gradeBadge = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> ${isEng ? 'Graded' : 'Dinilai'} (${sub.grade})</span>`;
                 gradeInput = `<input type="number" class="input-grade" value="${sub.grade}" min="0" max="100"/>`;
             } else {
-                gradeBadge = `<span class="grade-badge pending"><i class="bi bi-hourglass-split"></i> Belum Dinilai</span>`;
+                gradeBadge = `<span class="grade-badge pending"><i class="bi bi-hourglass-split"></i> ${isEng ? 'Ungraded' : 'Belum Dinilai'}</span>`;
                 gradeInput = `<input type="number" class="input-grade" placeholder="-" min="0" max="100"/>`;
             }
 
@@ -236,24 +238,26 @@ async function loadTugasDetailAndSubmissions(taskId) {
 
     } catch (error) {
         console.error(error);
-        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+        const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
+        showToast("Error", isEng ? "Connection to server failed." : "Koneksi ke server gagal.", "bi-wifi-off text-danger");
     }
 }
 
 // Interactive Grade Submission
 async function saveGrade(subId, studentName, btn) {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     var wrapper = btn.closest(".grading-input-wrapper");
     var input = wrapper.querySelector(".input-grade");
     var scoreValue = input.value.trim();
 
     if (!scoreValue) {
-        showToast("Error", "Harap masukkan nilai tugas terlebih dahulu!", "bi-exclamation-triangle-fill text-danger");
+        showToast("Error", isEng ? "Please enter the grade first!" : "Harap masukkan nilai tugas terlebih dahulu!", "bi-exclamation-triangle-fill text-danger");
         return;
     }
 
     var score = parseInt(scoreValue);
     if (isNaN(score) || score < 0 || score > 100) {
-        showToast("Error", "Nilai harus berupa angka antara 0 dan 100!", "bi-exclamation-triangle-fill text-danger");
+        showToast("Error", isEng ? "Grade must be a number between 0 and 100!" : "Nilai harus berupa angka antara 0 dan 100!", "bi-exclamation-triangle-fill text-danger");
         return;
     }
 
@@ -274,31 +278,32 @@ async function saveGrade(subId, studentName, btn) {
                 // Update table badge status
                 var tr = btn.closest("tr");
                 var statusTd = tr.querySelector(".status-td");
-                statusTd.innerHTML = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> Dinilai (${score})</span>`;
+                statusTd.innerHTML = `<span class="grade-badge graded"><i class="bi bi-check-circle-fill"></i> ${isEng ? 'Graded' : 'Dinilai'} (${score})</span>`;
                 
                 // Success Toast
-                showToast("Penilaian Sukses!", "Nilai tugas " + studentName + " berhasil disimpan: " + score, "bi-patch-check-fill text-success");
+                showToast(isEng ? "Grading Success!" : "Penilaian Sukses!", isEng ? "Grade for " + studentName + " saved successfully: " + score : "Nilai tugas " + studentName + " berhasil disimpan: " + score, "bi-patch-check-fill text-success");
             }, 200);
         } else {
-            showToast("Error", data.message || "Gagal menyimpan nilai.", "bi-exclamation-triangle-fill text-danger");
+            showToast("Error", data.message || (isEng ? "Failed to save grade." : "Gagal menyimpan nilai."), "bi-exclamation-triangle-fill text-danger");
         }
     } catch (e) {
         console.error(e);
-        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+        showToast("Error", isEng ? "Connection to server failed." : "Koneksi ke server gagal.", "bi-wifi-off text-danger");
     }
 }
 
 // Original helper functions
 function toggleDetails(btn) {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     var card = btn.closest(".tugas-item");
     var details = card.querySelector(".collapsed-details");
     
     if (details.classList.contains("open")) {
         details.classList.remove("open");
-        btn.innerHTML = '<i class="bi bi-chevron-down"></i> Detail';
+        btn.innerHTML = '<i class="bi bi-chevron-down"></i> ' + (isEng ? 'Detail' : 'Detail');
     } else {
         details.classList.add("open");
-        btn.innerHTML = '<i class="bi bi-chevron-up"></i> Tutup';
+        btn.innerHTML = '<i class="bi bi-chevron-up"></i> ' + (isEng ? 'Close' : 'Tutup');
     }
 }
 
@@ -329,7 +334,8 @@ function showToast(title, message, iconClass) {
 }
 
 async function deleteMockTask(id) {
-    if (!confirm("Apakah Anda yakin ingin menghapus tugas ini?")) return;
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
+    if (!confirm(isEng ? "Are you sure you want to delete this assignment?" : "Apakah Anda yakin ingin menghapus tugas ini?")) return;
     
     try {
         let res = await fetch('/api/tugas/hapus', {
@@ -347,19 +353,20 @@ async function deleteMockTask(id) {
                 setTimeout(function() {
                     el.remove();
                     updateDosenTugasStats();
-                    showToast("Tugas Dihapus", "Tugas berhasil dihapus.", "bi-trash3-fill text-danger");
+                    showToast(isEng ? "Assignment Deleted" : "Tugas Dihapus", isEng ? "Assignment successfully deleted." : "Tugas berhasil dihapus.", "bi-trash3-fill text-danger");
                 }, 300);
             }
         } else {
-            showToast("Error", "Gagal menghapus tugas.", "bi-exclamation-triangle-fill text-danger");
+            showToast("Error", isEng ? "Failed to delete assignment." : "Gagal menghapus tugas.", "bi-exclamation-triangle-fill text-danger");
         }
     } catch (e) {
         console.error(e);
-        showToast("Error", "Koneksi ke server gagal.", "bi-wifi-off text-danger");
+        showToast("Error", isEng ? "Connection to server failed." : "Koneksi ke server gagal.", "bi-wifi-off text-danger");
     }
 }
 
 function editMockTask(id) {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     var el = document.querySelector(`[data-id="${id}"]`);
     if (!el) return;
 
@@ -379,7 +386,7 @@ function editMockTask(id) {
     document.getElementById("form-buat-tugas").scrollIntoView({ behavior: "smooth" });
     el.remove();
     updateDosenTugasStats();
-    showToast("Mode Edit", "Detail tugas dimuat ke formulir.", "bi-pencil-square text-primary");
+    showToast(isEng ? "Edit Mode" : "Mode Edit", isEng ? "Assignment details loaded to form." : "Detail tugas dimuat ke formulir.", "bi-pencil-square text-primary");
 }
 
 function updateDosenTugasStats() {

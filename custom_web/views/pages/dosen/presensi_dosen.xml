@@ -499,7 +499,7 @@
                         </div>
                     </div>
                     <a href="/dosen/presensi" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_btn_back_menu">Kembali ke Menu</span>
                     </a>
                 </div>
 
@@ -509,28 +509,28 @@
                         <span class="stat-icon"><i class="bi bi-person-check-fill"></i></span>
                         <div class="stat-info">
                             <span class="stat-num"><t t-esc="len(hadir_ids)"/></span>
-                            <span class="stat-lbl">Sudah Hadir</span>
+                            <span class="stat-lbl" data-translate-id="dosen_pres_stat_present">Sudah Hadir</span>
                         </div>
                     </div>
                     <div class="aktif-stat-card amber">
                         <span class="stat-icon"><i class="bi bi-person-x-fill"></i></span>
                         <div class="stat-info">
                             <span class="stat-num"><t t-esc="total_mhs - len(hadir_ids)"/></span>
-                            <span class="stat-lbl">Belum Hadir</span>
+                            <span class="stat-lbl" data-translate-id="dosen_pres_stat_absent">Belum Hadir</span>
                         </div>
                     </div>
                     <div class="aktif-stat-card blue">
                         <span class="stat-icon"><i class="bi bi-people-fill"></i></span>
                         <div class="stat-info">
                             <span class="stat-num"><t t-esc="total_mhs"/></span>
-                            <span class="stat-lbl">Total Mahasiswa</span>
+                            <span class="stat-lbl" data-translate-id="dosen_pres_stat_total_students">Total Mahasiswa</span>
                         </div>
                     </div>
                     <div class="aktif-stat-card purple">
                         <span class="stat-icon"><i class="bi bi-clock-fill"></i></span>
                         <div class="stat-info">
                             <span class="stat-num time-format"><span t-field="sesi.waktu_buka" t-options="{'widget': 'datetime', 'format': 'HH:mm'}"/></span>
-                            <span class="stat-lbl">Waktu Buka</span>
+                            <span class="stat-lbl" data-translate-id="dosen_presensi_open_time">Waktu Buka</span>
                         </div>
                     </div>
                 </div>
@@ -541,11 +541,11 @@
                     <div class="aktif-tab-header">
                         <button id="tab-btn-hadir" class="aktif-tab-btn active" data-tab="tab-panel-hadir">
                             <i class="bi bi-person-check"></i>
-                            Sudah Hadir (<t t-esc="len(hadir_ids)"/>)
+                            <span data-translate-id="dosen_pres_stat_present">Sudah Hadir</span> (<t t-esc="len(hadir_ids)"/>)
                         </button>
                         <button id="tab-btn-belum" class="aktif-tab-btn" data-tab="tab-panel-belum">
                             <i class="bi bi-person-dash"></i>
-                            Belum Hadir (<t t-esc="total_mhs - len(hadir_ids)"/>)
+                            <span data-translate-id="dosen_pres_stat_absent">Belum Hadir</span> (<t t-esc="total_mhs - len(hadir_ids)"/>)
                         </button>
                     </div>
 
@@ -555,17 +555,17 @@
                             <table class="modern-table">
                                 <thead>
                                     <tr>
-                                        <th>Nama Mahasiswa</th>
-                                        <th>NIM</th>
-                                        <th>Waktu Presensi</th>
-                                        <th>Status</th>
-                                        <th>Metode</th>
+                                        <th data-translate-id="pre_info_name">Nama Mahasiswa</th>
+                                        <th data-translate-id="pre_info_nim">NIM</th>
+                                        <th data-translate-id="dosen_pres_th_time">Waktu Presensi</th>
+                                        <th data-translate-id="dosen_pres_th_status">Status</th>
+                                        <th data-translate-id="dosen_pres_th_method">Metode</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <t t-if="not hadir_records">
                                         <tr class="row-empty">
-                                            <td colspan="5">Belum ada mahasiswa yang hadir pada sesi ini.</td>
+                                            <td colspan="5" data-translate-id="dosen_pres_no_students_present">Belum ada mahasiswa yang hadir pada sesi ini.</td>
                                         </tr>
                                     </t>
                                     <t t-else="">
@@ -576,18 +576,18 @@
                                                 <td class="time-format"><span t-field="r.waktu_presensi" t-options="{'widget': 'datetime', 'format': 'HH:mm:ss'}"/></td>
                                                 <td>
                                                     <t t-if="r.status_kehadiran == 'tepat_waktu'">
-                                                        <span class="badge online">Tepat Waktu</span>
+                                                        <span class="badge online" data-translate-id="dosen_pres_status_present">Tepat Waktu</span>
                                                     </t>
                                                     <t t-else="">
-                                                        <span class="badge offline">Terlambat</span>
+                                                        <span class="badge offline" data-translate-id="dosen_pres_status_late">Terlambat</span>
                                                     </t>
                                                 </td>
                                                 <td>
                                                     <t t-if="r.is_manual">
-                                                        <span class="badge-text manual"><i class="bi bi-pencil-square"></i> Manual</span>
+                                                        <span class="badge-text manual"><i class="bi bi-pencil-square"></i> <span data-translate-id="dosen_pres_method_manual">Manual</span></span>
                                                     </t>
                                                     <t t-else="">
-                                                        <span class="badge-text auto"><i class="bi bi-phone"></i> Mandiri</span>
+                                                        <span class="badge-text auto"><i class="bi bi-phone"></i> <span data-translate-id="dosen_pres_method_auto">Mandiri</span></span>
                                                     </t>
                                                 </td>
                                             </tr>
@@ -621,7 +621,7 @@
                             <t t-if="belum_hadir_count == 0">
                                 <div class="empty-state" style="padding: 40px 20px;">
                                     <i class="bi bi-check-circle-fill" style="font-size: 2.5rem; color: #10b981;"></i>
-                                    <p>Semua mahasiswa sudah melakukan presensi!</p>
+                                    <p data-translate-id="dosen_pres_all_students_present">Semua mahasiswa sudah melakukan presensi!</p>
                                 </div>
                             </t>
                         </div>
@@ -629,7 +629,7 @@
                         <!-- Sticky Batch Submit Button -->
                         <div id="batch-submit-bar" class="batch-submit-container hidden">
                             <button type="button" id="btn-submit-batch-presensi" class="btn-submit-batch" t-att-data-sesi-id="sesi.id">
-                                <i class="bi bi-person-check-fill"></i> Simpan Kehadiran (<span id="batch-count">0</span> terpilih)
+                                <i class="bi bi-person-check-fill"></i> <span data-translate-id="dosen_pres_btn_save_attendance">Simpan Kehadiran</span> (<span id="batch-count">0</span> <span data-translate-id="dosen_pres_selected">terpilih</span>)
                             </button>
                         </div>
                     </div>
@@ -638,7 +638,7 @@
                 <!-- Tombol Aksi Bawah -->
                 <div class="aktif-detail-actions">
                     <button type="button" class="btn-tutup-sesi" t-att-data-id="sesi.id" style="max-width: 300px; margin: 0 auto;">
-                        <i class="bi bi-stop-circle-fill"></i> Tutup Sesi Presensi
+                        <i class="bi bi-stop-circle-fill"></i> <span data-translate-id="dosen_presensi_btn_close">Tutup Sesi Presensi</span>
                     </button>
                 </div>
 

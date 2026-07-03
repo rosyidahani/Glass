@@ -14,13 +14,13 @@
             <div class="presensi-scan-container">
                 <!-- Top Mock Header Bar -->
                 <div class="presensi-top-bar glass-panel">
-                    <span class="bar-title" style="margin-left: 15px;">Registrasi Face ID</span>
+                    <span class="bar-title" style="margin-left: 15px;" data-translate-id="face_reg_title">Registrasi Face ID</span>
                 </div>
 
                 <!-- Main Camera/Scanner Card -->
                 <div class="scanner-card glass-panel" id="scannerCard">
                     <div class="camera-wrapper">
-                        <!-- Real Camera Video Element -->
+                        <!-- Video Webcam -->
                         <video id="webcam" autoplay="true" playsinline="true" class="webcam-feed hidden"></video>
 
                         <!-- Fallback Wireframe Scanner Illustration (SVG) -->
@@ -34,7 +34,7 @@
                                 <circle cx="115" cy="80" r="4" fill="rgba(59, 130, 246, 0.6)" />
                                 <path d="M100,75 L100,100 L95,102" fill="none" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" />
                             </svg>
-                            <span class="fallback-text"><i class="bi bi-camera-video-off-fill"></i> Kamera tidak aktif / diblokir</span>
+                            <span class="fallback-text"><i class="bi bi-camera-video-off-fill"></i> <span data-translate-id="face_reg_camera_blocked">Kamera tidak aktif / diblokir</span></span>
                         </div>
 
                         <!-- Scan Overlay Frame -->
@@ -42,7 +42,7 @@
                             <div class="laser-scanner" id="laserScanner"></div>
                             <div class="face-oval-frame" id="faceOvalFrame"></div>
                             
-                            <!-- Real-time Tracking Box (moving around the face) -->
+                            <!-- Real-time Tracking Box -->
                             <div class="face-tracking-box hidden" id="faceTrackingBox" style="position: absolute; border: 2px dashed #3b82f6; border-radius: 12px; width: 120px; height: 120px; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all 0.2s ease; z-index: 4;">
                                 <div style="position: absolute; top: -5px; left: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-left: 3px solid #3b82f6;"></div>
                                 <div style="position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border-top: 3px solid #3b82f6; border-right: 3px solid #3b82f6;"></div>
@@ -55,11 +55,11 @@
                         <div class="interactive-indicators hidden" id="interactiveIndicators" style="position: absolute; bottom: 15px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 6; pointer-events: none;">
                             <!-- Distance Indicator -->
                             <div id="distanceIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
-                                <i class="bi bi-arrows-expand" id="distanceIcon"></i> <span id="distanceText">Jarak Wajah: Mendeteksi...</span>
+                                <i class="bi bi-arrows-expand" id="distanceIcon"></i> <span id="distanceText" data-translate-id="face_reg_distance_detecting">Jarak Wajah: Mendeteksi...</span>
                             </div>
                             <!-- Pose/Liveness Guide -->
                             <div id="poseIndicator" class="indicator-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;">
-                                <i class="bi bi-person-badge" id="poseIcon"></i> <span id="poseText">Petunjuk: Posisikan Wajah Anda</span>
+                                <i class="bi bi-person-badge" id="poseIcon"></i> <span id="poseText" data-translate-id="face_reg_pose_instruction">Petunjuk: Posisikan Wajah Anda</span>
                             </div>
                         </div>
 
@@ -71,21 +71,21 @@
                                     <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                                 </svg>
                             </div>
-                            <h3>Registrasi Berhasil!</h3>
-                            <p id="successMessage">Data wajah Anda telah terdaftar dalam sistem.</p>
+                            <h3 data-translate-id="face_reg_success_title">Registrasi Berhasil!</h3>
+                            <p id="successMessage" data-translate-id="face_reg_success_desc">Data wajah Anda telah terdaftar dalam sistem.</p>
                         </div>
 
                         <!-- Micro Info Box on Scanner Top -->
                         <div class="scanner-status-box" id="scannerStatusBox">
-                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> Posisikan wajah Anda pada area lingkaran</span>
+                            <span id="statusMessage"><i class="bi bi-camera-fill"></i> <span data-translate-id="face_reg_oval_status">Posisikan wajah Anda pada area lingkaran</span></span>
                         </div>
                     </div>
 
                     <!-- Action Button -->
                     <div class="scanner-action">
                         <button type="button" class="btn-scan-oval" id="btnMulaiRegistrasi" onclick="startFaceRegistration()">
-                            <span class="btn-text">Daftarkan Wajah</span>
-                            <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> memproses...</span>
+                            <span class="btn-text" data-translate-id="face_reg_btn_text">Daftarkan Wajah</span>
+                            <span class="btn-loader hidden"><i class="bi bi-arrow-repeat spin"></i> <span data-translate-id="face_reg_btn_loader">memproses...</span></span>
                         </button>
                     </div>
                 </div>
@@ -93,13 +93,13 @@
                 <!-- Bottom Instructions Card -->
                 <div class="student-info-card glass-panel" style="padding: 18px;">
                     <h4 style="margin-top: 0; color: var(--accent-color); font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                        <i class="bi bi-info-circle-fill"></i> Petunjuk Registrasi Wajah
+                        <i class="bi bi-info-circle-fill"></i> <span data-translate-id="face_reg_instructions_title">Petunjuk Registrasi Wajah</span>
                     </h4>
                     <ul style="margin: 8px 0 0 0; padding-left: 20px; font-size: 13px; color: var(--text-color); opacity: 0.85; line-height: 1.6;">
-                        <li>Pastikan wajah Anda terlihat jelas dengan pencahayaan yang cukup.</li>
-                        <li>Jangan menggunakan kacamata hitam, masker, atau topi.</li>
-                        <li>Posisikan wajah tepat di dalam bingkai oval di atas.</li>
-                        <li>Sistem akan mendeteksi dan mengamankan data biometrik wajah Anda untuk kebutuhan absensi otomatis.</li>
+                        <li data-translate-id="face_reg_instruction_1">Pastikan wajah Anda terlihat jelas dengan pencahayaan yang cukup.</li>
+                        <li data-translate-id="face_reg_instruction_2">Jangan menggunakan kacamata hitam, masker, atau topi.</li>
+                        <li data-translate-id="face_reg_instruction_3">Posisikan wajah tepat di dalam bingkai oval di atas.</li>
+                        <li data-translate-id="face_reg_instruction_4">Sistem akan mendeteksi dan mengamankan data biometrik wajah Anda untuk kebutuhan absensi otomatis.</li>
                     </ul>
                 </div>
             </div>

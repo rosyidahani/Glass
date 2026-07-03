@@ -53,12 +53,13 @@ var latestFaceDescriptor = null;
 
 // Fungsi memuat model face-api.js dari CDN
 function loadFaceApiModels(onSuccess, onFailure) {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     if (modelsLoaded) {
         if (onSuccess) onSuccess();
         return;
     }
     
-    updateStatusBox('camera-active', '<i class="bi bi-cpu spin"></i> Memuat Model AI...');
+    updateStatusBox('camera-active', '<i class="bi bi-cpu spin"></i> ' + (isEng ? 'Loading AI Models...' : 'Memuat Model AI...'));
     
     // Memuat bobot model dari CDN jsDelivr
     const weightsUrl = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
@@ -75,12 +76,13 @@ function loadFaceApiModels(onSuccess, onFailure) {
     })
     .catch(function(err) {
         console.error("Gagal memuat model AI:", err);
-        updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> Gagal memuat model AI. Silakan refresh halaman.');
+        updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> ' + (isEng ? 'Failed to load AI models. Please refresh the page.' : 'Gagal memuat model AI. Silakan refresh halaman.'));
         if (onFailure) onFailure(err);
     });
 }
 
 function initWebcam() {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     var video = document.getElementById('webcam');
     var fallback = document.getElementById('cameraFallback');
     
@@ -101,23 +103,24 @@ function initWebcam() {
             if (fallback) {
                 fallback.classList.add('hidden');
             }
-            updateStatusBox('camera-active', '<i class="bi bi-camera-fill"></i> Kamera Siap. Posisikan wajah Anda.');
+            updateStatusBox('camera-active', '<i class="bi bi-camera-fill"></i> ' + (isEng ? 'Camera Ready. Position your face.' : 'Kamera Siap. Posisikan wajah Anda.'));
             
             // Mulai loop pelacakan wajah real-time
             startFaceTracking();
         })
         .catch(function(err) {
             console.warn("Akses kamera ditolak atau tidak tersedia: ", err);
-            updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> Kamera diblokir. Harap izinkan akses kamera.');
+            updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> ' + (isEng ? 'Camera blocked. Please allow camera access.' : 'Kamera diblokir. Harap izinkan akses kamera.'));
         });
     } else {
-        updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> Browser tidak mendukung webcam.');
+        updateStatusBox('camera-denied', '<i class="bi bi-exclamation-triangle-fill"></i> ' + (isEng ? 'Browser does not support webcam.' : 'Browser tidak mendukung webcam.'));
     }
 }
 
 // --- Analisis Wajah (Jarak, Posisi Tengah, Pose Lurus) ---
 function analyzeFace(detection, video) {
-    if (!detection) return { ok: false, reason: "Wajah tidak terdeteksi" };
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
+    if (!detection) return { ok: false, reason: isEng ? "Face not detected" : "Wajah tidak terdeteksi" };
 
     const box = detection.detection.box;
     const videoWidth = video.videoWidth || video.clientWidth || 640;
@@ -126,15 +129,15 @@ function analyzeFace(detection, video) {
     // 1. Cek Jarak Wajah (Lebar Box dibanding Lebar Video)
     const boxWidthRatio = box.width / videoWidth;
     let distanceOk = true;
-    let distanceMsg = "Jarak Sesuai";
+    let distanceMsg = isEng ? "Distance OK" : "Jarak Sesuai";
     let distanceStatus = "ok";
     if (boxWidthRatio < 0.28) {
         distanceOk = false;
-        distanceMsg = "Terlalu Jauh, Mendekatlah";
+        distanceMsg = isEng ? "Too Far, Move Closer" : "Terlalu Jauh, Mendekatlah";
         distanceStatus = "too-far";
     } else if (boxWidthRatio > 0.55) {
         distanceOk = false;
-        distanceMsg = "Terlalu Dekat, Menjauhlah";
+        distanceMsg = isEng ? "Too Close, Move Back" : "Terlalu Dekat, Menjauhlah";
         distanceStatus = "too-close";
     }
 
@@ -146,15 +149,15 @@ function analyzeFace(detection, video) {
     const devX = Math.abs(boxCenterX - videoCenterX) / videoWidth;
     const devY = Math.abs(boxCenterY - videoCenterY) / videoHeight;
     let positionOk = true;
-    let positionMsg = "Posisi Tengah";
+    let positionMsg = isEng ? "Centered" : "Posisi Tengah";
     if (devX > 0.12 || devY > 0.15) {
         positionOk = false;
-        positionMsg = "Posisikan Wajah di Tengah";
+        positionMsg = isEng ? "Center Your Face" : "Posisikan Wajah di Tengah";
     }
 
     // 3. Cek Pose (Menghadap Lurus) menggunakan Landmarks 68 titik
     let poseOk = true;
-    let poseMsg = "Menghadap Lurus";
+    let poseMsg = isEng ? "Pose OK" : "Menghadap Lurus";
     let ratio = 1.0;
     if (detection.landmarks) {
         const nose = detection.landmarks.getNose()[3]; // Ujung hidung
@@ -168,7 +171,7 @@ function analyzeFace(detection, video) {
         // Ratio ideal adalah ~1.0 jika lurus. Toleransi antara 0.65 - 1.5.
         if (ratio < 0.65 || ratio > 1.5) {
             poseOk = false;
-            poseMsg = "Hadapkan Wajah Lurus ke Depan";
+            poseMsg = isEng ? "Face Straight Ahead" : "Hadapkan Wajah Lurus ke Depan";
         }
     }
 
@@ -188,6 +191,7 @@ function analyzeFace(detection, video) {
 
 // --- Perbarui Badge Indikator di Layar ---
 function updateIndicators(analysis) {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     const distBadge = document.getElementById('distanceIndicator');
     const distText = document.getElementById('distanceText');
     const distIcon = document.getElementById('distanceIcon');
@@ -195,15 +199,15 @@ function updateIndicators(analysis) {
     const poseText = document.getElementById('poseText');
     const poseIcon = document.getElementById('poseIcon');
 
-    if (!analysis || (analysis.ok === false && analysis.reason === "Wajah tidak terdeteksi")) {
+    if (!analysis || (analysis.ok === false && analysis.reason === (isEng ? "Face not detected" : "Wajah tidak terdeteksi"))) {
         if (distBadge) {
             distBadge.style.background = 'rgba(15, 23, 42, 0.75)';
-            if (distText) distText.innerText = "Jarak Wajah: Mendeteksi...";
+            if (distText) distText.innerText = isEng ? "Face Distance: Detecting..." : "Jarak Wajah: Mendeteksi...";
             if (distIcon) distIcon.className = "bi bi-arrows-expand";
         }
         if (poseBadge) {
             poseBadge.style.background = 'rgba(15, 23, 42, 0.75)';
-            if (poseText) poseText.innerText = "Petunjuk: Posisikan Wajah Anda";
+            if (poseText) poseText.innerText = isEng ? "Instructions: Position Your Face" : "Petunjuk: Posisikan Wajah Anda";
             if (poseIcon) poseIcon.className = "bi bi-person-badge";
         }
         return;
@@ -213,7 +217,7 @@ function updateIndicators(analysis) {
     if (distBadge && distText) {
         if (analysis.distanceOk) {
             distBadge.style.background = 'rgba(34, 197, 94, 0.85)'; // Hijau
-            distText.innerText = "Jarak Wajah: Sesuai";
+            distText.innerText = isEng ? "Face Distance: OK" : "Jarak Wajah: Sesuai";
             if (distIcon) distIcon.className = "bi bi-check-circle-fill";
         } else {
             distBadge.style.background = 'rgba(239, 68, 68, 0.85)'; // Merah
@@ -226,7 +230,7 @@ function updateIndicators(analysis) {
     if (poseBadge && poseText) {
         if (analysis.positionOk && analysis.poseOk) {
             poseBadge.style.background = 'rgba(34, 197, 94, 0.85)'; // Hijau
-            poseText.innerText = "Posisi & Pose: Sesuai";
+            poseText.innerText = isEng ? "Position & Pose: OK" : "Posisi & Pose: Sesuai";
             if (poseIcon) poseIcon.className = "bi bi-check-circle-fill";
         } else {
             poseBadge.style.background = 'rgba(245, 158, 11, 0.85)'; // Jingga
@@ -350,12 +354,13 @@ function startPresenceSimulation() {
     }
 
     async function proceedWithFaceCheck(lat, lon, isMock, accuracy) {
+        const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
         latestFaceDescriptor = null; // Bersihkan cache data wajah sebelum pemindaian aktif
-        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> Menyiapkan kamera...');
+        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> ' + (isEng ? 'Preparing camera...' : 'Menyiapkan kamera...'));
         
         var video = document.getElementById('webcam');
         if (!video) {
-            triggerScanFailure("Kamera tidak ditemukan.");
+            triggerScanFailure(isEng ? "Camera not found." : "Kamera tidak ditemukan.");
             return;
         }
 
@@ -368,7 +373,7 @@ function startPresenceSimulation() {
         document.body.style.transition = 'background-color 0.2s ease';
         document.body.style.backgroundColor = '#ffffff'; // Kilatan putih penuh (Flash)
 
-        updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Mengkalibrasi sensor mata...');
+        updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Liveness Detection' : 'Deteksi Liveness'}</strong><br>${isEng ? 'Calibrating eye sensors...' : 'Mengkalibrasi sensor mata...'}`);
 
         let detectedDescriptor = null;
         let attempts = 0;
@@ -411,7 +416,7 @@ function startPresenceSimulation() {
                         if (avgEAR > 0.14 && avgEAR < 0.48) {
                             baselineFrames.push(avgEAR);
                         }
-                        updateStatusBox('active', '<i class="bi bi-cpu spin"></i> <strong>Kalibrasi Sensor...</strong><br>Harap tatap kamera dengan mata terbuka.');
+                        updateStatusBox('active', `<i class="bi bi-cpu spin"></i> <strong>${isEng ? 'Sensor Calibration...' : 'Kalibrasi Sensor...'}</strong><br>${isEng ? 'Please look at the camera with eyes open.' : 'Harap tatap kamera dengan mata terbuka.'}`);
                     } else {
                         if (baselineEAR === 0.0) {
                             if (baselineFrames.length > 0) {
@@ -429,18 +434,18 @@ function startPresenceSimulation() {
                         // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
                         if (avgEAR < closedThreshold) {
                             eyesClosed = true;
-                            updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Kedipan Terdeteksi!</strong><br>Buka mata Anda kembali...');
+                            updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Blink Detected!' : 'Kedipan Terdeteksi!'}</strong><br>${isEng ? 'Open your eyes again...' : 'Buka mata Anda kembali...'}`);
                         } else if (eyesClosed && avgEAR > openedThreshold) {
                             blinkDetected = true;
                             break; // Selesai jika berkedip berhasil dideteksi
                         }
                         
                         if (!eyesClosed) {
-                            updateStatusBox('active', '<i class="bi bi-person-video spin"></i> <strong>Deteksi Liveness</strong><br>Silakan kedipkan mata Anda sekali...');
+                            updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Liveness Detection' : 'Deteksi Liveness'}</strong><br>${isEng ? 'Please blink your eyes once...' : 'Silakan kedipkan mata Anda sekali...'}`);
                         }
                     }
                 } else {
-                    updateStatusBox('active', '<i class="bi bi-camera-fill"></i> Wajah tidak terdeteksi. Posisikan wajah Anda.');
+                    updateStatusBox('active', `<i class="bi bi-camera-fill"></i> ${isEng ? 'Face not detected. Position your face.' : 'Wajah tidak terdeteksi. Posisikan wajah Anda.'}`);
                 }
             } catch (e) {
                 console.error("Gagal mendeteksi wajah:", e);
@@ -452,7 +457,7 @@ function startPresenceSimulation() {
 
         if (detectedDescriptor && blinkDetected) {
             const faceVectorJSON = JSON.stringify(Array.from(detectedDescriptor));
-            updateStatusBox('active', '<i class="bi bi-cloud-arrow-up-fill spin"></i> Mengirim data verifikasi ke server...');
+            updateStatusBox('active', `<i class="bi bi-cloud-arrow-up-fill spin"></i> ${isEng ? 'Sending verification data to server...' : 'Mengirim data verifikasi ke server...'}`);
             submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVectorJSON);
         } else {
             scannerCard.classList.remove('scanning');
@@ -461,18 +466,19 @@ function startPresenceSimulation() {
             btn.disabled = false;
             startFaceTracking();
             if (detectedDescriptor && !blinkDetected) {
-                triggerScanFailure("Deteksi Liveness Gagal: Kedipan mata tidak terdeteksi. Silakan gunakan wajah asli.");
+                triggerScanFailure(isEng ? "Liveness Detection Failed: Eye blink not detected. Please use a real face." : "Deteksi Liveness Gagal: Kedipan mata tidak terdeteksi. Silakan gunakan wajah asli.");
             } else {
-                triggerScanFailure("Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
+                triggerScanFailure(isEng ? "Face not detected. Please position your face facing the camera." : "Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
             }
         }
     }
     
     if (courseType === 'offline') {
-        updateStatusBox('location-active', '<i class="bi bi-geo-alt-fill spin"></i> Mendeteksi GPS Handphone/Browser Anda...');
+        const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
+        updateStatusBox('location-active', `<i class="bi bi-geo-alt-fill spin"></i> ${isEng ? 'Detecting your phone/browser GPS...' : 'Mendeteksi GPS Handphone/Browser Anda...'}`);
         
         if (!navigator.geolocation) {
-            triggerScanFailure("Sensor lokasi GPS tidak didukung oleh browser Anda.");
+            triggerScanFailure(isEng ? "GPS sensor is not supported by your browser." : "Sensor lokasi GPS tidak didukung oleh browser Anda.");
             return;
         }
         
@@ -487,11 +493,11 @@ function startPresenceSimulation() {
             },
             function(error) {
                 console.error("GPS error:", error);
-                var errorMsg = "Gagal memverifikasi lokasi GPS.";
+                var errorMsg = isEng ? "Failed to verify GPS location." : "Gagal memverifikasi lokasi GPS.";
                 if (error.code === error.PERMISSION_DENIED) {
-                    errorMsg = "Akses lokasi ditolak. Harap aktifkan izin lokasi di browser Anda.";
+                    errorMsg = isEng ? "Location access denied. Please enable location permissions in your browser." : "Akses lokasi ditolak. Harap aktifkan izin lokasi di browser Anda.";
                 } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    errorMsg = "Sinyal GPS tidak tersedia.";
+                    errorMsg = isEng ? "GPS signal unavailable." : "Sinyal GPS tidak tersedia.";
                 }
                 triggerScanFailure(errorMsg);
             },
@@ -549,7 +555,7 @@ function submitCheckInAPI(sesiId, courseName, lat, lon, isMock, accuracy, faceVe
             if (json.result && json.result.status === 'success') {
                 return json.result.data;
             } else {
-                throw new Error((json.result && json.result.message) || (json.error && json.error.message) || 'Gagal merekam presensi.');
+                throw new Error((json.result && json.result.message) || (json.error && json.error.message) || (isEng ? 'Failed to record attendance.' : 'Gagal merekam presensi.'));
             }
         });
     })
@@ -589,6 +595,7 @@ function triggerScanFailure(errorMessage) {
 
 // --- Menangani Keberhasilan Scan & Menampilkan Reward Gamifikasi ---
 function triggerScanSuccess(courseName, data) {
+    const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
     var scannerCard = document.getElementById('scannerCard');
     var successCheckmark = document.getElementById('successCheckmark');
     var btn = document.getElementById('btnMulaiPresensi');
@@ -601,16 +608,26 @@ function triggerScanSuccess(courseName, data) {
     
     var successMsgText = "";
     if (data.status_kehadiran === 'terlambat') {
-        successMsgText = `Presensi Sukses! Namun Anda terlambat (mendapatkan +0 XP / +0 Koin). Tetap semangat!`;
+        successMsgText = isEng 
+            ? `Attendance Successful! But you are late (getting +0 XP / +0 Coins). Keep up the spirit!`
+            : `Presensi Sukses! Namun Anda terlambat (mendapatkan +0 XP / +0 Koin). Tetap semangat!`;
     } else {
         if (data.urutan_hadir === 1) {
-            successMsgText = `🎉 LUAR BIASA! Anda yang Pertama Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
+            successMsgText = isEng
+                ? `🎉 AMAZING! You are the First to Attend! Bonus +${data.xp_didapat} XP and +${data.koin_didapat} Coins received!`
+                : `🎉 LUAR BIASA! Anda yang Pertama Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
         } else if (data.urutan_hadir === 2) {
-            successMsgText = `🎉 LUAR BIASA! Anda yang Kedua Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
+            successMsgText = isEng
+                ? `🎉 AMAZING! You are the Second to Attend! Bonus +${data.xp_didapat} XP and +${data.koin_didapat} Coins received!`
+                : `🎉 LUAR BIASA! Anda yang Kedua Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
         } else if (data.urutan_hadir === 3) {
-            successMsgText = `🎉 LUAR BIASA! Anda yang Ketiga Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
+            successMsgText = isEng
+                ? `🎉 AMAZING! You are the Third to Attend! Bonus +${data.xp_didapat} XP and +${data.koin_didapat} Coins received!`
+                : `🎉 LUAR BIASA! Anda yang Ketiga Hadir! Bonus +${data.xp_didapat} XP dan +${data.koin_didapat} Koin didapatkan!`;
         } else {
-            successMsgText = `Anda berhasil melakukan presensi`;
+            successMsgText = isEng
+                ? `You have successfully recorded attendance`
+                : `Anda berhasil melakukan presensi`;
         }
     }
     
@@ -623,7 +640,7 @@ function triggerScanSuccess(courseName, data) {
     }
     
     if (btn) {
-        btn.innerHTML = '<span class="text-green"><i class="bi bi-check-circle-fill"></i> Presensi Berhasil!</span>';
+        btn.innerHTML = `<span class="text-green"><i class="bi bi-check-circle-fill"></i> ${isEng ? 'Attendance Successful!' : 'Presensi Berhasil!'}</span>`;
         btn.disabled = true;
         btn.style.background = '#e6f4ea';
         btn.style.borderColor = '#34a853';

@@ -58,12 +58,12 @@
                             <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name">Buat &amp; Kelola Tugas</h2>
-                            <p class="dosen-role"><i class="bi bi-pencil-square"></i> Buat tugas baru dan kelola daftar tugas aktif Anda</p>
+                            <h2 class="dosen-name" data-translate-id="dosen_tugas_create_header_title">Buat &amp; Kelola Tugas</h2>
+                            <p class="dosen-role"><i class="bi bi-pencil-square"></i> <span data-translate-id="dosen_tugas_create_header_desc">Buat tugas baru dan kelola daftar tugas aktif Anda</span></p>
                         </div>
                     </div>
                     <a href="/dosen/tugas" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Tugas</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_tugas_btn_back_menu">Kembali ke Menu Tugas</span>
                     </a>
                 </div>
 
@@ -71,13 +71,13 @@
                 <div class="dosen-single-form-layout">
                     <div class="card-header">
                         <span class="header-icon"><i class="bi bi-journal-plus"></i></span>
-                        <h3>Buat Tugas Baru</h3>
+                        <h3 data-translate-id="dosen_btn_create_task">Buat Tugas Baru</h3>
                     </div>
                     <form id="form-buat-tugas" class="modern-form" onsubmit="return false;">
                         <div class="form-group">
-                            <label for="mk_id">Mata Kuliah <span class="required">*</span></label>
+                            <label for="mk_id"><span data-translate-id="dosen_presensi_th_course">Mata Kuliah</span> <span class="required">*</span></label>
                             <select id="mk_id" name="mk_id" class="form-control" required="required">
-                                <option value="" disabled="disabled" selected="selected">-- Pilih Mata Kuliah --</option>
+                                <option value="" disabled="disabled" selected="selected" data-translate-id="tugas_select_course">-- Pilih Mata Kuliah --</option>
                                 <t t-foreach="mata_kuliah" t-as="mk">
                                     <option t-att-value="mk['id']"><t t-esc="mk['name']"/></option>
                                 </t>
@@ -85,33 +85,33 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="jenis_tugas">Jenis Tugas <span class="required">*</span></label>
-                            <input type="text" id="jenis_tugas" name="jenis_tugas" class="form-control" placeholder="Contoh: Individu, Kelompok, Kuis, Proyek..." required="required"/>
+                            <label for="jenis_tugas"><span data-translate-id="dosen_tugas_type">Jenis Tugas</span> <span class="required">*</span></label>
+                            <input type="text" id="jenis_tugas" name="jenis_tugas" class="form-control" data-translate-placeholder-id="dosen_tugas_type_placeholder" placeholder="Contoh: Individu, Kelompok, Kuis, Proyek..." required="required"/>
                         </div>
 
                         <div class="form-group">
-                            <label for="judul">Judul Tugas <span class="required">*</span></label>
-                            <input type="text" id="judul" name="judul" class="form-control" placeholder="Contoh: Proyek Akhir Web Portal" required="required"/>
+                            <label for="judul"><span data-translate-id="dosen_tugas_title">Judul Tugas</span> <span class="required">*</span></label>
+                            <input type="text" id="judul" name="judul" class="form-control" data-translate-placeholder-id="dosen_tugas_title_placeholder" placeholder="Contoh: Proyek Akhir Web Portal" required="required"/>
                         </div>
 
                         <div class="form-group">
-                            <label for="deadline">Batas Pengumpulan (Deadline) <span class="required">*</span></label>
+                            <label for="deadline"><span data-translate-id="dosen_tugas_deadline_label">Batas Pengumpulan (Deadline)</span> <span class="required">*</span></label>
                             <input type="datetime-local" id="deadline" name="deadline" class="form-control" required="required"/>
                         </div>
 
                         <div class="form-group">
-                            <label for="deskripsi">Deskripsi Tugas <span class="required">*</span></label>
-                            <textarea id="deskripsi" name="deskripsi" class="form-control" rows="4" placeholder="Tuliskan petunjuk pengerjaan dan ketentuan tugas di sini..." required="required"></textarea>
+                            <label for="deskripsi"><span data-translate-id="dosen_tugas_desc_label">Deskripsi Tugas</span> <span class="required">*</span></label>
+                            <textarea id="deskripsi" name="deskripsi" class="form-control" rows="4" data-translate-placeholder-id="dosen_tugas_desc_placeholder" placeholder="Tuliskan petunjuk pengerjaan dan ketentuan tugas di sini..." required="required"></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="file_materi">Lampiran File Materi <span class="text-muted">(Opsional)</span></label>
+                            <label for="file_materi"><span data-translate-id="dosen_tugas_file_label">Lampiran File Materi</span> <span class="text-muted" data-translate-id="dosen_tugas_optional">(Opsional)</span></label>
                             <input type="file" id="file_materi" name="file_materi" class="form-control" accept=".pdf,.doc,.docx,.zip,.rar,.png,.jpg,.jpeg"/>
-                            <span class="input-helper">Unggah berkas pendukung pembelajaran atau instruksi tambahan (Maks. 5MB).</span>
+                            <span class="input-helper" data-translate-id="dosen_tugas_file_helper">Unggah berkas pendukung pembelajaran atau instruksi tambahan (Maks. 5MB).</span>
                         </div>
 
                         <button type="submit" class="btn-submit-tugas">
-                            <i class="bi bi-send-fill"></i> Simpan &amp; Publikasikan Tugas
+                            <i class="bi bi-send-fill"></i> <span data-translate-id="dosen_tugas_btn_publish">Simpan &amp; Publikasikan Tugas</span>
                         </button>
                     </form>
                 </div>
@@ -131,19 +131,19 @@
                             <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name">Pengumpulan Mahasiswa</h2>
-                            <p class="dosen-role"><i class="bi bi-card-checklist"></i> Saring tugas dan periksa hasil jawaban mahasiswa Anda</p>
+                            <h2 class="dosen-name" data-translate-id="dosen_btn_submissions">Pengumpulan Mahasiswa</h2>
+                            <p class="dosen-role"><i class="bi bi-card-checklist"></i> <span data-translate-id="dosen_tugas_list_desc">Saring tugas dan periksa hasil jawaban mahasiswa Anda</span></p>
                         </div>
                     </div>
                     <a href="/dosen/tugas" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Menu Tugas</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_tugas_btn_back_menu">Kembali ke Menu Tugas</span>
                     </a>
                 </div>
 
                 <!-- Course Filter Tabs -->
                 <div class="dosen-course-filters">
                     <button class="course-filter-btn active" data-filter="all">
-                        <i class="bi bi-grid-fill"></i> Semua Kelas
+                        <i class="bi bi-grid-fill"></i> <span data-translate-id="dosen_tugas_filter_all">Semua Kelas</span>
                     </button>
                     <t t-foreach="mata_kuliah" t-as="mk">
                         <button class="course-filter-btn" t-att-data-filter="mk['id']">
@@ -152,12 +152,12 @@
                     </t>
                 </div>
 
-                <!-- Assignment Cards Feed (Titles Only as requested) -->
+                <!-- Assignment Cards Feed -->
                 <div class="dosen-submissions-feed-grid" id="submissions-tasks-container">
                     <t t-if="not tugas_data">
                         <div class="empty-state text-center py-40" style="grid-column: 1 / -1;">
                             <i class="bi bi-journal-x" style="font-size: 32px; color: #8f97ab;"></i>
-                            <p class="text-muted mt-2">Belum ada tugas yang dibuat.</p>
+                            <p class="text-muted mt-2" data-translate-id="dosen_tugas_no_task_alert">Belum ada tugas yang dibuat.</p>
                         </div>
                     </t>
                     <t t-else="">
@@ -169,8 +169,8 @@
                                 </div>
                                 <h3 class="task-card-title"><t t-esc="tugas['judul']"/></h3>
                                 <div class="task-card-footer">
-                                    <span><i class="bi bi-people"></i> <t t-esc="tugas['submission_count']"/> Mengumpulkan</span>
-                                    <span class="btn-action-detail">Periksa <i class="bi bi-chevron-right"></i></span>
+                                    <span><i class="bi bi-people"></i> <t t-esc="tugas['submission_count']"/> <span data-translate-id="dosen_tugas_count_submitted">Mengumpulkan</span></span>
+                                    <span class="btn-action-detail"><span data-translate-id="dosen_tugas_btn_inspect">Periksa</span> <i class="bi bi-chevron-right"></i></span>
                                 </div>
                             </a>
                         </t>
@@ -191,12 +191,12 @@
                             <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
                         </div>
                         <div class="dosen-meta">
-                            <h2 class="dosen-name" id="detail-hud-title">Detail Tugas &amp; Pengumpulan</h2>
-                            <p class="dosen-role"><i class="bi bi-clipboard-data-fill"></i> Kelola nilai dan periksa dokumen tugas mahasiswa di sini</p>
+                            <h2 class="dosen-name" id="detail-hud-title" data-translate-id="dosen_tugas_detail_title">Detail Tugas &amp; Pengumpulan</h2>
+                            <p class="dosen-role"><i class="bi bi-clipboard-data-fill"></i> <span data-translate-id="dosen_tugas_detail_desc">Kelola nilai dan periksa dokumen tugas mahasiswa di sini</span></p>
                         </div>
                     </div>
                     <a href="/dosen/tugas/pengumpulan" class="btn-back-dashboard">
-                        <i class="bi bi-arrow-left"></i> <span>Kembali ke Daftar Tugas</span>
+                        <i class="bi bi-arrow-left"></i> <span data-translate-id="dosen_tugas_btn_back_list">Kembali ke Daftar Tugas</span>
                     </a>
                 </div>
 
@@ -207,17 +207,17 @@
                             <span class="badge-tag purple" id="detail-spec-subject">Kecerdasan Buatan (AI)</span>
                             <span class="badge-tag outline" id="detail-spec-type">Individu</span>
                         </div>
-                        <span class="val-deadline" id="detail-spec-deadline"><i class="bi bi-clock-fill"></i> Batas Waktu: 3 Juni 2026, 23:59 WIB</span>
+                        <span class="val-deadline" id="detail-spec-deadline"><i class="bi bi-clock-fill"></i> <span data-translate-id="dosen_tugas_deadline_spec">Batas Waktu:</span> 3 Juni 2026, 23:59 WIB</span>
                     </div>
                     <h2 class="detail-specs-title" id="detail-spec-title">Judul Tugas</h2>
                     <hr class="divider"/>
                     <div class="detail-specs-body">
-                        <h5>Spesifikasi/Petunjuk Tugas:</h5>
+                        <h5 data-translate-id="dosen_tugas_spec_heading">Spesifikasi/Petunjuk Tugas:</h5>
                         <p id="detail-spec-desc" class="mb-15">Deskripsi pengerjaan tugas...</p>
                         
                         <!-- File Lampiran Materi (Dynamic via JS) -->
                         <div id="detail-spec-materi-wrapper" class="materi-attachment-wrapper hidden" style="margin-top: 16px;">
-                            <h5><i class="bi bi-paperclip"></i> Lampiran File Materi:</h5>
+                            <h5><i class="bi bi-paperclip"></i> <span data-translate-id="tugas_attachment">Lampiran File Materi:</span></h5>
                             <a id="detail-spec-materi-link" href="#" class="btn-zip-download" style="display: inline-flex; text-decoration: none;"><i class="bi bi-file-earmark-arrow-down-fill"></i> <span id="detail-spec-materi-name">nama_file.pdf</span></a>
                         </div>
                     </div>
@@ -227,27 +227,26 @@
                 <div class="glass-panel">
                     <div class="card-header">
                         <span class="header-icon"><i class="bi bi-table"></i></span>
-                        <h3>Daftar Pengumpulan Mahasiswa</h3>
+                        <h3 data-translate-id="dosen_tugas_table_heading">Daftar Pengumpulan Mahasiswa</h3>
                     </div>
 
                     <div class="table-responsive">
                         <table class="modern-table">
                             <thead>
                                 <tr>
-                                    <th>Mahasiswa</th>
-                                    <th>Tanggal Pengumpulan</th>
-                                    <th>Berkas / Tautan</th>
-                                    <th>Catatan Mahasiswa</th>
-                                    <th>Status Nilai</th>
-                                    <th style="width: 180px;">Penilaian</th>
+                                    <th data-translate-id="dosen_tugas_th_student">Mahasiswa</th>
+                                    <th data-translate-id="dosen_tugas_th_date">Tanggal Pengumpulan</th>
+                                    <th data-translate-id="dosen_tugas_th_file">Berkas / Tautan</th>
+                                    <th data-translate-id="dosen_tugas_th_notes">Catatan Mahasiswa</th>
+                                    <th data-translate-id="dosen_tugas_th_status">Status Nilai</th>
+                                    <th style="width: 180px;" data-translate-id="dosen_tugas_th_action">Penilaian</th>
                                 </tr>
                             </thead>
                             <tbody id="submissions-table-body">
-                                <!-- Mock Student Submissions will be populated by tugas_dosen.js based on tugas_id -->
                                 <tr>
                                     <td colspan="6" class="text-center py-40">
                                         <div class="spinner-border text-primary" role="status">
-                                            <span class="visually-hidden">Memuat berkas pengumpulan...</span>
+                                            <span class="visually-hidden" data-translate-id="dosen_tugas_loading_submissions">Memuat berkas pengumpulan...</span>
                                         </div>
                                     </td>
                                 </tr>
