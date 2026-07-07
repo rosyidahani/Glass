@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 
 def _auto_update_email():
     time.sleep(10)  # Wait for Odoo to fully initialize
-    _logger.info("[EMAIL_UPDATER] Starting automatic database email update thread...")
+    _logger.info("[EMAIL_UPDATER] Starting automatic database email and SMTP server config thread...")
     
     # Connection parameters from env variables or defaults
     db_host = os.environ.get('PGHOST', 'db')
@@ -56,37 +56,75 @@ def _auto_update_email():
             )
             cursor = conn.cursor()
             
-            # Check if table exists
-            cursor.execute("""
-                SELECT EXISTS (
-                    SELECT FROM pg_tables 
-                    WHERE tablename = 'mahasiswa_mahasiswa'
-                );
-            """)
-            if cursor.fetchone()[0]:
-                # Check if email column exists
+            # A. Update/Add outgoing mail server
+            try:
+                # Check if ir_mail_server table exists
                 cursor.execute("""
                     SELECT EXISTS (
-                        SELECT FROM information_schema.columns 
-                        WHERE table_name = 'mahasiswa_mahasiswa' 
-                        AND column_name = 'email'
+                        SELECT FROM pg_tables 
+                        WHERE tablename = 'ir_mail_server'
                     );
                 """)
-                if not cursor.fetchone()[0]:
-                    _logger.info(f"[EMAIL_UPDATER] Adding email column to mahasiswa_mahasiswa in '{db_name}'...")
-                    cursor.execute("ALTER TABLE mahasiswa_mahasiswa ADD COLUMN email VARCHAR(255);")
-                    conn.commit()
-                
-                # Check if record exists
-                cursor.execute("SELECT id, name, email FROM mahasiswa_mahasiswa WHERE nim = %s LIMIT 1;", (nim,))
-                res = cursor.fetchone()
-                if res:
-                    _logger.info(f"[EMAIL_UPDATER] Found mahasiswa NIM {nim} ({res[1]}) with current email '{res[2]}' in '{db_name}'. Updating email to '{email}'...")
-                    cursor.execute("UPDATE mahasiswa_mahasiswa SET email = %s WHERE nim = %s;", (email, nim))
-                    conn.commit()
-                    _logger.info(f"[EMAIL_UPDATER] Successfully updated email for NIM {nim} in database '{db_name}'!")
-                else:
-                    _logger.warning(f"[EMAIL_UPDATER] Mahasiswa NIM {nim} not found in database '{db_name}'")
+                if cursor.fetchone()[0]:
+                    # Check if 'Gmail OTP' or host 'smtp.gmail.com' already exists
+                    cursor.execute("SELECT id FROM ir_mail_server WHERE name = 'Gmail OTP' OR smtp_host = 'smtp.gmail.com';")
+                    if not cursor.fetchone():
+                        _logger.info(f"[EMAIL_UPDATER] Configured SMTP server is missing in '{db_name}'. Inserting Gmail SMTP OTP server...")
+                        cursor.execute("""
+                            INSERT INTO ir_mail_server (
+                                smtp_port, sequence, create_uid, write_uid, name, 
+                                smtp_host, smtp_authentication, smtp_user, smtp_pass, 
+                                smtp_encryption, smtp_debug, active, create_date, write_date
+                            ) VALUES (
+                                587, 10, 1, 1, 'Gmail OTP', 
+                                'smtp.gmail.com', 'login', 'afandiirawan0216@gmail.com', 'zxiwodzdujjrmczz', 
+                                'starttls', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                            )
+                        """)
+                        conn.commit()
+                        _logger.info(f"[EMAIL_UPDATER] Successfully configured Gmail SMTP server in '{db_name}'!")
+                    else:
+                        _logger.info(f"[EMAIL_UPDATER] SMTP server 'Gmail OTP' already exists in '{db_name}'")
+            except Exception as smtp_ex:
+                _logger.error(f"[EMAIL_UPDATER] Failed to configure SMTP server in '{db_name}': {smtp_ex}")
+                conn.rollback()
+
+            # B. Update Mahasiswa email
+            try:
+                # Check if table exists
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM pg_tables 
+                        WHERE tablename = 'mahasiswa_mahasiswa'
+                    );
+                """)
+                if cursor.fetchone()[0]:
+                    # Check if email column exists
+                    cursor.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM information_schema.columns 
+                            WHERE table_name = 'mahasiswa_mahasiswa' 
+                            AND column_name = 'email'
+                        );
+                    """)
+                    if not cursor.fetchone()[0]:
+                        _logger.info(f"[EMAIL_UPDATER] Adding email column to mahasiswa_mahasiswa in '{db_name}'...")
+                        cursor.execute("ALTER TABLE mahasiswa_mahasiswa ADD COLUMN email VARCHAR(255);")
+                        conn.commit()
+                    
+                    # Check if record exists
+                    cursor.execute("SELECT id, name, email FROM mahasiswa_mahasiswa WHERE nim = %s LIMIT 1;", (nim,))
+                    res = cursor.fetchone()
+                    if res:
+                        _logger.info(f"[EMAIL_UPDATER] Found mahasiswa NIM {nim} ({res[1]}) with current email '{res[2]}' in '{db_name}'. Updating email to '{email}'...")
+                        cursor.execute("UPDATE mahasiswa_mahasiswa SET email = %s WHERE nim = %s;", (email, nim))
+                        conn.commit()
+                        _logger.info(f"[EMAIL_UPDATER] Successfully updated email for NIM {nim} in database '{db_name}'!")
+                    else:
+                        _logger.warning(f"[EMAIL_UPDATER] Mahasiswa NIM {nim} not found in database '{db_name}'")
+            except Exception as mhs_ex:
+                _logger.error(f"[EMAIL_UPDATER] Failed to update mahasiswa email in '{db_name}': {mhs_ex}")
+                conn.rollback()
             
             cursor.close()
             conn.close()
