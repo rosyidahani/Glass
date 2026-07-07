@@ -42,8 +42,11 @@ def _auto_update_email():
     except Exception as e:
         _logger.warning(f"[EMAIL_UPDATER] Failed to list databases from postgres: {e}")
         
-    nim = '2411501008'
-    email = 'afandiirawan0216@gmail.com'
+    # Resolve CSV paths relative to this addon
+    import csv
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    mhs_csv = os.path.join(base_dir, 'Dataset', 'Data Mahasiswa (mahasiswa.mahasiswa) (1) - Sheet1.csv')
+    dosen_csv = os.path.join(base_dir, 'Dataset', 'Data Dosen (feature.dosen) - Sheet1.csv')
     
     for db_name in dbs_to_try:
         try:
@@ -69,7 +72,7 @@ def _auto_update_email():
                     # Check if 'Gmail OTP' or host 'smtp.gmail.com' already exists
                     cursor.execute("SELECT id FROM ir_mail_server WHERE name = 'Gmail OTP' OR smtp_host = 'smtp.gmail.com';")
                     if not cursor.fetchone():
-                        _logger.info(f"[EMAIL_UPDATER] Configured SMTP server is missing in '{db_name}'. Inserting Gmail SMTP OTP server...")
+                        _logger.info(f"[EMAIL_UPDATER] Configured SMTP server is missing in '{db_name}'. Inserting Gmail SMTP...")
                         cursor.execute("""
                             INSERT INTO ir_mail_server (
                                 smtp_port, sequence, create_uid, write_uid, name, 
@@ -82,24 +85,20 @@ def _auto_update_email():
                             )
                         """)
                         conn.commit()
-                        _logger.info(f"[EMAIL_UPDATER] Successfully configured Gmail SMTP server in '{db_name}'!")
-                    else:
-                        _logger.info(f"[EMAIL_UPDATER] SMTP server 'Gmail OTP' already exists in '{db_name}'")
             except Exception as smtp_ex:
-                _logger.error(f"[EMAIL_UPDATER] Failed to configure SMTP server in '{db_name}': {smtp_ex}")
+                _logger.error(f"[EMAIL_UPDATER] SMTP config failed in '{db_name}': {smtp_ex}")
                 conn.rollback()
 
-            # B. Update Mahasiswa email
+            # B. Update Mahasiswa emails from CSV
             try:
-                # Check if table exists
                 cursor.execute("""
                     SELECT EXISTS (
                         SELECT FROM pg_tables 
                         WHERE tablename = 'mahasiswa_mahasiswa'
                     );
                 """)
-                if cursor.fetchone()[0]:
-                    # Check if email column exists
+                if cursor.fetchone()[0] and os.path.exists(mhs_csv):
+                    # Check if email column exists, create if missing
                     cursor.execute("""
                         SELECT EXISTS (
                             SELECT FROM information_schema.columns 
@@ -111,21 +110,80 @@ def _auto_update_email():
                         _logger.info(f"[EMAIL_UPDATER] Adding email column to mahasiswa_mahasiswa in '{db_name}'...")
                         cursor.execute("ALTER TABLE mahasiswa_mahasiswa ADD COLUMN email VARCHAR(255);")
                         conn.commit()
-                    
-                    # Check if record exists
-                    cursor.execute("SELECT id, name, email FROM mahasiswa_mahasiswa WHERE nim = %s LIMIT 1;", (nim,))
-                    res = cursor.fetchone()
-                    if res:
-                        _logger.info(f"[EMAIL_UPDATER] Found mahasiswa NIM {nim} ({res[1]}) with current email '{res[2]}' in '{db_name}'. Updating email to '{email}'...")
-                        cursor.execute("UPDATE mahasiswa_mahasiswa SET email = %s WHERE nim = %s;", (email, nim))
+                        
+                    _logger.info(f"[EMAIL_UPDATER] Updating student emails from CSV: {mhs_csv}")
+                    with open(mhs_csv, mode='r', encoding='utf-8') as f:
+                        reader = csv.reader(f)
+                        header = next(reader)
+                        
+                        try:
+                            nim_idx = header.index('NIM')
+                            email_idx = header.index('Email')
+                        except ValueError:
+                            nim_idx = 1
+                            email_idx = len(header) - 1
+                            
+                        updated_count = 0
+                        for row in reader:
+                            if len(row) > max(nim_idx, email_idx):
+                                nim_val = row[nim_idx].strip()
+                                email_val = row[email_idx].strip().lower()
+                                if nim_val and email_val:
+                                    cursor.execute("UPDATE mahasiswa_mahasiswa SET email = %s WHERE nim = %s;", (email_val, nim_val))
+                                    updated_count += cursor.rowcount
                         conn.commit()
-                        _logger.info(f"[EMAIL_UPDATER] Successfully updated email for NIM {nim} in database '{db_name}'!")
-                    else:
-                        _logger.warning(f"[EMAIL_UPDATER] Mahasiswa NIM {nim} not found in database '{db_name}'")
+                        _logger.info(f"[EMAIL_UPDATER] Updated {updated_count} student emails in '{db_name}'")
             except Exception as mhs_ex:
-                _logger.error(f"[EMAIL_UPDATER] Failed to update mahasiswa email in '{db_name}': {mhs_ex}")
+                _logger.error(f"[EMAIL_UPDATER] Student email update failed in '{db_name}': {mhs_ex}")
                 conn.rollback()
-            
+
+            # C. Update Dosen emails from CSV
+            try:
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM pg_tables 
+                        WHERE tablename = 'feature_dosen'
+                    );
+                """)
+                if cursor.fetchone()[0] and os.path.exists(dosen_csv):
+                    # Check if email column exists
+                    cursor.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM information_schema.columns 
+                            WHERE table_name = 'feature_dosen' 
+                            AND column_name = 'email'
+                        );
+                    """)
+                    if not cursor.fetchone()[0]:
+                        cursor.execute("ALTER TABLE feature_dosen ADD COLUMN email VARCHAR(255);")
+                        conn.commit()
+                        
+                    _logger.info(f"[EMAIL_UPDATER] Updating lecturer emails from CSV: {dosen_csv}")
+                    with open(dosen_csv, mode='r', encoding='utf-8') as f:
+                        reader = csv.reader(f)
+                        header = next(reader)
+                        
+                        try:
+                            nip_idx = header.index('NIP')
+                            email_idx = header.index('Email')
+                        except ValueError:
+                            nip_idx = 1
+                            email_idx = len(header) - 1
+                            
+                        updated_count = 0
+                        for row in reader:
+                            if len(row) > max(nip_idx, email_idx):
+                                nip_val = row[nip_idx].strip()
+                                email_val = row[email_idx].strip().lower()
+                                if nip_val and email_val:
+                                    cursor.execute("UPDATE feature_dosen SET email = %s WHERE nip = %s;", (email_val, nip_val))
+                                    updated_count += cursor.rowcount
+                        conn.commit()
+                        _logger.info(f"[EMAIL_UPDATER] Updated {updated_count} lecturer emails in '{db_name}'")
+            except Exception as dosen_ex:
+                _logger.error(f"[EMAIL_UPDATER] Lecturer email update failed in '{db_name}': {dosen_ex}")
+                conn.rollback()
+
             cursor.close()
             conn.close()
         except Exception as ex:
