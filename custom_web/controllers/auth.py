@@ -361,5 +361,96 @@ class AuthController(http.Controller):
             'email': None,
         })
 
+    @http.route('/lupa-password/debug-status', auth='public', website=True, type='http', methods=['GET'])
+    def debug_status(self, **kwargs):
+        """Debug route to inspect recent OTP tokens and email statuses from psycopg2 database."""
+        import psycopg2
+        import os
+        import json
+        
+        db_host = os.environ.get('PGHOST', 'db')
+        db_port = os.environ.get('PGPORT', '5432')
+        db_user = os.environ.get('PGUSER', 'odoo')
+        db_password = os.environ.get('PGPASSWORD', 'odoopwd')
+        db_name = 'odoo_glass' # default live db
+        
+        results = {}
+        try:
+            conn = psycopg2.connect(
+                host=db_host,
+                port=int(db_port),
+                database=db_name,
+                user=db_user,
+                password=db_password
+            )
+            cursor = conn.cursor()
+            
+            # 1. Fetch recent reset tokens
+            cursor.execute("""
+                SELECT id, email, role, token, expired_at, used, create_date
+                FROM glass_reset_token
+                ORDER BY create_date DESC
+                LIMIT 10
+            """)
+            tokens = []
+            for row in cursor.fetchall():
+                tokens.append({
+                    'id': row[0],
+                    'email': row[1],
+                    'role': row[2],
+                    'token': row[3],
+                    'expired_at': str(row[4]),
+                    'used': row[5],
+                    'create_date': str(row[6])
+                })
+            results['reset_tokens'] = tokens
+            
+            # 2. Fetch recent mail.mail records
+            cursor.execute("""
+                SELECT id, email_to, state, create_date, failure_reason
+                FROM mail_mail
+                ORDER BY create_date DESC
+                LIMIT 10
+            """)
+            mails = []
+            for row in cursor.fetchall():
+                mails.append({
+                    'id': row[0],
+                    'email_to': row[1],
+                    'state': row[2],
+                    'create_date': str(row[3]),
+                    'failure_reason': row[4]
+                })
+            results['mails'] = mails
+            
+            # 3. Fetch outgoing mail servers
+            cursor.execute("""
+                SELECT id, name, smtp_host, smtp_port, smtp_user, smtp_encryption, active
+                FROM ir_mail_server
+            """)
+            servers = []
+            for row in cursor.fetchall():
+                servers.append({
+                    'id': row[0],
+                    'name': row[1],
+                    'smtp_host': row[2],
+                    'smtp_port': row[3],
+                    'smtp_user': row[4],
+                    'smtp_encryption': row[5],
+                    'active': row[6]
+                })
+            results['mail_servers'] = servers
+            
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            results['error'] = str(e)
+            
+        return request.make_response(
+            json.dumps(results, indent=2),
+            headers=[('Content-Type', 'application/json')]
+        )
+
+
 
 
