@@ -361,6 +361,55 @@ class AuthController(http.Controller):
             'email': None,
         })
 
+    @http.route('/lupa-password/verify-count', auth='public', website=True, type='http', methods=['GET'])
+    def verify_count(self, **kwargs):
+        import psycopg2
+        import os
+        import json
+        
+        db_host = os.environ.get('PGHOST', 'db')
+        db_port = os.environ.get('PGPORT', '5432')
+        db_user = os.environ.get('PGUSER', 'odoo')
+        db_password = os.environ.get('PGPASSWORD', 'odoopwd')
+        db_name = 'odoo_glass'
+        
+        results = {}
+        try:
+            conn = psycopg2.connect(
+                host=db_host,
+                port=int(db_port),
+                database=db_name,
+                user=db_user,
+                password=db_password
+            )
+            cursor = conn.cursor()
+            
+            # Count students with emails
+            cursor.execute("SELECT count(*) FROM mahasiswa_mahasiswa WHERE email IS NOT NULL AND email != '';")
+            results['students_with_email'] = cursor.fetchone()[0]
+            
+            # Count lecturers with emails
+            cursor.execute("SELECT count(*) FROM feature_dosen WHERE email IS NOT NULL AND email != '';")
+            results['lecturers_with_email'] = cursor.fetchone()[0]
+            
+            # Sample 3 students
+            cursor.execute("SELECT nim, name, email FROM mahasiswa_mahasiswa WHERE email IS NOT NULL AND email != '' LIMIT 3;")
+            results['sample_students'] = [{'nim': r[0], 'name': r[1], 'email': r[2]} for r in cursor.fetchall()]
+            
+            # Sample 3 lecturers
+            cursor.execute("SELECT nip, name, email FROM feature_dosen WHERE email IS NOT NULL AND email != '' LIMIT 3;")
+            results['sample_lecturers'] = [{'nip': r[0], 'name': r[1], 'email': r[2]} for r in cursor.fetchall()]
+            
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            results['error'] = str(e)
+            
+        return request.make_response(
+            json.dumps(results, indent=2),
+            headers=[('Content-Type', 'application/json')]
+        )
+
 
 
 
