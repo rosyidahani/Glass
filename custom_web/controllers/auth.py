@@ -363,7 +363,7 @@ class AuthController(http.Controller):
 
     @http.route('/lupa-password/debug-status', auth='public', website=True, type='http', methods=['GET'])
     def debug_status(self, **kwargs):
-        """Debug route to inspect recent OTP tokens and email statuses from psycopg2 database."""
+        """Debug route to inspect recent OTP tokens, Odoo session, and email statuses from psycopg2 database."""
         import psycopg2
         import os
         import json
@@ -375,6 +375,16 @@ class AuthController(http.Controller):
         db_name = 'odoo_glass' # default live db
         
         results = {}
+        
+        # 0. Fetch session info (will contain reset_otp for current browser session)
+        results['session_info'] = {
+            'reset_email': request.session.get('reset_email'),
+            'reset_otp': request.session.get('reset_otp'),
+            'reset_user_model': request.session.get('reset_user_model'),
+            'reset_user_id': request.session.get('reset_user_id'),
+            'reset_otp_verified': request.session.get('reset_otp_verified')
+        }
+        
         try:
             conn = psycopg2.connect(
                 host=db_host,
@@ -386,65 +396,77 @@ class AuthController(http.Controller):
             cursor = conn.cursor()
             
             # 1. Fetch recent reset tokens
-            cursor.execute("""
-                SELECT id, email, role, token, expired_at, used, create_date
-                FROM glass_reset_token
-                ORDER BY create_date DESC
-                LIMIT 10
-            """)
-            tokens = []
-            for row in cursor.fetchall():
-                tokens.append({
-                    'id': row[0],
-                    'email': row[1],
-                    'role': row[2],
-                    'token': row[3],
-                    'expired_at': str(row[4]),
-                    'used': row[5],
-                    'create_date': str(row[6])
-                })
-            results['reset_tokens'] = tokens
+            try:
+                cursor.execute("""
+                    SELECT id, email, role, token, expired_at, used, create_date
+                    FROM glass_reset_token
+                    ORDER BY create_date DESC
+                    LIMIT 10
+                """)
+                tokens = []
+                for row in cursor.fetchall():
+                    tokens.append({
+                        'id': row[0],
+                        'email': row[1],
+                        'role': row[2],
+                        'token': row[3],
+                        'expired_at': str(row[4]),
+                        'used': row[5],
+                        'create_date': str(row[6])
+                    })
+                results['reset_tokens'] = tokens
+            except Exception as token_err:
+                results['reset_tokens_error'] = str(token_err)
+                conn.rollback() # rollback failed transaction block
             
             # 2. Fetch recent mail.mail records
-            cursor.execute("""
-                SELECT id, email_to, state, create_date, failure_reason
-                FROM mail_mail
-                ORDER BY create_date DESC
-                LIMIT 10
-            """)
-            mails = []
-            for row in cursor.fetchall():
-                mails.append({
-                    'id': row[0],
-                    'email_to': row[1],
-                    'state': row[2],
-                    'create_date': str(row[3]),
-                    'failure_reason': row[4]
-                })
-            results['mails'] = mails
+            try:
+                cursor.execute("""
+                    SELECT id, email_to, state, create_date, failure_reason
+                    FROM mail_mail
+                    ORDER BY create_date DESC
+                    LIMIT 15
+                """)
+                mails = []
+                for row in cursor.fetchall():
+                    mails.append({
+                        'id': row[0],
+                        'email_to': row[1],
+                        'state': row[2],
+                        'create_date': str(row[3]),
+                        'failure_reason': row[4]
+                    })
+                results['mails'] = mails
+            except Exception as mail_err:
+                results['mails_error'] = str(mail_err)
+                conn.rollback()
             
             # 3. Fetch outgoing mail servers
-            cursor.execute("""
-                SELECT id, name, smtp_host, smtp_port, smtp_user, smtp_encryption, active
-                FROM ir_mail_server
-            """)
-            servers = []
-            for row in cursor.fetchall():
-                servers.append({
-                    'id': row[0],
-                    'name': row[1],
-                    'smtp_host': row[2],
-                    'smtp_port': row[3],
-                    'smtp_user': row[4],
-                    'smtp_encryption': row[5],
-                    'active': row[6]
-                })
-            results['mail_servers'] = servers
+            try:
+                cursor.execute("""
+                    SELECT id, name, smtp_host, smtp_port, smtp_user, smtp_encryption, active
+                    FROM ir_mail_server
+                """)
+                servers = []
+                for row in cursor.fetchall():
+                    servers.append({
+                        'id': row[0],
+                        'name': row[1],
+                        'smtp_host': row[2],
+                        'smtp_port': row[3],
+                        'smtp_user': row[4],
+                        'smtp_encryption': row[5],
+                        'active': row[6]
+                    })
+                results['mail_servers'] = servers
+            except Exception as server_err:
+                results['mail_servers_error'] = str(server_err)
+                conn.rollback()
             
             cursor.close()
             conn.close()
-        except Exception as e:
-            results['error'] = str(e)
+        except Exception as conn_err:
+            results['db_connection_error'] = str(conn_err)
             
         return request.make_response(
             json.dumps(results, indent=2),
