@@ -38,13 +38,16 @@ def _send_otp_email(env, to_email, otp_code, user_name=''):
         </div>
         """
 
+        # Get active SMTP server email to build friendly display name
+        smtp_server = env['ir.mail_server'].sudo().search([('active', '=', True)], limit=1)
+        from_email = smtp_server.smtp_user if smtp_server else env['ir.config_parameter'].sudo().get_param('mail.catchall.email', 'noreply@glass.local')
+        email_from = f'"GLASS Presensi" <{from_email}>'
+
         mail_values = {
             'subject': subject,
             'body_html': body_html,
             'email_to': to_email,
-            'email_from': env['ir.config_parameter'].sudo().get_param(
-                'mail.catchall.email', 'noreply@glass.local'
-            ),
+            'email_from': email_from,
             'auto_delete': True,
         }
         mail = env['mail.mail'].sudo().create(mail_values)
