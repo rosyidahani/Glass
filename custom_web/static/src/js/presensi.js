@@ -377,7 +377,7 @@ function startPresenceSimulation() {
 
         let detectedDescriptor = null;
         let attempts = 0;
-        const maxAttempts = 120; // Maksimum 12 detik batas waktu deteksi kedipan
+        const maxAttempts = 200; // Lebih banyak kesempatan karena framerate lebih cepat
         let eyesClosed = false;
         let blinkDetected = false;
 
@@ -390,13 +390,19 @@ function startPresenceSimulation() {
         while (attempts < maxAttempts) {
             attempts++;
             try {
-                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
-                    .withFaceLandmarks()
-                    .withFaceDescriptor();
+                // Optimasi Kecepatan: Gunakan Face Descriptor HANYA pada frame pertama untuk menghemat CPU.
+                // Frame selanjutnya hanya mendeteksi Landmarks untuk kecepatan FPS deteksi kedipan yang maksimal.
+                let detection;
+                if (!detectedDescriptor) {
+                    detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+                } else {
+                    detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
+                        .withFaceLandmarks();
+                }
                     
                 if (detection) {
-                    detectedDescriptor = detection.descriptor;
-                    
                     // Hitung Eye Aspect Ratio (EAR) untuk deteksi mata berkedip (Liveness Detection)
                     const landmarks = detection.landmarks;
                     const leftEye = landmarks.getLeftEye();
@@ -408,6 +414,11 @@ function startPresenceSimulation() {
                     
                     if (isNaN(avgEAR) || avgEAR <= 0.0) {
                         continue;
+                    }
+                    
+                    // Simpan descriptor jika belum ada dan mata sedang terbuka normal
+                    if (!detectedDescriptor && detection.descriptor && avgEAR > 0.16) {
+                        detectedDescriptor = detection.descriptor;
                     }
                     
                     // Fase 1: Kalibrasi baseline EAR mata terbuka (ambil rata-rata dari 5 frame awal)
@@ -428,8 +439,10 @@ function startPresenceSimulation() {
                         }
                         
                         // Menghitung threshold secara adaptif berdasarkan mata pengguna
-                        const closedThreshold = baselineEAR * 0.77; // Turun 23% dari kondisi mata terbuka
-                        const openedThreshold = baselineEAR * 0.88; // Kembali ke 88% dari kondisi mata terbuka
+                        // closedThreshold capped maksimal 0.23 agar tidak terlalu sensitif pada mata besar
+                        // openedThreshold diatur ke 88% dari baseline agar mudah dideteksi saat membuka mata kembali
+                        const closedThreshold = Math.min(baselineEAR * 0.82, 0.23);
+                        const openedThreshold = baselineEAR * 0.88;
                         
                         // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
                         if (avgEAR < closedThreshold) {
@@ -437,6 +450,16 @@ function startPresenceSimulation() {
                             updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Blink Detected!' : 'Kedipan Terdeteksi!'}</strong><br>${isEng ? 'Open your eyes again...' : 'Buka mata Anda kembali...'}`);
                         } else if (eyesClosed && avgEAR > openedThreshold) {
                             blinkDetected = true;
+                            
+                            // Ambil descriptor jika belum didapatkan sebelumnya
+                            if (!detectedDescriptor) {
+                                const finalDetection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
+                                    .withFaceLandmarks()
+                                    .withFaceDescriptor();
+                                if (finalDetection) {
+                                    detectedDescriptor = finalDetection.descriptor;
+                                }
+                            }
                             break; // Selesai jika berkedip berhasil dideteksi
                         }
                         
@@ -450,7 +473,7 @@ function startPresenceSimulation() {
             } catch (e) {
                 console.error("Gagal mendeteksi wajah:", e);
             }
-            await new Promise(resolve => setTimeout(resolve, 100)); // Scan setiap 100ms
+            await new Promise(resolve => setTimeout(resolve, 50)); // Scan setiap 50ms untuk responsivitas tinggi
         }
 
         restorePageStyle(); // Kembalikan warna layar
