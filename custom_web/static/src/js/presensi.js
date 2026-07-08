@@ -340,19 +340,6 @@ function startPresenceSimulation() {
     
     scannerCard.classList.add('scanning');
     
-    function calculateEAR(eye) {
-        try {
-            if (!eye || eye.length < 6) return 0.0;
-            const v1 = Math.hypot(eye[1].x - eye[5].x, eye[1].y - eye[5].y);
-            const v2 = Math.hypot(eye[2].x - eye[4].x, eye[2].y - eye[4].y);
-            const h = Math.hypot(eye[0].x - eye[3].x, eye[0].y - eye[3].y);
-            return h > 0 ? (v1 + v2) / (2.0 * h) : 0.0;
-        } catch (e) {
-            console.error("Gagal menghitung EAR:", e);
-            return 0.0;
-        }
-    }
-
     async function proceedWithFaceCheck(lat, lon, isMock, accuracy) {
         const isEng = (localStorage.getItem("portal_lang") || "id") === 'en';
         latestFaceDescriptor = null; // Bersihkan cache data wajah sebelum pemindaian aktif
@@ -373,16 +360,12 @@ function startPresenceSimulation() {
         document.body.style.transition = 'background-color 0.2s ease';
         document.body.style.backgroundColor = '#ffffff'; // Kilatan putih penuh (Flash)
 
-        updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Liveness Detection' : 'Deteksi Liveness'}</strong><br>${isEng ? 'Calibrating eye sensors...' : 'Mengkalibrasi sensor mata...'}`);
+        updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Face Scan' : 'Pemindaian Wajah'}</strong><br>${isEng ? 'Position your face in the center...' : 'Posisikan wajah Anda di tengah...'}`);
 
         let detectedDescriptor = null;
         let attempts = 0;
-        const maxAttempts = 200; // Lebih banyak kesempatan karena framerate lebih cepat
-        let mouthOpened = false;
-        let livenessPassed = false;
-
-        let baselineMAR = 0.0;
-        let baselineMARFrames = [];
+        const maxAttempts = 150; 
+        let scanPassed = false;
 
         // Tunggu kilatan layar sebentar (150ms)
         await new Promise(resolve => setTimeout(resolve, 150));
@@ -390,88 +373,36 @@ function startPresenceSimulation() {
         while (attempts < maxAttempts) {
             attempts++;
             try {
-                // Optimasi Kecepatan: Gunakan Face Descriptor HANYA pada frame pertama untuk menghemat CPU.
-                // Frame selanjutnya hanya mendeteksi Landmarks untuk kecepatan FPS deteksi liveness maksimal.
-                let detection;
-                if (!detectedDescriptor) {
-                    detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-                } else {
-                    detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
-                        .withFaceLandmarks();
-                }
+                const detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
                     
                 if (detection) {
-                    const landmarks = detection.landmarks;
-                    const mouth = landmarks.getMouth();
+                    const analysis = analyzeFace(detection, video);
+                    updateIndicators(analysis);
                     
-                    if (mouth && mouth.length >= 20) {
-                        // Titik-titik bibir dalam:
-                        // p12: indeks 12 (60 - sudut kiri)
-                        // p16: indeks 16 (64 - sudut kanan)
-                        // p14: indeks 14 (62 - atas tengah)
-                        // p18: indeks 18 (66 - bawah tengah)
-                        const p12 = mouth[12];
-                        const p16 = mouth[16];
-                        const p14 = mouth[14];
-                        const p18 = mouth[18];
-                        
-                        const w = Math.hypot(p12.x - p16.x, p12.y - p16.y);
-                        const h = Math.hypot(p14.x - p18.x, p14.y - p18.y);
-                        const mar = w > 0 ? h / w : 0.0;
-                        
-                        // Simpan descriptor jika belum ada
-                        if (!detectedDescriptor && detection.descriptor) {
-                            detectedDescriptor = detection.descriptor;
-                        }
-                        
-                        // Kalibrasi baseline MAR mulut tertutup (5 frame pertama)
-                        if (baselineMARFrames.length < 5 && attempts < 30) {
-                            baselineMARFrames.push(mar);
-                            updateStatusBox('active', `<i class="bi bi-cpu spin"></i> <strong>${isEng ? 'Calibrating sensors...' : 'Mengkalibrasi sensor...'}</strong>`);
-                        } else {
-                            if (baselineMAR === 0.0) {
-                                baselineMAR = baselineMARFrames.reduce((a, b) => a + b, 0) / baselineMARFrames.length;
-                                if (isNaN(baselineMAR) || baselineMAR <= 0.0) {
-                                    baselineMAR = 0.12; // Fallback aman
-                                }
-                                console.log("Baseline MAR Calibrated:", baselineMAR);
-                            }
-                            
-                            const openThreshold = Math.max(baselineMAR * 2.2, 0.28);
-                            const closeThreshold = baselineMAR * 1.3;
-                            
-                            if (!mouthOpened) {
-                                updateStatusBox('active', `<i class="bi bi-emoji-smile-fill spin"></i> <strong>${isEng ? 'Liveness Challenge' : 'Tantangan Liveness'}</strong><br>${isEng ? 'Please open your mouth slightly...' : 'Silakan buka mulut Anda sedikit...'}`);
-                                if (mar > openThreshold) {
-                                    mouthOpened = true;
-                                    console.log("Mouth open detected! MAR:", mar);
-                                    updateStatusBox('active', `<i class="bi bi-emoji-smile-fill spin"></i> <strong>${isEng ? 'Mouth Opened!' : 'Mulut Terbuka!'}</strong><br>${isEng ? 'Now close your mouth...' : 'Sekarang tutup mulut Anda kembali...'}`);
-                                    await new Promise(resolve => setTimeout(resolve, 200)); // Delay visual singkat
-                                }
-                            } else {
-                                updateStatusBox('active', `<i class="bi bi-emoji-smile-fill spin"></i> <strong>${isEng ? 'Liveness Challenge' : 'Tantangan Liveness'}</strong><br>${isEng ? 'Please close your mouth again...' : 'Silakan tutup mulut Anda kembali...'}`);
-                                if (mar < closeThreshold) {
-                                    console.log("Mouth closed detected! MAR:", mar);
-                                    livenessPassed = true;
-                                    break; // Sukses verifikasi liveness
-                                }
-                            }
-                        }
+                    if (analysis.ok) {
+                        detectedDescriptor = detection.descriptor;
+                        scanPassed = true;
+                        break;
+                    } else {
+                        // Tampilkan pesan error spesifik agar pengguna tahu apa yang harus diperbaiki
+                        let errorMsg = !analysis.distanceOk ? analysis.distanceMsg : (!analysis.positionOk ? analysis.positionMsg : analysis.poseMsg);
+                        updateStatusBox('active', `<i class="bi bi-exclamation-circle-fill"></i> <strong>${isEng ? 'Adjust Position' : 'Sesuaikan Posisi'}</strong><br>${errorMsg}`);
                     }
                 } else {
+                    updateIndicators(null);
                     updateStatusBox('active', `<i class="bi bi-camera-fill"></i> ${isEng ? 'Face not detected. Position your face.' : 'Wajah tidak terdeteksi. Posisikan wajah Anda.'}`);
                 }
             } catch (e) {
                 console.error("Gagal mendeteksi wajah:", e);
             }
-            await new Promise(resolve => setTimeout(resolve, 50)); // Scan setiap 50ms untuk responsivitas tinggi
+            await new Promise(resolve => setTimeout(resolve, 100)); // Scan setiap 100ms untuk kelancaran
         }
 
         restorePageStyle(); // Kembalikan warna layar
 
-        if (detectedDescriptor && livenessPassed) {
+        if (detectedDescriptor && scanPassed) {
             const faceVectorJSON = JSON.stringify(Array.from(detectedDescriptor));
             updateStatusBox('active', `<i class="bi bi-cloud-arrow-up-fill spin"></i> ${isEng ? 'Sending verification data to server...' : 'Mengirim data verifikasi ke server...'}`);
             submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVectorJSON);
@@ -481,11 +412,7 @@ function startPresenceSimulation() {
             if (btnLoader) btnLoader.classList.add('hidden');
             btn.disabled = false;
             startFaceTracking();
-            if (detectedDescriptor && !livenessPassed) {
-                triggerScanFailure(isEng ? "Liveness Detection Failed: Unable to verify live face. Please try again." : "Deteksi Liveness Gagal: Tidak dapat memverifikasi keaktifan wajah. Silakan coba kembali.");
-            } else {
-                triggerScanFailure(isEng ? "Face not detected. Please position your face facing the camera." : "Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
-            }
+            triggerScanFailure(isEng ? "Face Scan Failed: Unable to verify your face. Please try again." : "Pemindaian Wajah Gagal: Tidak dapat memverifikasi wajah Anda. Silakan coba kembali.");
         }
     }
     
