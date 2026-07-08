@@ -23,7 +23,7 @@ def _get_faceid_secret(env):
 
 
 def verify_face_server_side(env, stored_encrypted_descriptor_b64: str, client_descriptor: str,
-                               method: str = 'cosine', threshold: float = 0.88) -> dict:
+                               method: str = 'euclidean', threshold: float = 0.45) -> dict:
     """Verify if client face_descriptor matches stored descriptor.
 
     Parameters
