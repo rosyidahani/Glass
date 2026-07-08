@@ -375,14 +375,39 @@ function startPresenceSimulation() {
 
         updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Liveness Detection' : 'Deteksi Liveness'}</strong><br>${isEng ? 'Calibrating eye sensors...' : 'Mengkalibrasi sensor mata...'}`);
 
+        // Helper Standard Deviation calculation
+        function getStdDev(arr) {
+            if (!arr || arr.length < 2) return 0;
+            const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+            const variance = arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (arr.length - 1);
+            return Math.sqrt(variance);
+        }
+
         let detectedDescriptor = null;
         let attempts = 0;
         const maxAttempts = 200; // Lebih banyak kesempatan karena framerate lebih cepat
         let eyesClosed = false;
-        let blinkDetected = false;
+        let livenessPassed = false;
 
         let baselineEAR = 0.0;
         let baselineFrames = [];
+
+        // Passive Liveness Buffers
+        const historyH = [];
+        const historyV = [];
+        const historyJaw = [];
+        const historyEAR = [];
+
+        const historyNoseX = [];
+        const historyNoseY = [];
+        const historyChinX = [];
+        const historyChinY = [];
+        const historyLeftEyeX = [];
+        const historyRightEyeX = [];
+
+        let passiveFrameCount = 0;
+        const requiredPassiveFrames = 25;
+        let useActiveFallback = false;
 
         // Tunggu kilatan layar sebentar (150ms)
         await new Promise(resolve => setTimeout(resolve, 150));
@@ -391,7 +416,7 @@ function startPresenceSimulation() {
             attempts++;
             try {
                 // Optimasi Kecepatan: Gunakan Face Descriptor HANYA pada frame pertama untuk menghemat CPU.
-                // Frame selanjutnya hanya mendeteksi Landmarks untuk kecepatan FPS deteksi kedipan yang maksimal.
+                // Frame selanjutnya hanya mendeteksi Landmarks untuk kecepatan FPS deteksi liveness maksimal.
                 let detection;
                 if (!detectedDescriptor) {
                     detection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
@@ -403,10 +428,11 @@ function startPresenceSimulation() {
                 }
                     
                 if (detection) {
-                    // Hitung Eye Aspect Ratio (EAR) untuk deteksi mata berkedip (Liveness Detection)
                     const landmarks = detection.landmarks;
                     const leftEye = landmarks.getLeftEye();
                     const rightEye = landmarks.getRightEye();
+                    const nose = landmarks.getNose();
+                    const jaw = landmarks.getJawOutline();
                     
                     const earLeft = calculateEAR(leftEye);
                     const earRight = calculateEAR(rightEye);
@@ -421,50 +447,116 @@ function startPresenceSimulation() {
                         detectedDescriptor = detection.descriptor;
                     }
                     
-                    // Fase 1: Kalibrasi baseline EAR mata terbuka (ambil rata-rata dari 5 frame awal)
-                    // Jika dalam 3 detik (attempts < 30) kalibrasi belum selesai, paksa fallback ke default
-                    if (baselineFrames.length < 5 && attempts < 30) {
-                        if (avgEAR > 0.14 && avgEAR < 0.48) {
-                            baselineFrames.push(avgEAR);
-                        }
-                        updateStatusBox('active', `<i class="bi bi-cpu spin"></i> <strong>${isEng ? 'Sensor Calibration...' : 'Kalibrasi Sensor...'}</strong><br>${isEng ? 'Please look at the camera with eyes open.' : 'Harap tatap kamera dengan mata terbuka.'}`);
-                    } else {
-                        if (baselineEAR === 0.0) {
-                            if (baselineFrames.length > 0) {
-                                baselineEAR = baselineFrames.reduce((a, b) => a + b, 0) / baselineFrames.length;
-                            } else {
-                                baselineEAR = 0.28; // Fallback default aman
-                            }
-                            console.log("Baseline EAR Calibrated:", baselineEAR);
-                        }
+                    if (!useActiveFallback) {
+                        const box = detection.detection.box;
+                        const noseTip = nose[6]; // index 33 (ujung hidung)
+                        const noseBridge = nose[0]; // index 27 (pangkal hidung)
+                        const leftEyeOuter = leftEye[0]; // index 36 (ujung luar mata kiri)
+                        const rightEyeOuter = rightEye[3]; // index 45 (ujung luar mata kanan)
+                        const chin = jaw[8]; // index 8 (dagu)
+                        const leftJaw = jaw[0]; // index 0 (sudut kiri rahang)
+                        const rightJaw = jaw[16]; // index 16 (sudut kanan rahang)
                         
-                        // Menghitung threshold secara adaptif berdasarkan mata pengguna
-                        // closedThreshold capped maksimal 0.23 agar tidak terlalu sensitif pada mata besar
-                        // openedThreshold diatur ke 88% dari baseline agar mudah dideteksi saat membuka mata kembali
-                        const closedThreshold = Math.min(baselineEAR * 0.82, 0.23);
-                        const openedThreshold = baselineEAR * 0.88;
+                        const dNoseLeftEye = Math.hypot(noseTip.x - leftEyeOuter.x, noseTip.y - leftEyeOuter.y);
+                        const dNoseRightEye = Math.hypot(noseTip.x - rightEyeOuter.x, noseTip.y - rightEyeOuter.y);
+                        const ratioH = dNoseLeftEye / (dNoseRightEye || 1.0);
                         
-                        // Deteksi kedipan (transisi mata tertutup -> mata terbuka)
-                        if (avgEAR < closedThreshold) {
-                            eyesClosed = true;
-                            updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Blink Detected!' : 'Kedipan Terdeteksi!'}</strong><br>${isEng ? 'Open your eyes again...' : 'Buka mata Anda kembali...'}`);
-                        } else if (eyesClosed && avgEAR > openedThreshold) {
-                            blinkDetected = true;
+                        const dBridgeNoseTip = Math.hypot(noseBridge.x - noseTip.x, noseBridge.y - noseTip.y);
+                        const dNoseTipChin = Math.hypot(noseTip.x - chin.x, noseTip.y - chin.y);
+                        const ratioV = dBridgeNoseTip / (dNoseTipChin || 1.0);
+                        
+                        const dNoseLeftJaw = Math.hypot(noseTip.x - leftJaw.x, noseTip.y - leftJaw.y);
+                        const dNoseRightJaw = Math.hypot(noseTip.x - rightJaw.x, noseTip.y - rightJaw.y);
+                        const ratioJaw = dNoseLeftJaw / (dNoseRightJaw || 1.0);
+                        
+                        // Simpan history rasio perspektif
+                        historyH.push(ratioH);
+                        historyV.push(ratioV);
+                        historyJaw.push(ratioJaw);
+                        historyEAR.push(avgEAR);
+                        
+                        // Simpan koordinat ternormalisasi
+                        historyNoseX.push((noseTip.x - box.x) / box.width);
+                        historyNoseY.push((noseTip.y - box.y) / box.height);
+                        historyChinX.push((chin.x - box.x) / box.width);
+                        historyChinY.push((chin.y - box.y) / box.height);
+                        historyLeftEyeX.push((leftEyeOuter.x - box.x) / box.width);
+                        historyRightEyeX.push((rightEyeOuter.x - box.x) / box.width);
+                        
+                        passiveFrameCount++;
+                        
+                        updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Scanning Face...' : 'Memindai Wajah...'}</strong><br>${isEng ? 'Please look at the camera naturally.' : 'Harap tatap kamera dengan santai.'}`);
+                        
+                        if (passiveFrameCount >= requiredPassiveFrames) {
+                            const stdH = getStdDev(historyH);
+                            const stdV = getStdDev(historyV);
+                            const stdJaw = getStdDev(historyJaw);
+                            const stdEAR = getStdDev(historyEAR);
                             
-                            // Ambil descriptor jika belum didapatkan sebelumnya
-                            if (!detectedDescriptor) {
-                                const finalDetection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
-                                    .withFaceLandmarks()
-                                    .withFaceDescriptor();
-                                if (finalDetection) {
-                                    detectedDescriptor = finalDetection.descriptor;
-                                }
+                            const stdNoseX = getStdDev(historyNoseX);
+                            const stdNoseY = getStdDev(historyNoseY);
+                            const stdChinX = getStdDev(historyChinX);
+                            const stdChinY = getStdDev(historyChinY);
+                            const stdLeftEyeX = getStdDev(historyLeftEyeX);
+                            const stdRightEyeX = getStdDev(historyRightEyeX);
+                            
+                            const avgCoordStd = (stdNoseX + stdNoseY + stdChinX + stdChinY + stdLeftEyeX + stdRightEyeX) / 6.0;
+                            
+                            console.log("Passive Liveness Analysis:", { stdH, stdV, stdJaw, stdEAR, avgCoordStd });
+                            
+                            // Deteksi Spoof 2D (Foto/Layar)
+                            // 1. isStatic: Jika posisi koordinat sangat kaku (tidak ada getaran/micro-movement sama sekali)
+                            const isStatic = avgCoordStd < 0.0003;
+                            // 2. isRigid: Jika tidak ada variasi depth/perspektif 3D sama sekali (foto datar digerakkan)
+                            const isRigid = stdH < 0.0004 && stdV < 0.0004 && stdJaw < 0.0004;
+                            // 3. isEyeStatic: Jika tidak ada perubahan getaran kelopak mata alami
+                            const isEyeStatic = stdEAR < 0.0004;
+                            
+                            if (!isStatic && !isRigid && !isEyeStatic) {
+                                console.log("Passive Liveness VERIFIED!");
+                                livenessPassed = true;
+                                break; // Verifikasi sukses!
+                            } else {
+                                console.warn("Passive check failed (static or rigid profile). Switching to Active Fallback.");
+                                useActiveFallback = true;
+                                baselineEAR = avgEAR;
+                                baselineFrames = [avgEAR];
                             }
-                            break; // Selesai jika berkedip berhasil dideteksi
                         }
-                        
-                        if (!eyesClosed) {
-                            updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Liveness Detection' : 'Deteksi Liveness'}</strong><br>${isEng ? 'Please blink your eyes once...' : 'Silakan kedipkan mata Anda sekali...'}`);
+                    } else {
+                        // Backup Aktif (Deteksi Kedipan) jika Liveness Pasif mencurigakan / tidak yakin
+                        if (baselineFrames.length < 5) {
+                            baselineFrames.push(avgEAR);
+                            updateStatusBox('active', `<i class="bi bi-cpu spin"></i> <strong>${isEng ? 'Calibrating backup sensors...' : 'Mengkalibrasi sensor cadangan...'}</strong>`);
+                        } else {
+                            if (baselineEAR === 0.0) {
+                                baselineEAR = baselineFrames.reduce((a, b) => a + b, 0) / baselineFrames.length;
+                            }
+                            
+                            const closedThreshold = Math.min(baselineEAR * 0.82, 0.23);
+                            const openedThreshold = baselineEAR * 0.88;
+                            
+                            if (avgEAR < closedThreshold) {
+                                eyesClosed = true;
+                                updateStatusBox('active', `<i class="bi bi-person-video spin"></i> <strong>${isEng ? 'Blink Detected!' : 'Kedipan Terdeteksi!'}</strong><br>${isEng ? 'Open your eyes again...' : 'Buka mata Anda kembali...'}`);
+                            } else if (eyesClosed && avgEAR > openedThreshold) {
+                                livenessPassed = true;
+                                
+                                // Ambil descriptor jika belum didapatkan sebelumnya
+                                if (!detectedDescriptor) {
+                                    const finalDetection = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 }))
+                                        .withFaceLandmarks()
+                                        .withFaceDescriptor();
+                                    if (finalDetection) {
+                                        detectedDescriptor = finalDetection.descriptor;
+                                    }
+                                }
+                                break; // Selesai
+                            }
+                            
+                            if (!eyesClosed) {
+                                updateStatusBox('active', `<i class="bi bi-eye-fill"></i> <strong>${isEng ? 'Additional Verification' : 'Verifikasi Tambahan'}</strong><br>${isEng ? 'Please blink your eyes once.' : 'Harap kedipkan mata Anda sekali.'}`);
+                            }
                         }
                     }
                 } else {
@@ -478,7 +570,7 @@ function startPresenceSimulation() {
 
         restorePageStyle(); // Kembalikan warna layar
 
-        if (detectedDescriptor && blinkDetected) {
+        if (detectedDescriptor && livenessPassed) {
             const faceVectorJSON = JSON.stringify(Array.from(detectedDescriptor));
             updateStatusBox('active', `<i class="bi bi-cloud-arrow-up-fill spin"></i> ${isEng ? 'Sending verification data to server...' : 'Mengirim data verifikasi ke server...'}`);
             submitCheckInAPI(courseId, courseName, lat, lon, isMock, accuracy, faceVectorJSON);
@@ -488,8 +580,8 @@ function startPresenceSimulation() {
             if (btnLoader) btnLoader.classList.add('hidden');
             btn.disabled = false;
             startFaceTracking();
-            if (detectedDescriptor && !blinkDetected) {
-                triggerScanFailure(isEng ? "Liveness Detection Failed: Eye blink not detected. Please use a real face." : "Deteksi Liveness Gagal: Kedipan mata tidak terdeteksi. Silakan gunakan wajah asli.");
+            if (detectedDescriptor && !livenessPassed) {
+                triggerScanFailure(isEng ? "Liveness Detection Failed: Unable to verify live face. Please try again." : "Deteksi Liveness Gagal: Tidak dapat memverifikasi keaktifan wajah. Silakan coba kembali.");
             } else {
                 triggerScanFailure(isEng ? "Face not detected. Please position your face facing the camera." : "Wajah tidak terdeteksi. Silakan posisikan wajah Anda menghadap kamera.");
             }
