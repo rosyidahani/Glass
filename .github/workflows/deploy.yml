@@ -1,27 +1,35 @@
-name: Deploy Glass to VPS
+name: Deploy Odoo to VM
 
+# Script ini akan berjalan setiap kali ada 'push' ke branch 'main'
 on:
   push:
     branches:
-      - main
+      - main 
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22
-
-          script: |
-            cd ~/Glass
-            git pull origin main
-            docker compose down
-            docker compose up -d --build
+    - name: Masuk ke Server dan Update Aplikasi
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        # Berikut adalah perintah yang akan dijalankan otomatis di terminal VM kamu
+        script: |
+          cd ~/Glass
+          git pull origin main
+          docker build -t glass .
+          docker rm -f aplikasi-glass
+          docker run -d \
+            -p 80:8069 \
+            -e PORT=8069 \
+            -e PGHOST=server-db \
+            -e PGPORT=5432 \
+            -e PGUSER=odoo \
+            -e PGPASSWORD=odoo \
+            --name aplikasi-glass \
+            --network jaringan-odoo \
+            glass
