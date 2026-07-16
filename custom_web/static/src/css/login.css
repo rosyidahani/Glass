@@ -94,6 +94,7 @@ body::after {
 .splash-section {
     z-index: 20;
     transition: opacity 0.6s ease, transform 0.6s ease;
+    padding-bottom: 120px; /* Offset the center to account for the scroll-hint at the bottom */
 }
 
 .splash-content {

@@ -1,7 +1,7 @@
 <odoo>
     <template id="dashboard" name="Dashboard Page">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/dashboard.css?v=11"/>
+            <link rel="stylesheet" href="/custom_web/static/src/css/dashboard.css?v=12"/>
 
             <div class="dashboard-container">
                 <!-- TOP HUD -->

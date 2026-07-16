@@ -1,10 +1,10 @@
 import psycopg2
 
 db_host = 'localhost'
-db_user = 'openpg'
-db_password = 'koentji'
+db_user = 'odoo'
+db_password = 'odoopwd'
 db_port = 5432
-db_name = 'Glass'
+db_name = 'marchendise_ti'
 
 def force_upgrade_modules():
     """Force upgrade of modules in Odoo database"""
