@@ -122,7 +122,7 @@ const portalTranslations = {
         "card_attendance_title": "Presensi",
         "card_attendance_desc": "Buka sesi kehadiran kelas baru dan awasi partisipasi mahasiswa secara instan.",
         "card_attendance_btn": "Mulai Presensi",
-        "card_submission_title": "Pengumpulan",
+        "card_submission_title": "test aja",
         "card_submission_desc": "Periksa berkas jawaban tugas mahasiswa dan berikan feedback nilai secara instan.",
         "card_submission_btn": "Periksa Tugas",
         "card_leaderboard_title": "Leaderboard",
