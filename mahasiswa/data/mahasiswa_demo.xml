@@ -11,15 +11,6 @@
             <field name="koin">0</field>
         </record>
 
-        <record id="mahasiswa_demo_02" model="mahasiswa.mahasiswa">
-            <field name="name">Siti Nurhaliza</field>
-            <field name="nim">2024002</field>
-            <field name="password">admin123</field>
-            <field name="semester">5</field>
-            <field name="total_xp">0</field>
-            <field name="koin">0</field>
-        </record>
-
         <record id="mahasiswa_demo_03" model="mahasiswa.mahasiswa">
             <field name="name">Budi Santoso</field>
             <field name="nim">2024003</field>
