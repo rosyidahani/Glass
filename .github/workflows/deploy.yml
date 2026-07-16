@@ -1,10 +1,11 @@
 name: Deploy Odoo to VM
 
-# Script ini akan berjalan setiap kali ada 'push' ke branch 'main'
+# Script ini akan berjalan setiap kali ada 'push' ke branch 'main' atau 'Perubahan'
 on:
   push:
     branches:
-      - main 
+      - main
+      - Perubahan
 
 jobs:
   deploy:
@@ -20,7 +21,9 @@ jobs:
         # Berikut adalah perintah yang akan dijalankan otomatis di terminal VM kamu
         script: |
           cd ~/Glass
-          git pull origin main
+          git fetch origin
+          git checkout ${{ github.ref_name }}
+          git pull origin ${{ github.ref_name }}
           docker build -t glass .
           docker rm -f aplikasi-glass
           docker run -d \
