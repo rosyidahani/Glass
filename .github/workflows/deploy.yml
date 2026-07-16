@@ -27,7 +27,7 @@ jobs:
           docker build -t glass .
           docker rm -f aplikasi-glass
           docker run -d \
-            -p 80:8069 \
+            -p 8069:8069 \
             -e PORT=8069 \
             -e PGHOST=server-db \
             -e PGPORT=5432 \

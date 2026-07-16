@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-
+        <!-- Data demo mahasiswa -->
         <record id="mahasiswa_demo_01" model="mahasiswa.mahasiswa">
             <field name="name">Ahmad Fauzi</field>
             <field name="nim">2024001</field>
             <field name="password">admin123</field>
             <field name="semester">3</field>
-            <field name="total_xp">0</field>
-            <field name="koin">0</field>
-        </record>
-
-        <record id="mahasiswa_demo_02" model="mahasiswa.mahasiswa">
-            <field name="name">Siti Nurhaliza</field>
-            <field name="nim">2024002</field>
-            <field name="password">admin123</field>
-            <field name="semester">5</field>
             <field name="total_xp">0</field>
             <field name="koin">0</field>
         </record>
