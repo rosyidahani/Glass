@@ -7,9 +7,12 @@
             <div class="profile-container">
                 <div class="profile-header">
                     <div class="profile-picture-wrapper">
-                        <div class="profile-picture" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
-                            <t t-esc="dosen.name[0].upper()"/>
-                        </div>
+                        <t t-if="dosen and dosen.foto_profil">
+                            <img t-att-src="'data:image/png;base64,' + dosen.foto_profil.decode('utf-8')" class="profile-picture" style="object-fit: cover;"/>
+                        </t>
+                        <t t-else="">
+                            <img src="/custom_web/static/src/img/avatar_default.png" class="profile-picture" style="object-fit: cover;"/>
+                        </t>
                     </div>
                     <div class="profile-details">
                         <h2 data-translate-id="set_security">Sandi &amp; Keamanan</h2>

@@ -8,7 +8,12 @@
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
-                            <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
+                            <t t-if="dosen and dosen.foto_profil">
+                                <img t-att-src="'data:image/png;base64,' + dosen.foto_profil.decode('utf-8')" alt="Profile"/>
+                            </t>
+                            <t t-else="">
+                                <img src="/custom_web/static/src/img/avatar_default.png" alt="Profile"/>
+                            </t>
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name"><t t-esc="dosen.name if dosen else 'Dosen'"/></h2>
@@ -55,7 +60,12 @@
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
-                            <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
+                            <t t-if="dosen and dosen.foto_profil">
+                                <img t-att-src="'data:image/png;base64,' + dosen.foto_profil.decode('utf-8')" alt="Profile"/>
+                            </t>
+                            <t t-else="">
+                                <img src="/custom_web/static/src/img/avatar_default.png" alt="Profile"/>
+                            </t>
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name" data-translate-id="dosen_tugas_create_header_title">Buat &amp; Kelola Tugas</h2>
@@ -128,7 +138,12 @@
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
-                            <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
+                            <t t-if="dosen and dosen.foto_profil">
+                                <img t-att-src="'data:image/png;base64,' + dosen.foto_profil.decode('utf-8')" alt="Profile"/>
+                            </t>
+                            <t t-else="">
+                                <img src="/custom_web/static/src/img/avatar_default.png" alt="Profile"/>
+                            </t>
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name" data-translate-id="dosen_btn_submissions">Pengumpulan Mahasiswa</h2>
@@ -188,7 +203,12 @@
                 <div class="dosen-header-hud">
                     <div class="dosen-profile-info">
                         <div class="dosen-avatar-wrapper">
-                            <t t-esc="dosen.name[0] if dosen and dosen.name else 'D'"/>
+                            <t t-if="dosen and dosen.foto_profil">
+                                <img t-att-src="'data:image/png;base64,' + dosen.foto_profil.decode('utf-8')" alt="Profile"/>
+                            </t>
+                            <t t-else="">
+                                <img src="/custom_web/static/src/img/avatar_default.png" alt="Profile"/>
+                            </t>
                         </div>
                         <div class="dosen-meta">
                             <h2 class="dosen-name" id="detail-hud-title" data-translate-id="dosen_tugas_detail_title">Detail Tugas &amp; Pengumpulan</h2>

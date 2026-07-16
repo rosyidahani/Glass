@@ -95,7 +95,7 @@
                         <img t-att-src="'data:image/png;base64,' + mahasiswa.foto_profil.decode('utf-8')" alt="Profile" class="avatar-img-round"/>
                     </t>
                     <t t-else="">
-                        <img src="/custom_web/static/src/img/avatar g2.png" alt="Profile" class="avatar-img-round"/>
+                        <img src="/custom_web/static/src/img/avatar_default.png" alt="Profile" class="avatar-img-round"/>
                     </t>
                 </div>
             </div>
