@@ -3,7 +3,7 @@
     <template id="settings_dosen" name="Dosen Settings">
         <t t-call="custom_web.layout">
             <link rel="stylesheet" href="/custom_web/static/src/css/settings.css"/>
-            <script src="/custom_web/static/src/js/settings_dosen.js" type="text/javascript"></script>
+            <script src="/custom_web/static/src/js/settings_dosen.js?v=11" type="text/javascript"></script>
 
             <div class="profile-container">
                 <div class="mhs-header-hud">

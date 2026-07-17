@@ -31,10 +31,7 @@
                     </div>
                 </div>
 
-                <form action="/dashboard/mahasiswa/settings/upload_photo" method="post" enctype="multipart/form-data" id="photoUploadForm" style="display: none;">
-                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                    <input type="file" name="foto_profil" id="fotoProfilInput" accept="image/png, image/jpeg, image/jpg" onchange="document.getElementById('photoUploadForm').submit();"/>
-                </form>
+                <input type="file" id="fotoProfilInput" accept="image/png, image/jpeg, image/jpg" style="display: none;"/>
 
                 <!-- Stats Tabs -->
                 <div class="stats-container">

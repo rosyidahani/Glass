@@ -24,6 +24,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Check URL on initial load
     openModalByUrlPath();
+
+    // Student profile photo upload with client-side compression
+    const fotoInput = document.getElementById("fotoProfilInput");
+    if (fotoInput) {
+        fotoInput.addEventListener("change", function (e) {
+            if (!e.target.files || !e.target.files[0]) {
+                return;
+            }
+            
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    
+                    // Mahasiswa foto_profil is 354x472 (3x4 aspect ratio). 
+                    // Let's force it to 354x472 or scale within those bounds.
+                    const targetWidth = 354;
+                    const targetHeight = 472;
+                    
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    
+                    // Center and crop/scale to cover the 354x472 canvas
+                    const imgRatio = img.width / img.height;
+                    const targetRatio = targetWidth / targetHeight;
+                    let drawWidth = targetWidth;
+                    let drawHeight = targetHeight;
+                    let offsetX = 0;
+                    let offsetY = 0;
+                    
+                    if (imgRatio > targetRatio) {
+                        drawWidth = targetHeight * imgRatio;
+                        offsetX = (targetWidth - drawWidth) / 2;
+                    } else {
+                        drawHeight = targetWidth / imgRatio;
+                        offsetY = (targetHeight - drawHeight) / 2;
+                    }
+                    
+                    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    const base64 = dataUrl.split(',')[1] || '';
+                    
+                    // Send to backend via JSON API
+                    fetch('/api/mahasiswa/settings/upload-foto', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            foto_base64: base64
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            alert('Foto profil berhasil diupdate.');
+                            window.location.reload();
+                        } else {
+                            alert(result.message || 'Gagal mengupdate foto profil.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Error: ' + err.message);
+                    });
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 });
 
 function openModalByUrlPath() {

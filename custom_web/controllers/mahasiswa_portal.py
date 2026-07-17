@@ -123,6 +123,27 @@ class MahasiswaPortalController(http.Controller):
 
         return request.redirect('/dashboard/mahasiswa/settings')
 
+    @http.route('/api/mahasiswa/settings/upload-foto', type='http', auth='public', methods=['POST'], csrf=False, cors='*')
+    def upload_foto_mahasiswa_json(self, **kwargs):
+        mahasiswa = get_active_mahasiswa()
+        if not mahasiswa:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Unauthorized'}), headers=[('Content-Type', 'application/json')])
+        
+        try:
+            body = json.loads(request.httprequest.data or '{}')
+        except Exception:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'Format JSON tidak valid.'}), headers=[('Content-Type', 'application/json')])
+            
+        foto_base64 = body.get('foto_base64')
+        if not foto_base64:
+            return request.make_response(json.dumps({'status': 'error', 'message': 'foto_base64 wajib diisi.'}), headers=[('Content-Type', 'application/json')])
+        
+        try:
+            mahasiswa.sudo().write({'foto_profil': foto_base64})
+            return request.make_response(json.dumps({'status': 'success'}), headers=[('Content-Type', 'application/json')])
+        except Exception as e:
+            return request.make_response(json.dumps({'status': 'error', 'message': str(e)}), headers=[('Content-Type', 'application/json')])
+
     @http.route('/dashboard/mahasiswa/shop', auth='public', website=True, type='http')
     def shop_mahasiswa(self, **kwargs):
         mahasiswa = get_active_mahasiswa()

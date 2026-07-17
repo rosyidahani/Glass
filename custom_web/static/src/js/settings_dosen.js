@@ -33,25 +33,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var file = input.files[0];
             var reader = new FileReader();
-            reader.onload = function () {
-                // reader result: data URL; ambil base64 setelah koma
-                var dataUrl = reader.result;
-                var base64 = dataUrl.split(',')[1] || '';
+            reader.onload = function (e) {
+                var img = new Image();
+                img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    var max_size = 500; // max width/height for Dosen avatar
+                    var width = img.width;
+                    var height = img.height;
 
-                postJSON('/api/dosen/settings/upload-foto', {
-                    foto_base64: base64,
-                    filename: file.name || ''
-                }).then(function (json) {
-                    if (json && json.status === 'success') {
-                        alert('Foto profil berhasil diupdate.');
-                        window.location.reload();
+                    if (width > height) {
+                        if (width > max_size) {
+                            height = Math.round((height * max_size) / width);
+                            width = max_size;
+                        }
                     } else {
-                        alert(json.message || 'Gagal update foto profil.');
+                        if (height > max_size) {
+                            width = Math.round((width * max_size) / height);
+                            height = max_size;
+                        }
                     }
-                }).catch(function (err) {
-                    console.error(err);
-                    alert('Error: ' + err.message);
-                });
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    var ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    var base64 = dataUrl.split(',')[1] || '';
+
+                    postJSON('/api/dosen/settings/upload-foto', {
+                        foto_base64: base64,
+                        filename: file.name || ''
+                    }).then(function (json) {
+                        if (json && json.status === 'success') {
+                            alert('Foto profil berhasil diupdate.');
+                            window.location.reload();
+                        } else {
+                            alert(json.message || 'Gagal update foto profil.');
+                        }
+                    }).catch(function (err) {
+                        console.error(err);
+                        alert('Error: ' + err.message);
+                    });
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
