@@ -41,6 +41,14 @@
     font-weight: 800;
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
     border: 2px solid #ffffff;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.dosen-avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .dosen-meta .dosen-name {
