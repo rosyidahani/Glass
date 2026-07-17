@@ -2,9 +2,6 @@
 <odoo>
     <template id="leaderboard_dosen" name="Leaderboard Dosen">
         <t t-call="custom_web.layout">
-            <link rel="stylesheet" href="/custom_web/static/src/css/leaderboard.css"/>
-            <link rel="stylesheet" href="/custom_web/static/src/css/dosen_presensi.css"/>
-
             <div class="leaderboard-container">
                  <!-- Profiles HUD Header -->
                 <div class="dosen-header-hud">
