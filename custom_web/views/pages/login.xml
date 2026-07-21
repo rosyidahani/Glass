@@ -42,7 +42,7 @@
                     <!-- SECTION 2: LOGIN CARD -->
                     <div class="scroll-section login-section" id="loginSection">
                         <div class="login-card">
-                            <h2>Selamat Datang</h2>
+                            <h2>Selamat Jalan</h2>
                             <p class="subtitle">Masuk untuk mengelola kehadiran Anda</p>
 
                             <t t-if="error">

@@ -36,6 +36,12 @@ class MataKuliahController(http.Controller):
         token = auth_header.split(' ')[1]
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            # Ambil secret dari Odoo System Parameters untuk keamanan
+            jwt_secret = request.env['ir.config_parameter'].sudo().get_param('glass.jwt.secret')
+            if not jwt_secret:
+                # Log error atau kembalikan None jika secret tidak diset di backend
+                return None
+            payload = jwt.decode(token, jwt_secret, algorithms=['HS256'])
             return request.env['mahasiswa.mahasiswa'].sudo().search(
                 [('nim', '=', payload.get('nim')), ('active', '=', True)], limit=1
             )
